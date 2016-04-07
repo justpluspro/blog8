@@ -1,2 +1,2 @@
-# SelfAss.github.io
-某学弟的博客专栏，记录成长之路
+# moutongxue.github.io
+技术宅男的博客专栏，记录成长之路。
