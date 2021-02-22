@@ -1,0 +1,18 @@
+package com.qwli7.blog.mapper;
+
+import com.qwli7.blog.entity.Article;
+import com.qwli7.blog.entity.ArticleTag;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * @author qwli7
+ * @date 2021/2/22 13:49
+ * 功能：blog8
+ **/
+@Mapper
+public interface ArticleTagMapper {
+
+    int insert(ArticleTag articleTag);
+
+
+}

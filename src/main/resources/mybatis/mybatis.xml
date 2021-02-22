@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias
+                type="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                alias="EnumOrdinalTypeHandler" />
+        <package name="com.qwli7.blog.entity" />
+    </typeAliases>
+
+    <mappers>
+        <mapper resource="mybatis/mapper/ArticleMapper.xml" />
+        <mapper resource="mybatis/mapper/ArticleTagMapper.xml" />
+        <mapper resource="mybatis/mapper/MomentMapper.xml" />
+        <mapper resource="mybatis/mapper/CommentMapper.xml" />
+        <mapper resource="mybatis/mapper/CategoryMapper.xml" />
+        <mapper resource="mybatis/mapper/TagMapper.xml" />
+        <mapper resource="mybatis/mapper/BlackIpMapper.xml" />
+    </mappers>
+</configuration>

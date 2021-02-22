@@ -1,0 +1,41 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qwli7.blog.mapper.CategoryMapper">
+
+    <select id="findByName" parameterType="string" resultType="Category">
+        select * from blog_category where name = #{name,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        <selectKey keyColumn="id" keyProperty="id" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into blog_category(name, create_at, modify_at) values (#{name,jdbcType=VARCHAR}, now(), now())
+    </insert>
+
+    <select id="findAll" resultType="Category">
+        select id, name, create_at, modify_at from blog_category
+    </select>
+
+    <select id="findById" resultType="Category">
+        select * from blog_category where id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from blog_category where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="Category">
+        update blog_category
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyAt != null">
+                modify_at = {modifyAt},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

@@ -1,12 +1,12 @@
-package com.qwli7.blog8;
+package com.qwli7.blog;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Blog8 {
+public class Blog {
 
     public static void main(String[] args){
-        SpringApplication.run(Blog8.class, args);
+        SpringApplication.run(Blog.class, args);
     }
 }
