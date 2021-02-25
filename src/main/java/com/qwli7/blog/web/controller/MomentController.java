@@ -1,7 +1,12 @@
 package com.qwli7.blog.web.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.service.MomentService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.xml.ws.Response;
 
 /**
  * @author qwli7
@@ -11,4 +16,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api")
 public class MomentController {
+
+    private final MomentService momentService;
+
+    public MomentController(MomentService momentService) {
+        this.momentService = momentService;
+    }
+
+
+    @PostMapping("moment")
+    public ResponseEntity<?> create(@RequestBody @Valid Moment moment) {
+        return ResponseEntity.ok(momentService.saveMoment(moment));
+    }
+
+    @PutMapping("moment/{id}")
+    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody @Valid Moment moment) {
+        moment.setId(id);
+        momentService.update(moment);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("moment/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") int id) {
+        momentService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("moment/{id}")
+    public Moment getMomentForEdit(@PathVariable("id") int id) {
+        return momentService.getMomentForEdit(id);
+    }
+
+
 }

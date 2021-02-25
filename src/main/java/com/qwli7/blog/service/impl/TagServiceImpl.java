@@ -2,6 +2,7 @@ package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.entity.Tag;
 import com.qwli7.blog.event.TagDeleteEvent;
+import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.TagMapper;
 import com.qwli7.blog.service.TagService;
@@ -29,6 +30,17 @@ public class TagServiceImpl implements TagService {
     public TagServiceImpl(TagMapper tagMapper, ApplicationEventPublisher publisher) {
         this.tagMapper = tagMapper;
         this.publisher = publisher;
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = LogicException.class)
+    @Override
+    public void save(Tag tag) {
+        final Optional<Tag> tagOp = tagMapper.findByName(tag.getName());
+        if(tagOp.isPresent()) {
+            throw new LogicException("tag.exists", "标签存在");
+        }
+        tagMapper.insert(tag);
     }
 
     @Transactional(readOnly = true)

@@ -15,7 +15,7 @@ public interface CategoryService {
     int saveCategory(Category category);
 
 
-    List<Category> getAllCategories();
+    List<Category> findAllCategories();
 
     Optional<Category> getCategory(String name);
 
