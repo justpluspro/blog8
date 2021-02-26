@@ -7,11 +7,13 @@ import java.io.Serializable;
  * @date 2021/2/22 13:05
  * 功能：blog8
  **/
-public class User extends BaseEntity implements Serializable {
+public class User implements Serializable {
 
     private String username;
 
     private String password;
+
+    private String email;
 
     public String getUsername() {
         return username;
@@ -27,5 +29,13 @@ public class User extends BaseEntity implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }
