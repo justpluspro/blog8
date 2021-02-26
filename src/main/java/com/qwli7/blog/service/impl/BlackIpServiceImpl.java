@@ -1,5 +1,6 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.mapper.BlackIpMapper;
 import com.qwli7.blog.service.BlackIpService;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public class BlackIpServiceImpl implements BlackIpService {
-   private final BlackIpMapper blackIpMapper;
+
+    private final BlackIpMapper blackIpMapper;
 
     public BlackIpServiceImpl(BlackIpMapper blackIpMapper) {
         this.blackIpMapper = blackIpMapper;
