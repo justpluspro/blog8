@@ -10,4 +10,9 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public class BlackIpServiceImpl implements BlackIpService {
+   private final BlackIpMapper blackIpMapper;
+
+    public BlackIpServiceImpl(BlackIpMapper blackIpMapper) {
+        this.blackIpMapper = blackIpMapper;
+    }
 }
