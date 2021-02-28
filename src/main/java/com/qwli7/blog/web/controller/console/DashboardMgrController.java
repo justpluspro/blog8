@@ -1,18 +1,16 @@
 package com.qwli7.blog.web.controller.console;
 
-import com.qwli7.blog.security.Authenticated;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-//@Authenticated
 @RequestMapping("console")
 @Controller
-public class CategoryMgrController {
+public class DashboardMgrController {
 
-    @GetMapping("categories")
+
+    @GetMapping("dashboard")
     public String index() {
-        return "console/category/index";
+        return "console/dashboard/index";
     }
-
 }

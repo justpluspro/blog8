@@ -4,11 +4,11 @@
 <mapper namespace="com.qwli7.blog.mapper.CategoryMapper">
 
     <select id="findByName" parameterType="string" resultType="Category">
-        select * from blog_category where name = #{name,jdbcType=VARCHAR}
+        select id, name, create_at from blog_category where name = #{name,jdbcType=VARCHAR}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        <selectKey keyColumn="id" keyProperty="id" order="AFTER">
+        <selectKey keyColumn="id" keyProperty="id" order="AFTER" resultType="int">
             select last_insert_id()
         </selectKey>
         insert into blog_category(name, create_at, modify_at) values (#{name,jdbcType=VARCHAR}, now(), now())
@@ -19,10 +19,10 @@
     </select>
 
     <select id="findById" resultType="Category">
-        select * from blog_category where id = #{id}
+        select id, name, create_at from blog_category where id = #{id}
     </select>
 
-    <delete id="deleteById">
+    <delete id="deleteById" parameterType="int">
         delete from blog_category where id = #{id}
     </delete>
 

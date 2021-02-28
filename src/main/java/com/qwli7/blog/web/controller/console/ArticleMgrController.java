@@ -11,7 +11,6 @@ public class ArticleMgrController {
 
     @GetMapping("articles")
     public String index() {
-
         return "console/article/index";
     }
 
