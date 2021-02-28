@@ -2,6 +2,8 @@ package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.Moment;
 
+import java.util.Optional;
+
 /**
  * @author qwli7
  * @date 2021/2/22 13:09
@@ -15,4 +17,7 @@ public interface MomentService {
     void delete(int id);
 
     Moment getMomentForEdit(int id);
+
+    Optional<Moment> getMoment(int id);
 }
+
