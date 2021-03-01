@@ -1,5 +1,6 @@
 package com.qwli7.blog.mapper;
 
+import com.qwli7.blog.entity.CommentModule;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -9,4 +10,5 @@ import org.apache.ibatis.annotations.Mapper;
  **/
 @Mapper
 public interface CommentMapper {
+    void deleteByModule(CommentModule commentModule);
 }
