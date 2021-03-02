@@ -1,6 +1,8 @@
 package com.qwli7.blog.file;
 
-public class VideoInfo {
+import java.io.Serializable;
+
+public class VideoInfo implements Serializable {
   private final int width;
   
   private final int height;
@@ -11,7 +13,7 @@ public class VideoInfo {
     super();
     this.width = width;
     this.height = height;
-    this.duration = duration
+    this.duration = duration;
   }
   
   public int getWidth() {
@@ -24,6 +26,5 @@ public class VideoInfo {
   
   public int getDuration() {
     return duration;
-  }
-  
+  } 
 }
