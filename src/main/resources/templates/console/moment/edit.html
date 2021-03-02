@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="/console/common/head::head('动态管理')"></div>
+<body class="antialiased">
+<div class="page">
+    <div th:replace="/console/common/aside::aside('moment')"></div>
+    <div th:replace="/console/common/header::header(null)"></div>
+    <div class="content">
+        <div class="container-xl">
+            <!-- Page title -->
+            <textarea id="content" class="form-control" th:text="${moment.content}"></textarea>
+            <button type="button" class="btn btn-success" id="updateMoment">保存</button>
+        </div>
+        <div th:replace="/console/common/footer"></div>
+    </div>
+</div>
+<script src="/static/tabler/js/tabler.min.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/sweetalert2.min.js"></script>
+<script src="/static/js/moment.min.js"></script>
+<script>
+    let id = '[[${moment.id}]]';
+    $(document).ready(function() {
+        $('#updateMoment').bind('click', function() {
+            let Moment = {
+                "content": document.getElementById('content').value
+            };
+            $.ajax({
+                url: '/api/moment/' + id,
+                method: 'PUT',
+                dataType: 'json',
+                contentType:'application/json;charset=utf8',
+                data: JSON.stringify(Moment),
+                success: function(res) {
+                    window.location.href = '/console/moments'
+                }
+            })
+        })
+    })
+</script>
+</body>
+</html>
