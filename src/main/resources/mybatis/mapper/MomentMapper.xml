@@ -44,4 +44,23 @@
     <delete id="deleteById" parameterType="int">
         delete from blog_moment where id = #{id}
     </delete>
+
+    <select id="count" parameterType="MomentQueryParam" resultType="int">
+        select count(id) from blog_moment
+        <where>
+            <if test="query != null and query != ''">
+                content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPage" parameterType="MomentQueryParam" resultType="Moment">
+        select * from blog_moment
+        <where>
+            <if test="query != null and query != ''">
+                content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        limit #{start}, #{offset}
+    </select>
 </mapper>
