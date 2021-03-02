@@ -1,6 +1,7 @@
 package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.service.MomentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,20 @@ public class MomentController {
 
     public MomentController(MomentService momentService) {
         this.momentService = momentService;
+    }
+
+
+    @GetMapping("moments")
+    public ResponseEntity<?> query(MomentQueryParam queryParam) {
+        int page = queryParam.getPage();
+        if(page < 1) {
+            queryParam.setPage(1);
+        }
+        int size = queryParam.getSize();
+        if(size < 10) {
+            queryParam.setSize(10);
+        }
+        return ResponseEntity.ok(momentService.selectPage(queryParam));
     }
 
 
