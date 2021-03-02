@@ -1,8 +1,10 @@
 package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.vo.MomentQueryParam;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,4 +22,8 @@ public interface MomentMapper {
     Optional<Moment> selectById(int id);
 
     void deleteById(int id);
+
+    List<Moment> selectPage(MomentQueryParam queryParam);
+
+    int count(MomentQueryParam queryParam);
 }
