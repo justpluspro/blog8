@@ -1,6 +1,8 @@
 package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.MomentQueryParam;
 
 import java.util.Optional;
 
@@ -19,5 +21,7 @@ public interface MomentService {
     Moment getMomentForEdit(int id);
 
     Optional<Moment> getMoment(int id);
+
+    PageDto selectPage(MomentQueryParam queryParam);
 }
 
