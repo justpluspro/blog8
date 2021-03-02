@@ -3,6 +3,8 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.event.MomentDeleteEvent;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.CommentMapper;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -72,7 +75,8 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
 
     @Override
     public Moment getMomentForEdit(int id) {
-        return null;
+        return momentMapper.selectById(id).orElseThrow(()
+                -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
     }
 
     @Transactional(readOnly = true)
@@ -83,6 +87,18 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
 //           markdown2Html.
         }
         return Optional.empty();
+    }
+
+    @Override
+    public PageDto selectPage(MomentQueryParam queryParam) {
+        int count = momentMapper.count(queryParam);
+        if(count == 0) {
+            return new PageDto();
+        }
+        List<Moment> moments = momentMapper.selectPage(queryParam);
+        PageDto pageDto = new PageDto();
+        pageDto.setData(moments);
+        return pageDto;
     }
 
     @Override
