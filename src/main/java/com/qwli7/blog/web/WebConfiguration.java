@@ -1,6 +1,7 @@
 package com.qwli7.blog.web;
 
 import com.qwli7.blog.template.MyAutoDialect;
+import com.qwli7.blog.template.PageHelperDialect;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,12 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
 
+    @Bean
+    public PageHelperDialect pageHelperDialect() {
+        return new PageHelperDialect();
+    }
+
+
     /* **************************************************************** */
     /*  THYMELEAF-SPECIFIC ARTIFACTS                                    */
     /*  TemplateResolver <- TemplateEngine <- ViewResolver              */
@@ -37,7 +44,6 @@ public class WebConfiguration implements WebMvcConfigurer {
         templateResolver.setTemplateMode(TemplateMode.HTML);
         templateResolver.setPrefix("classpath:/templates/");
         templateResolver.setSuffix(".html");
-
         //Template cache is true by default. Set to false if you want
         //templates to be automatically updated when modified
         templateResolver.setCacheable(true);
@@ -52,6 +58,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         templateEngine.setEnableSpringELCompiler(true); //是否启用 SpringEL 表达式编译
         templateEngine.setTemplateResolver(templateResolver(applicationContext));
         templateEngine.addDialect(myAutoDialect());
+        templateEngine.addDialect(pageHelperDialect());
 //        templateEngine.setDialect();// 该方法将会导致默认的方言不可用 StandardDialect, 也就是 th:*
 
         return templateEngine;
