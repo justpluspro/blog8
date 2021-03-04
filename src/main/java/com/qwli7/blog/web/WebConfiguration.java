@@ -1,19 +1,28 @@
 package com.qwli7.blog.web;
 
+import com.qwli7.blog.service.MomentService;
+import com.qwli7.blog.template.DataElementTagProcessor;
 import com.qwli7.blog.template.MyAutoDialect;
-import com.qwli7.blog.template.PageHelperDialect;
+//import com.qwli7.blog.template.PageHelperDialect;
+import com.qwli7.blog.template.SayToAttributeTagProcessor;
+import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.thymeleaf.dialect.AbstractProcessorDialect;
+import org.thymeleaf.dialect.IProcessorDialect;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Configuration
@@ -27,10 +36,10 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
 
-    @Bean
-    public PageHelperDialect pageHelperDialect() {
-        return new PageHelperDialect();
-    }
+//    @Bean
+//    public PageHelperDialect pageHelperDialect() {
+//        return new PageHelperDialect();
+//    }
 
 
     /* **************************************************************** */
@@ -58,10 +67,42 @@ public class WebConfiguration implements WebMvcConfigurer {
         templateEngine.setEnableSpringELCompiler(true); //是否启用 SpringEL 表达式编译
         templateEngine.setTemplateResolver(templateResolver(applicationContext));
         templateEngine.addDialect(myAutoDialect());
-        templateEngine.addDialect(pageHelperDialect());
+//        templateEngine.addDialect(pageHelperDialect());
+//        templateEngine.add
 //        templateEngine.setDialect();// 该方法将会导致默认的方言不可用 StandardDialect, 也就是 th:*
 
+        templateEngine.setAdditionalDialects(new HashSet<>(Arrays.asList(new IProcessorDialect() {
+            @Override
+            public String getPrefix() {
+                return "data";
+            }
+
+            @Override
+            public int getDialectProcessorPrecedence() {
+                return 1000;
+            }
+
+            @Override
+            public Set<IProcessor> getProcessors(String prefix) {
+                return createProcessor(prefix, applicationContext);
+            }
+
+            @Override
+            public String getName() {
+                return "template dialect";
+            }
+        }, new ExtStandardExpressionDialect())));
         return templateEngine;
+    }
+
+
+    private Set<IProcessor> createProcessor(String prefix, ApplicationContext applicationContext) {
+        Set<IProcessor> processors = new HashSet<>();
+        processors.add(new SayToAttributeTagProcessor(prefix));
+        DataElementTagProcessor dataElementTagProcessor = new DataElementTagProcessor(prefix);
+        dataElementTagProcessor.registerAllProcessors(applicationContext);
+        processors.add(dataElementTagProcessor);
+        return processors;
     }
 
     @Bean
