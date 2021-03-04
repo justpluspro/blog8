@@ -1,14 +1,16 @@
 package com.qwli7.blog.web;
 
-import com.qwli7.blog.service.MomentService;
-import com.qwli7.blog.template.DataElementTagProcessor;
+import com.qwli7.blog.BlogProperties;
+import com.qwli7.blog.service.Markdown2Html;
+import com.qwli7.blog.service.impl.DefaultMarkdown2Html;
 import com.qwli7.blog.template.MyAutoDialect;
-//import com.qwli7.blog.template.PageHelperDialect;
 import com.qwli7.blog.template.SayToAttributeTagProcessor;
+import com.qwli7.blog.template.data.DataElementTagProcessor;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.dialect.IProcessorDialect;
@@ -27,6 +29,8 @@ import java.util.Set;
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
+    private Markdown2Html markdown2Html;
 
 
     @Override
@@ -61,7 +65,14 @@ public class WebConfiguration implements WebMvcConfigurer {
 
 
     @Bean
-    public SpringTemplateEngine templateEngine(ApplicationContext applicationContext) {
+    public SpringTemplateEngine templateEngine(ApplicationContext applicationContext, BlogProperties blogProperties) {
+
+        final String markdownServerUrl = blogProperties.getMarkdownServerUrl();
+        if(StringUtils.isEmpty(markdownServerUrl)) {
+            markdown2Html = new DefaultMarkdown2Html.CommonMarkdown2Html();
+        } else {
+            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl);
+        }
 
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setEnableSpringELCompiler(true); //是否启用 SpringEL 表达式编译
@@ -91,7 +102,7 @@ public class WebConfiguration implements WebMvcConfigurer {
             public String getName() {
                 return "template dialect";
             }
-        }, new ExtStandardExpressionDialect())));
+        }, new ExtStandardExpressionDialect(markdown2Html))));
         return templateEngine;
     }
 
@@ -106,9 +117,9 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public ThymeleafViewResolver viewResolver(ApplicationContext applicationContext) {
+    public ThymeleafViewResolver viewResolver(ApplicationContext applicationContext, BlogProperties blogProperties) {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-        viewResolver.setTemplateEngine(templateEngine(applicationContext));
+        viewResolver.setTemplateEngine(templateEngine(applicationContext, blogProperties));
         return viewResolver;
     }
 

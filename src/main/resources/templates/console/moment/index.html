@@ -7,21 +7,30 @@
     <div th:replace="/console/common/header::header(null)"></div>
     <div class="content">
         <div class="container-xl">
-            <div class="row">
-
+            <div class="row mb-3">
+                <div class="col-xl-4">
+                    <input type="text" id="query" class="form-control" placeholder="Search for…">
+                </div>
+                <div class="col-auto">
+                    <a href="#" class="btn btn-white btn-icon" aria-label="Button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
+                    </a>
+                </div>
+                <div class="col-xl-4">
+                    <a th:href="@{/console/moment/create}" class="btn btn-primary">新动态</a>
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-vcenter">
                         <thead>
                             <tr>
-                                <th>序号</th>
                                 <th>内容</th>
-                                <th>创建时间</th>
-                                <th>点击量</th>
-                                <th>评论量</th>
-                                <th>是否私人</th>
-                                <th>开启评论</th>
+                                <th>时间</th>
+                                <th>点击</th>
+                                <th>评论</th>
+                                <th>加密</th>
+                                <th>评论</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -59,16 +68,27 @@
                     for(let i = 0; i < moments.length; i++) {
                         let moment = moments[i];
                         html += '<tr>';
-                        html += '<td>'+moment.id+'</td>';
                         html += '<td>'+moment.content+'</td>';
-                        html += '<td>创建时间</td>';
-                        html += '<td>'+moment.hits+'</td>';
-                        html += '<td>'+moment.comments+'</td>';
-                        html += '<td>'+moment.private+'</td>';
-                        html += '<td>'+moment.allowComment+'</td>';
+                        html += '<td>'+formatter(moment.createAt)+'</td>';
+                        html += '<td><span class="badge bg-success">'+moment.hits+'</span></td>';
+                        html += '<td><span class="badge bg-success">'+moment.comments+'</span></td>';
+                        if(moment.private) {
+                            html+= '<td><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8v-2a2 2 0 0 1 2 -2h2" /><path d="M4 16v2a2 2 0 0 0 2 2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v2" /><path d="M16 20h2a2 2 0 0 0 2 -2v-2" /><rect x="8" y="11" width="8" height="5" rx="1" /><path d="M10 11v-2a2 2 0 1 1 4 0v2" /></svg></td>'
+                        } else {
+                            html += '<td><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="5" y="11" width="14" height="10" rx="2" /><circle cx="12" cy="16" r="1" /><path d="M8 11v-5a4 4 0 0 1 8 0" /></svg></td>';
+                        }
+                        if(moment.allowComment) {
+                            html += '<td><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" /><path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" /></svg></td>'
+                        } else {
+                            html += '<td><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="3" y1="3" x2="21" y2="21" /><path d="M11 11a1 1 0 0 1 -1 -1m0 -3.968v-2.032a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10l-3 -3h-3" /><path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" /></svg></td>'
+                        }
                         html += '<td>' +
-                            '<a href="javascript:void(0);" class="text-danger" data-trash="'+moment.id+'">删除</a>' +
-                            '<a href="javascript:void(0);" class="text-primary" data-edit="'+moment.id+'">编辑</a>' +
+                            '<a href="/console/moment/'+moment.id+'/edit" class="btn btn-primary btn-icon" aria-label="Button">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 15l8.385 -8.415a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3z" /><path d="M16 5l3 3" /><path d="M9 7.07a7.002 7.002 0 0 0 1 13.93a7.002 7.002 0 0 0 6.929 -5.999" /></svg>' +
+                            '</a>' +
+                            '<a href="javascript:void(0);" style="margin-left: 8px;" class="btn btn-danger btn-icon" data-trash="'+moment.id+'">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>' +
+                            '</a>' +
                             '</td>';
                         html += '</tr>';
                     }
@@ -110,6 +130,28 @@
                 // }
             }
         });
+    }
+
+    function formatter(value, row, index){
+        let arr = value;
+        if(arr == null || arr === ""){
+            return "-";
+        } else {
+            for(let i = 0; i < arr.length; i++){
+                if(arr[i].length === 1){
+                    arr[i] = "0" + arr[i];
+                }
+            }
+            let getFormatTime;
+            if(arr.length === 5){
+                getFormatTime = arr[0] + "-" + arr[1] + "-" + arr[2] + "\t" + arr[3] + ":" + arr[4] + ":" + "00";
+            }else{
+                getFormatTime = arr[0] + "-" + arr[1] + "-" + arr[2] + "\t" + arr[3] + ":" + arr[4] + ":" + arr[5];
+            }
+
+            return getFormatTime;
+        }
+
     }
 
 </script>

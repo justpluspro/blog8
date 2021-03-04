@@ -2,11 +2,11 @@ package com.qwli7.blog.template.data;
 
 import java.util.Map;
 
-public abstract class DataProvider<T> {
+public abstract class AbstractDataProvider<T> {
 
     protected String name;
 
-    public DataProcessor(String name) {
+    public AbstractDataProvider(String name) {
         this.name = name;
     }
 

@@ -1,15 +1,9 @@
-package com.qwli7.blog.template;
+package com.qwli7.blog.template.data;
 
-import com.qwli7.blog.entity.vo.MomentQueryParam;
-import com.qwli7.blog.template.data.DataProcessor;
-import com.qwli7.blog.template.data.MomentsDataProcessor;
-import com.qwli7.blog.template.data.TagDataProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.context.WebEngineContext;
-import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractElementTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
@@ -29,7 +23,7 @@ public class DataElementTagProcessor extends AbstractElementTagProcessor {
     private final static String TAG_NAME = "data";
 
 
-    private Map<String, DataProcessor<?>> dataProcessorMap;
+    private Map<String, AbstractDataProvider<?>> dataProviderMap;
 
     public DataElementTagProcessor(String dialectPrefix) {
         //带有 <data> 元素的模式
@@ -87,12 +81,12 @@ public class DataElementTagProcessor extends AbstractElementTagProcessor {
 //            }
 //            DataProcessor<?> dataProcessor = dataProcessorMap.get(name);
 //            Object data = dataProcessor.processData();
-            DataProcessor<?> dataProcessor = dataProcessorMap.get(name);
+            AbstractDataProvider<?> dataProvider = dataProviderMap.get(name);
 
-            Object data = dataProcessor.query(paramAttributeMap);
+            Object data = dataProvider.queryData(paramAttributeMap);
 //            Object data = dataProcessor.processData();
 
-            request.setAttribute(dataProcessor.getName(), data);
+            request.setAttribute(dataProvider.getName(), data);
 
         } finally {
             iElementTagStructureHandler.removeElement();
@@ -100,10 +94,16 @@ public class DataElementTagProcessor extends AbstractElementTagProcessor {
     }
 
     public void registerAllProcessors(ApplicationContext applicationContext) {
-        this.dataProcessorMap = new HashMap<>();
-        MomentsDataProcessor momentsDataProcessor = applicationContext.getBean(MomentsDataProcessor.class);
-        dataProcessorMap.put(momentsDataProcessor.getName(), momentsDataProcessor);
-        TagDataProcessor tagDataProcessor = applicationContext.getBean(TagDataProcessor.class);
-        dataProcessorMap.put(tagDataProcessor.getName(), tagDataProcessor);
+        this.dataProviderMap = new HashMap<>();
+        MomentsDataProvider momentsDataProcessor = applicationContext.getBean(MomentsDataProvider.class, AbstractDataProvider.class);
+        dataProviderMap.put(momentsDataProcessor.getName(), momentsDataProcessor);
+        TagsDataProvider tagsDataProvider = applicationContext.getBean(TagsDataProvider.class, AbstractDataProvider.class);
+        dataProviderMap.put(tagsDataProvider.getName(), tagsDataProvider);
+
+        final ArticlesDataProvider articlesDataProvider = applicationContext.getBean(ArticlesDataProvider.class, AbstractDataProvider.class);
+        dataProviderMap.put(articlesDataProvider.getName(), articlesDataProvider);
+
+
+
     }
 }

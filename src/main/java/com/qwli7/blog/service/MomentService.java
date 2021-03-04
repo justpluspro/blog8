@@ -22,6 +22,6 @@ public interface MomentService {
 
     Optional<Moment> getMoment(int id);
 
-    PageDto selectPage(MomentQueryParam queryParam);
+    PageDto<Moment> selectPage(MomentQueryParam queryParam);
 }
 

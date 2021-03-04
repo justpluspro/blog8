@@ -42,7 +42,7 @@ public class DefaultMarkdown2Html implements Markdown2Html {
         return delegate.toHtml(markdown);
     }
 
-    static class CommonMarkdown2Html implements Markdown2Html {
+    public static class CommonMarkdown2Html implements Markdown2Html {
 
         private final HtmlRenderer renderer;
         private final Parser parser;
@@ -72,7 +72,7 @@ public class DefaultMarkdown2Html implements Markdown2Html {
         }
     }
 
-    static class MarkdownConverter implements Markdown2Html {
+    public static class MarkdownConverter implements Markdown2Html {
 
         private String serverUrl;
 

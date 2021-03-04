@@ -1,5 +1,6 @@
 package com.qwli7.blog.template.dialect;
 
+import com.qwli7.blog.service.Markdown2Html;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionObjectDialect;
 import org.thymeleaf.expression.IExpressionObjectFactory;
@@ -11,12 +12,15 @@ import org.thymeleaf.expression.IExpressionObjectFactory;
  **/
 public class ExtStandardExpressionDialect extends AbstractDialect implements IExpressionObjectDialect {
 
-    public ExtStandardExpressionDialect() {
+    private final Markdown2Html markdown2Html;
+
+    public ExtStandardExpressionDialect(Markdown2Html markdown2Html) {
         super("ext-standard-expression");
+        this.markdown2Html = markdown2Html;
     }
 
     @Override
     public IExpressionObjectFactory getExpressionObjectFactory() {
-        return new ExtStandardExpressionFactory();
+        return new ExtStandardExpressionFactory(markdown2Html);
     }
 }

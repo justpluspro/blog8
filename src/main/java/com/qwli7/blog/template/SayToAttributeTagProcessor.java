@@ -22,7 +22,7 @@ public class SayToAttributeTagProcessor extends AbstractAttributeTagProcessor {
     private final static String ATTR_NAME = "sayto";
     private final static int PRECEDENCE = 1000;
 
-    protected SayToAttributeTagProcessor(String dialectPrefix) {
+    public SayToAttributeTagProcessor(String dialectPrefix) {
         super(TemplateMode.HTML,  // This processor will apply only to HTML mode
                 dialectPrefix, // prefix to be applied to name for matching
                  null, //no tag name: match any tag name

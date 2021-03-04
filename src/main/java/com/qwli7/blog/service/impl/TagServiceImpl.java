@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,8 @@ public class TagServiceImpl implements TagService {
         if(tagOp.isPresent()) {
             throw new LogicException("tag.exists", "标签存在");
         }
+        tag.setModifyAt(LocalDateTime.now());
+        tag.setCreateAt(LocalDateTime.now());
         tagMapper.insert(tag);
     }
 

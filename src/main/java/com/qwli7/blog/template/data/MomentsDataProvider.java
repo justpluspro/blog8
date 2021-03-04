@@ -2,13 +2,10 @@ package com.qwli7.blog.template.data;
 
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.dto.PageDto;
-import com.qwli7.blog.entity.vo.AbstractQueryParam;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.service.MomentService;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,17 +14,17 @@ import java.util.Map;
  * 功能：blog
  **/
 @Component
-public class MomentsDataProvider extends DataProvider<PageDto<Moment>>{
+public class MomentsDataProvider extends AbstractDataProvider<PageDto<Moment>> {
 
     private final MomentService momentService;
 
-    public MomentsDataProcessor(MomentService momentService) {
+    public MomentsDataProvider(MomentService momentService) {
         super("moments");
         this.momentService = momentService;
     }
 
     @Override
-    public PageDto<Moment> query(Map<String, String> attributeMap) {
+    public PageDto<Moment> queryData(Map<String, String> attributeMap) {
 
         MomentQueryParam queryParam = new MomentQueryParam();
 

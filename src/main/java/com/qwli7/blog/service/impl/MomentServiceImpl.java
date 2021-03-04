@@ -16,9 +16,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +49,10 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public int saveMoment(Moment moment) {
+        moment.setHits(0);
+        moment.setComments(0);
+        moment.setCreateAt(LocalDateTime.now());
+        moment.setModifyAt(LocalDateTime.now());
         momentMapper.insert(moment);
         return moment.getId();
     }
@@ -70,7 +74,6 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.deleteById(id);
         commentMapper.deleteByModule(new CommentModule(id, getModuleName()));
         publisher.publishEvent(new MomentDeleteEvent(this, oldMoment));
-
     }
 
     @Override
@@ -90,19 +93,19 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     }
 
     @Override
-    public PageDto selectPage(MomentQueryParam queryParam) {
+    public PageDto<Moment> selectPage(MomentQueryParam queryParam) {
         int count = momentMapper.count(queryParam);
         if(count == 0) {
-            return new PageDto();
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
         List<Moment> moments = momentMapper.selectPage(queryParam);
-        PageDto pageDto = new PageDto();
+        PageDto<Moment> pageDto = new PageDto<>(queryParam, 0, new ArrayList<>());
         pageDto.setData(moments);
         return pageDto;
     }
 
     @Override
     public String getModuleName() {
-        return MODULE_NAME;
+        return Moment.class.getName();
     }
 }

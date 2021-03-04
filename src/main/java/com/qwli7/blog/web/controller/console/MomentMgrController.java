@@ -23,6 +23,11 @@ public class MomentMgrController {
         return "console/moment/index";
     }
 
+    @GetMapping("moment/create")
+    public String create() {
+        return "console/moment/create";
+    }
+
     @GetMapping("moment/{id}/edit")
     public String edit(@PathVariable("id") int id, Model model) {
         Moment moment = momentService.getMomentForEdit(id);

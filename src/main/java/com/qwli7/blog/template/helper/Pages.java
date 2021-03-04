@@ -1,4 +1,4 @@
-package com.qwli7.blog.template.expression;
+package com.qwli7.blog.template.helper;
 
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.AbstractQueryParam;

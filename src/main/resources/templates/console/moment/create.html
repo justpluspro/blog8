@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="/console/common/head::head('动态管理')"></div>
+<body class="antialiased">
+<div class="page">
+    <div th:replace="/console/common/aside::aside('moment')"></div>
+    <div th:replace="/console/common/header::header(null)"></div>
+    <div class="content">
+        <div class="container-xl">
+            <!-- Page title -->
+            <textarea id="content" class="form-control"></textarea>
+            <input type="checkbox" id="is_private">私人
+            <input type="checkbox" id="allow_comment">开启评论
+            <button type="button" class="btn btn-success" id="save_moment_btn">保存</button>
+        </div>
+        <div th:replace="/console/common/footer"></div>
+    </div>
+</div>
+<script src="/static/tabler/js/tabler.min.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/sweetalert2.min.js"></script>
+<script src="/static/js/moment.min.js"></script>
+<script>
+    let rootPath = '[[@{/}]]';
+    $(document).ready(function() {
+        document.getElementById('save_moment_btn').addEventListener('click', function() {
+            let content = document.getElementById('content').value;
+            let isPrivate = document.getElementById('is_private').checked;
+            let allowComment = document.getElementById('allow_comment').checked;
+            if(content == null || content.length === 0) {
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: '内容不能为空',
+                })
+                return;
+            }
+            $.ajax({
+                url: rootPath + 'api/moment',
+                method: 'POST',
+                dataType: 'json',
+                contentType:'application/json;charset=utf8',
+                data: JSON.stringify({"content": content, "private": isPrivate, "allowComment": allowComment}),
+                success: function(res) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
+                    Toast.fire({
+                        type: 'success',
+                        title: 'Signed in successfully'
+                    });
+                    setTimeout(function() {
+                        window.location.href = rootPath + 'console/moments'
+                    }, 800);
+                }
+            });
+        });
+    })
+</script>
+</body>
+</html>
