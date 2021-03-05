@@ -16,11 +16,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author qwli7
@@ -87,9 +87,12 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     public Optional<Moment> getMoment(int id) {
         final Optional<Moment> momentOp= momentMapper.selectById(id);
         if(momentOp.isPresent()) {
+            Moment moment = momentOp.get();
 //           markdown2Html.
+            processMoment(moment);
+            return Optional.of(moment);
         }
-        return Optional.empty();
+        return momentOp;
     }
 
     @Override
@@ -99,9 +102,28 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
         List<Moment> moments = momentMapper.selectPage(queryParam);
-        PageDto<Moment> pageDto = new PageDto<>(queryParam, 0, new ArrayList<>());
-        pageDto.setData(moments);
+        if(CollectionUtils.isEmpty(moments)) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+        PageDto<Moment> pageDto = new PageDto<>(queryParam, count, moments);
         return pageDto;
+    }
+
+    private void processMoment(Moment moment) {
+        processMoments(Collections.singletonList(moment));
+    }
+
+    private void processMoments(List<Moment> moments) {
+
+        Map<Integer, String> contentMap = moments.stream().filter(m -> m.getContent() != null)
+                .collect(Collectors.toMap(Moment::getId, Moment::getContent));
+        if(contentMap.isEmpty()) {
+            return;
+        }
+        Map<Integer, String> markdownMap = markdown2Html.toHtmls(contentMap);
+        moments.forEach(e -> {
+            e.setContent(markdownMap.get(e.getId()));
+        });
     }
 
     @Override
