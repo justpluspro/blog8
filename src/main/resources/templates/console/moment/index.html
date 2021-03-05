@@ -9,38 +9,50 @@
         <div class="container-xl">
             <div class="row mb-3">
                 <div class="col-xl-4">
-                    <input type="text" id="query" class="form-control" placeholder="Search for…">
-                </div>
-                <div class="col-auto">
-                    <a href="#" class="btn btn-white btn-icon" aria-label="Button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
-                    </a>
+                    <div class="input-icon mb-3">
+                        <input type="text" id="query" class="form-control" placeholder="关键字">
+                        <span class="input-icon-addon" id="search-moment-btn" style="cursor: pointer;pointer-events: visible">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
+                          </span>
+                    </div>
                 </div>
                 <div class="col-xl-4">
                     <a th:href="@{/console/moment/create}" class="btn btn-primary">新动态</a>
                 </div>
             </div>
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-vcenter">
-                        <thead>
-                            <tr>
-                                <th>内容</th>
-                                <th>时间</th>
-                                <th>点击</th>
-                                <th>评论</th>
-                                <th>加密</th>
-                                <th>评论</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="momentContainer">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>内容</th>
+                                    <th>时间</th>
+                                    <th>点击</th>
+                                    <th>评论</th>
+                                    <th>加密</th>
+                                    <th>评论</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="momentContainer">
 
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+<!--                <div class="col-12">-->
+
+<!--                </div>-->
             </div>
+            <ul id="page-container" class="pagination justify-content-center mt-2">
+<!--                <li class="page-item"><a class="page-link" href="#">1</a></li>-->
+<!--                <li class="page-item active"><a class="page-link" href="#">2</a></li>-->
+<!--                <li class="page-item"><a class="page-link" href="#">3</a></li>-->
+<!--                <li class="page-item"><a class="page-link" href="#">4</a></li>-->
+<!--                <li class="page-item"><a class="page-link" href="#">5</a></li>-->
+            </ul>
         </div>
         <div th:replace="/console/common/footer"></div>
     </div>
@@ -54,14 +66,26 @@
     let rootPath = '[[@{/}]]';
 
     $(document).ready(function() {
-        initialMoments();
+        let Query = {
+
+        };
+        Query.page = 1;
+        Query.size = 10;
+        Query.query = "";
+        initialMoments(Query);
     })
 
-    function initialMoments() {
+    $('#query').bind('keypress', function(event) {
+        if(event.keyCode === 13) {
+            search();
+        }
+    });
+    function initialMoments(Query) {
         $.ajax({
-            url: rootPath + 'api/moments',
+            url: rootPath + 'api/moments?page=' + Query.page + "&size=" + Query.size + "&query=" + Query.query,
             dataType: 'json',
             success: function(res) {
+                document.getElementById('query').value = res.queryParam.query;
                 let moments = res.data;
                 let html = '';
                 if(moments.length > 0) {
@@ -69,7 +93,7 @@
                         let moment = moments[i];
                         html += '<tr>';
                         html += '<td>'+moment.content+'</td>';
-                        html += '<td>'+formatter(moment.createAt)+'</td>';
+                        html += '<td>'+moment.createAt+'</td>';
                         html += '<td><span class="badge bg-success">'+moment.hits+'</span></td>';
                         html += '<td><span class="badge bg-success">'+moment.comments+'</span></td>';
                         if(moment.private) {
@@ -96,6 +120,9 @@
                     html += '<tr><td>无数据</td></tr>';
                 }
                 document.getElementById('momentContainer').innerHTML = html;
+                loadPagination(res);
+
+
                 // for(const ele of document.querySelectorAll('[data-trash]')) {
                 //     ele.addEventListener('click', function() {
                 //         Swal.fire({
@@ -131,6 +158,77 @@
             }
         });
     }
+
+
+    function loadPagination(pageDto) {
+        let pagination = "";
+        let start;
+        let end;
+
+        //总页码超过8页
+        if (pageDto.totalPage < 8) {
+            start = 1;
+            end = pageDto.totalPage;
+        }else{
+            //总页码超过8页
+            start = pageDto.page - 4;
+            end = pageDto.page + 3;
+
+            //如果前面不够4个
+            if (start < 1) {
+                start  = 1;
+                end = start + 7;
+            }
+
+            //如果后面不足3个，前面补齐8个
+            if (end > pageDto.totalPage ) {
+                end = pageDto.totalPage;
+                start = end - 7;
+            }
+        }
+        for (let i = start; i <= end; i++) {
+            if (pageDto.page === i){
+                pagination += '<li class="page-item active"><a class="page-link" href="javascript:toPage('+i+')">'+ i + '</a></li>';
+            } else {
+                pagination += '<li class="page-item"><a class="page-link" href="javascript:toPage('+i+')">' + i + '</a></li>';
+            }
+        }
+        document.getElementById('page-container').innerHTML = pagination;
+    }
+
+    function toPage(page) {
+        let Query = {
+            "page": page,
+            "size": 10,
+            "query": document.getElementById('query').value
+        }
+        initialMoments(Query);
+    }
+
+
+    function search() {
+        let Query = {
+
+        };
+        let value = document.getElementById('query').value;
+        Query.page = 1;
+        Query.size = 10;
+        Query.query = value;
+
+        initialMoments(Query);
+    }
+
+
+    // document.getElementById('query').addEventListener('keypress', function(event) {
+    //     if(event.keyCode === 13) {
+    //         search();
+    //     }
+    // });
+
+    document.getElementById('search-moment-btn').addEventListener('click', function(){
+        search();
+    })
+
 
     function formatter(value, row, index){
         let arr = value;
