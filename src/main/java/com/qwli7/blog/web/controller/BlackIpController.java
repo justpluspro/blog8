@@ -1,6 +1,8 @@
 package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.entity.BlackIp;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.BlackIpService;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +24,11 @@ public class BlackIpController {
 
 
     @GetMapping("blackips")
-    public List<BlackIp> getAllBlackIps() {
-        return blackIpService.selectAll();
+    public PageDto<BlackIp> getAllBlackIps(CommonQueryParam queryParam) {
+        if(queryParam.hasNoSize()) {
+            queryParam.setSize(10);
+        }
+        return blackIpService.selectPage(queryParam);
     }
 
     @PostMapping("blackip")

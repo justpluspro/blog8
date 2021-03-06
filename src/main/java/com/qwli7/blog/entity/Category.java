@@ -1,5 +1,7 @@
 package com.qwli7.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -12,8 +14,10 @@ public class Category extends BaseEntity implements Serializable {
 
     private String name;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyAt;
 
     public LocalDateTime getCreateAt() {

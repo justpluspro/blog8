@@ -1,6 +1,9 @@
 insert into blog_category(name) values ('java');
 insert into blog_category(name) values ('life');
 insert into blog_category(name) values ('web');
+insert into blog_category(name) values ('android');
+insert into blog_category(name) values ('kotlin');
+insert into blog_category(name) values ('flutter');
 
 /*init blog_tag data*/
 insert into blog_tag(name) values ('android');
@@ -61,3 +64,31 @@ insert into blog_moment(content, hits, comments, is_private, allow_comment) valu
 insert into blog_moment(content, hits, comments, is_private, allow_comment) values('测试动态118', 0, 0, false, true);
 insert into blog_moment(content, hits, comments, is_private, allow_comment) values('测试动态19', 0, 0, false, true);
 insert into blog_moment(content, hits, comments, is_private, allow_comment) values('测试动态112', 0, 0, false, true);
+
+
+insert into blog_blackip(ip) values('127.0.0.1');
+insert into blog_blackip(ip) values('128.0.0.1');
+insert into blog_blackip(ip) values('129.0.0.1');
+insert into blog_blackip(ip) values('130.0.0.1');
+insert into blog_blackip(ip) values('131.0.0.1');
+insert into blog_blackip(ip) values('132.0.0.1');
+insert into blog_blackip(ip) values('133.0.0.1');
+insert into blog_blackip(ip) values('134.0.0.1');
+insert into blog_blackip(ip) values('135.0.0.1');
+insert into blog_blackip(ip) values('136.0.0.1');
+insert into blog_blackip(ip) values('137.0.0.1');
+insert into blog_blackip(ip) values('138.0.0.1');
+insert into blog_blackip(ip) values('139.0.0.1');
+insert into blog_blackip(ip) values('140.0.0.1');
+insert into blog_blackip(ip) values('141.0.0.1');
+insert into blog_blackip(ip) values('142.0.0.1');
+insert into blog_blackip(ip) values('143.0.0.1');
+insert into blog_blackip(ip) values('144.0.0.1');
+insert into blog_blackip(ip) values('145.0.0.1');
+insert into blog_blackip(ip) values('145.0.0.1');
+insert into blog_blackip(ip) values('146.0.0.1');
+insert into blog_blackip(ip) values('147.0.0.1');
+insert into blog_blackip(ip) values('148.0.0.1');
+insert into blog_blackip(ip) values('149.0.0.1');
+insert into blog_blackip(ip) values('150.0.0.1');
+insert into blog_blackip(ip) values('151.0.0.1');

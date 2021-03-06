@@ -1,6 +1,7 @@
 package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.BlackIp;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -23,4 +24,8 @@ public interface BlackIpMapper {
     Optional<BlackIp> selectByIp(String ip);
 
     Optional<BlackIp> selectById(int id);
+
+    int count(CommonQueryParam queryParam);
+
+    List<BlackIp> selectPage(CommonQueryParam queryParam);
 }

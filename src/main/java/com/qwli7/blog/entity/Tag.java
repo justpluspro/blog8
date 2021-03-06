@@ -1,5 +1,7 @@
 package com.qwli7.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -16,8 +18,10 @@ public class Tag extends BaseEntity implements Serializable {
     @Size(message = "标签名称不能超过 20 个字符", max = 20)
     private String name;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyAt;
 
     public Tag () {

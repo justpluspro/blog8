@@ -3,5 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qwli7.blog.mapper.ArticleMapper">
 
+    <insert id="insert" parameterType="Article" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+        insert into blog_article(title, content)
+        values(#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR})
+    </insert>
 
+    <select id="findByAlias" parameterType="string" resultType="Article">
+        select id, content, title from blog_article where alias = #{alias,jdbcType=VARCHAR}
+    </select>
 </mapper>

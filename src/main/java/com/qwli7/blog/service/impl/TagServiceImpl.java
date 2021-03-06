@@ -1,6 +1,9 @@
 package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.entity.Tag;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
+import com.qwli7.blog.entity.vo.TagQueryParam;
 import com.qwli7.blog.event.TagDeleteEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
@@ -10,9 +13,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,8 +53,12 @@ public class TagServiceImpl implements TagService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Tag> findAllTags() {
-        return tagMapper.findAll();
+    public PageDto<Tag> selectPage(CommonQueryParam queryParam) {
+        int count = tagMapper.count(queryParam);
+        if(count == 0) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+        return new PageDto<>(queryParam, count, tagMapper.selectPage(queryParam));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

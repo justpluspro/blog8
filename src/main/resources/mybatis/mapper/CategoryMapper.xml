@@ -8,14 +8,11 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        <selectKey keyColumn="id" keyProperty="id" order="AFTER" resultType="int">
-            select last_insert_id()
-        </selectKey>
         insert into blog_category(name, create_at, modify_at) values (#{name,jdbcType=VARCHAR}, now(), now())
     </insert>
 
     <select id="findAll" resultType="Category">
-        select id, name, create_at, modify_at from blog_category
+        select id, name, create_at, modify_at from blog_category order by create_at desc
     </select>
 
     <select id="findById" resultType="Category">

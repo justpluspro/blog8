@@ -1,6 +1,8 @@
 package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Tag;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
+import com.qwli7.blog.entity.vo.TagQueryParam;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -26,4 +28,8 @@ public interface TagMapper {
     void insert(Tag tag);
 
     void update(Tag tag);
+
+    int count(CommonQueryParam queryParam);
+
+    List<Tag> selectPage(CommonQueryParam queryParam);
 }

@@ -106,6 +106,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
         PageDto<Moment> pageDto = new PageDto<>(queryParam, count, moments);
+        processMoments(pageDto.getData());
         return pageDto;
     }
 

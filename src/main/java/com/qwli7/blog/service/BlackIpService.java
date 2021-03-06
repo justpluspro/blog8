@@ -1,6 +1,9 @@
 package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.BlackIp;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.AbstractQueryParam;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
 
 import java.util.List;
 
@@ -10,7 +13,7 @@ import java.util.List;
  * 功能：blog8
  **/
 public interface BlackIpService {
-    List<BlackIp> selectAll();
+    PageDto<BlackIp> selectPage(CommonQueryParam queryParam);
 
 
     void save(BlackIp blackIp);

@@ -7,43 +7,26 @@
     <div th:replace="/console/common/header::header(null)"></div>
     <div class="content">
         <div class="container-xl">
-            <!-- Page title -->
-            <div class="page-header d-print-none">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <!-- Page pre-title -->
-                        <h2 class="page-title">
-                            分类列表
-                        </h2>
-                    </div>
-                    <!-- Page title actions -->
-                    <div class="col-auto ms-auto">
-                        <div class="btn-list">
-                            <a id="addCategoryBtn" href="javascript:void(0);" class="btn btn-primary d-none d-sm-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
-                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                     stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <line x1="12" y1="5" x2="12" y2="19"/>
-                                    <line x1="5" y1="12" x2="19" y2="12"/>
-                                </svg>
-                                添加分类
-                            </a>
-                        </div>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="btn-list">
+                        <a id="addCategoryBtn" href="javascript:void(0);" class="btn btn-primary d-none d-sm-inline-block">
+                            新分类
+                        </a>
                     </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
-                        <table class="table card-table table-vcenter text-nowrap datatable">
+                        <table class="table table-vcenter text-nowrap">
                             <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>名称</th>
-                                <th>创建时间</th>
-                                <th>操作</th>
-                            </tr>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>时间</th>
+                                    <th>操作</th>
+                                </tr>
                             </thead>
                             <tbody id="categoryContainer"></tbody>
                         </table>
@@ -54,127 +37,9 @@
         <div th:replace="/console/common/footer"></div>
     </div>
 </div>
-<!-- Libs JS -->
 <script src="/static/js/jquery.min.js"></script>
-<!-- Tabler Core -->
 <script src="/static/tabler/js/tabler.min.js"></script>
 <script src="/static/js/sweetalert2.min.js"></script>
-<script src="/static/js/moment.min.js"></script>
-<script>
-    let html = "";
-    let rootPath = '[[@{/}]]';
-    $(document).ready(function() {
-        loadCategories();
-    });
-
-    document.getElementById('addCategoryBtn').addEventListener('click', function(){
-        (async () => {
-            const { value: name } = await Swal.fire({
-                title: '分类名称',
-                input: 'text',
-                inputLabel: '',
-                inputPlaceholder: '分类名称',
-                confirmButtonText: '确定'
-            })
-
-            if (name) {
-                $.ajax({
-                    url: rootPath + 'api/category',
-                    method: 'post',
-                    contentType: 'application/json;charset=utf8',
-                    dataType: 'json',
-                    data: JSON.stringify({'name': name}),
-                    success: function (res) {
-                        loadCategories();
-                    }
-                });
-            }
-        })()
-    });
-
-
-    function loadCategories() {
-        $.ajax({
-            url: rootPath + 'api/categories',
-            dataType: 'json',
-            success: function(res) {
-                if(res.length > 0) {
-                    for(let i = 0; i < res.length; i++) {
-                        let category = res[i];
-                        html += '<tr>';
-                        html += '<td>'+category.id+'</td>';
-                        html += '<td>'+category.name+'</td>';
-                        html += '<td>'+ moment(category.createAt)+'</td>';
-                        html += '<td><a href="javascript:void(0);" data-edit="'+category.id+'">编辑</a><a href="javascript:void(0);" data-trash="'+category.id+'">删除</a></td>'
-                        html += '</tr>';
-                    }
-                } else {
-                    html += '<tr><td>无数据</td></tr>';
-                }
-                document.getElementById('categoryContainer').innerHTML = html;
-                bindEvent();
-            }
-        });
-    }
-
-
-    function bindEvent() {
-        for(const ele of document.querySelectorAll('[data-trash]')) {
-            ele.addEventListener('click', function() {
-                Swal.fire({
-                    title: '您确定吗?',
-                    text: '确定要移除该分类吗?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消'
-                }).then((result) => {
-                    if(result.value) {
-                        let id = this.dataset.trash;
-                        $.ajax({
-                            url: rootPath + 'api/category/' + id,
-                            method: 'DELETE',
-                            dataType: 'json',
-                            success: function() {
-                                loadCategories();
-                            }
-                        })
-                    }
-                });
-            });
-        }
-
-        for(const ele of document.querySelectorAll('[data-edit]')) {
-            ele.addEventListener('click', function(){
-                let value = this.dataset.edit;
-                (async () => {
-                    const { value: name } = await Swal.fire({
-                        title: '分类名称',
-                        input: 'text',
-                        inputLabel: '',
-                        inputValue: value,
-                        inputPlaceholder: '分类名称',
-                        confirmButtonText: '确定'
-                    })
-
-                    if (name) {
-                        $.ajax({
-                            url: rootPath + 'api/category',
-                            method: 'PATCH',
-                            contentType: 'application/json;charset=utf8',
-                            dataType: 'json',
-                            data: JSON.stringify({'name': value}),
-                            success: function (res) {
-                                loadCategories();
-                            }
-                        });
-                    }
-                })()
-            });
-        }
-    }
-</script>
+<script src="/static/console/category.js"></script>
 </body>
 </html>

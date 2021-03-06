@@ -1,6 +1,9 @@
 package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.Tag;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
+import com.qwli7.blog.entity.vo.TagQueryParam;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -14,7 +17,7 @@ public interface TagService {
 
     void save(Tag tag);
 
-    List<Tag> findAllTags();
+    PageDto<Tag> selectPage(CommonQueryParam queryParam);
 
     void deleteTag(final int id);
 

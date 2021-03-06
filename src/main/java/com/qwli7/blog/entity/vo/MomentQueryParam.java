@@ -8,11 +8,21 @@ package com.qwli7.blog.entity.vo;
 public class MomentQueryParam extends AbstractQueryParam {
     private String query;
 
+    private Boolean orderDesc;
+
     public String getQuery() {
         return query;
     }
 
     public void setQuery(String query) {
         this.query = query;
+    }
+
+    public Boolean getOrderDesc() {
+        return orderDesc;
+    }
+
+    public void setOrderDesc(Boolean orderDesc) {
+        this.orderDesc = orderDesc;
     }
 }

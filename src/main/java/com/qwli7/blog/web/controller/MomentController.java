@@ -27,6 +27,11 @@ public class MomentController {
 
     @GetMapping("moments")
     public ResponseEntity<?> query(MomentQueryParam queryParam) {
+        Boolean orderDesc = queryParam.getOrderDesc();
+        if(orderDesc == null) {
+            orderDesc = true;
+        }
+        queryParam.setOrderDesc(orderDesc);
         int page = queryParam.getPage();
         if(page < 1) {
             queryParam.setPage(1);

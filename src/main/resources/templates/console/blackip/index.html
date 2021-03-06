@@ -1,95 +1,43 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>黑名单设置</title>
-    <!-- CSS files -->
-    <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
-</head>
+<div th:replace="/console/common/head::head('分类管理')"></div>
 <body class="antialiased">
 <div class="page">
     <div th:replace="/console/common/aside::aside('blackip')"></div>
     <div th:replace="/console/common/header::header(null)"></div>
     <div class="content">
         <div class="container-xl">
-            <!-- Page title -->
-            <div class="page-header d-print-none">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <!-- Page pre-title -->
-                        <h2 class="page-title">
-                            黑名单列表
-                        </h2>
-                    </div>
-                    <!-- Page title actions -->
-                    <div class="col-auto ms-auto">
-                        <div class="btn-list">
-                            <a id="addBlackIpBtn" href="javascript:void(0);" class="btn btn-primary d-none d-sm-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
-                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                     stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <line x1="12" y1="5" x2="12" y2="19"/>
-                                    <line x1="5" y1="12" x2="19" y2="12"/>
-                                </svg>
-                                添加黑名单
-                            </a>
-                        </div>
+            <div class="row mb-3">
+                <div class="col-xl-4">
+                    <div class="input-icon mb-3">
+                        <input type="text" id="query" autocomplete="off" class="form-control" placeholder="关键字">
+                        <span class="input-icon-addon" id="search-ip-btn" style="cursor: pointer;pointer-events: visible">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
+                          </span>
                     </div>
                 </div>
+                <div class="col-xl-4">
+                    <a href="javascript:void(0);" id="addBlackIpBtn" class="btn btn-primary">新黑名单</a>
+                </div>
             </div>
-            <div class="row">
+
+            <div class="row mb-3">
                 <div class="col-12">
                     <div class="table-responsive">
-                        <table class="table card-table table-vcenter text-nowrap datatable">
+                        <table class="table table-vcenter text-nowrap">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>ip 地址</th>
-                                    <th>创建时间</th>
+                                    <th>IP</th>
+                                    <th>时间</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody id="blackIpContainer"></tbody>
                         </table>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span>
-                            entries</p>
-                        <ul class="pagination m-0 ms-auto">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
-                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <polyline points="15 6 9 12 15 18"/>
-                                    </svg>
-                                    prev
-                                </a>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">
-                                    next
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
-                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <polyline points="9 6 15 12 9 18"/>
-                                    </svg>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
+            <ul id="page-container" class="pagination justify-content-center mt-2"></ul>
         </div>
         <div th:replace="/console/common/footer"></div>
     </div>
@@ -103,7 +51,33 @@
     let html = "";
     let rootPath = '[[@{/}]]';
     $(document).ready(function() {
-        loadBlackIps();
+        let queryObject = {
+            "page": 1,
+            "size": 10,
+            "query": ""
+        };
+        searchIpPages(queryObject);
+    });
+
+
+    $("#query").bind("keypress", function(event) {
+        if(event.keyCode === 13) {
+            search();
+        }
+    })
+
+    function search() {
+        let value = document.getElementById('query').value;
+        let queryObject = {};
+        queryObject.page = 1;
+        queryObject.size = 10;
+        queryObject.query = value;
+
+        searchIpPages(queryObject);
+    }
+
+    document.getElementById('search-ip-btn').addEventListener('click', function(){
+        search();
     });
 
     document.getElementById('addBlackIpBtn').addEventListener('click', function(){
@@ -124,7 +98,12 @@
                     dataType: 'json',
                     data: JSON.stringify({'ip': blackIp}),
                     success: function (res) {
-                        loadBlackIps();
+                        let queryObject = {
+                                "page": 1,
+                                "size": 10,
+                                "query": ""
+                            };
+                        searchIpPages(queryObject)
                     }
                 });
             }
@@ -132,54 +111,129 @@
     });
 
 
-    function loadBlackIps() {
+    function searchIpPages(queryObject) {
         $.ajax({
-            url: rootPath + 'api/blackips',
+            url: rootPath + 'api/blackips?page=' + queryObject.page + "&query=" + queryObject.query,
             dataType: 'json',
             success: function(res) {
-                if(res.length > 0) {
-                    for(let i = 0; i < res.length; i++) {
-                        let blackIp = res[i];
+                document.getElementById('query').value = res.queryParam.query;
+                let ips = res.data;
+                let html = '';
+                if(ips.length > 0) {
+                    for(let i = 0; i < ips.length; i++) {
+                        let blackIp = ips[i];
                         html += '<tr>';
-                        html += '<td>'+blackIp.id+'</td>';
                         html += '<td>'+blackIp.ip+'</td>';
-                        html += '<td>创建时间</td>';
-                        html += '<td><a href="javascript:void(0);" data-trash="'+blackIp.id+'">删除</a></td>'
+                        html += '<td>'+blackIp.createAt+'</td>';
+                        html += '<td><a class="text-danger" href="javascript:deleteBlackIp(\''+ blackIp.id +'\')">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>' +
+                            '</a></td>'
                         html += '</tr>';
                     }
                 } else {
-                    html += '<tr><td>无数据</td></tr>';
+                    html += '<tr><td colspan="3" style="text-align: center;">无数据</td></tr>';
                 }
                 document.getElementById('blackIpContainer').innerHTML = html;
-                for(const ele of document.querySelectorAll('[data-trash]')) {
-                    ele.addEventListener('click', function() {
-                        Swal.fire({
-                            title: '您确定吗?',
-                            text: '确定要移除该黑名单吗?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消'
-                        }).then((result) => {
-                            if(result.value) {
-                                let id = this.dataset.trash;
-                                $.ajax({
-                                    url: rootPath + 'api/blackip/' + id,
-                                    method: 'DELETE',
-                                    dataType: 'json',
-                                    success: function() {
-                                        loadBlackIps();
-                                    }
-                                })
-                            }
-                        });
-                    });
-                }
+                loadPagination(res);
+                // for(const ele of document.querySelectorAll('[data-trash]')) {
+                //     ele.addEventListener('click', function() {
+                //         Swal.fire({
+                //             title: '您确定吗?',
+                //             text: '确定要移除该黑名单吗?',
+                //             icon: 'warning',
+                //             showCancelButton: true,
+                //             confirmButtonColor: '#3085d6',
+                //             cancelButtonColor: '#d33',
+                //             confirmButtonText: '确定',
+                //             cancelButtonText: '取消'
+                //         }).then((result) => {
+                //             if(result.value) {
+                //                 let id = this.dataset.trash;
+                //                 $.ajax({
+                //                     url: rootPath + 'api/blackip/' + id,
+                //                     method: 'DELETE',
+                //                     dataType: 'json',
+                //                     success: function() {
+                //                         loadBlackIps();
+                //                     }
+                //                 })
+                //             }
+                //         });
+                //     });
+                // }
             }
         });
     }
+
+    function loadPagination(pageDto) {
+        let pagination = "";
+        let start;
+        let end;
+
+        //总页码超过8页
+        if (pageDto.totalPage < 8) {
+            start = 1;
+            end = pageDto.totalPage;
+        }else{
+            //总页码超过8页
+            start = pageDto.page - 4;
+            end = pageDto.page + 3;
+
+            //如果前面不够4个
+            if (start < 1) {
+                start  = 1;
+                end = start + 7;
+            }
+
+            //如果后面不足3个，前面补齐8个
+            if (end > pageDto.totalPage ) {
+                end = pageDto.totalPage;
+                start = end - 7;
+            }
+        }
+        for (let i = start; i <= end; i++) {
+            if (pageDto.page === i){
+                pagination += '<li class="page-item active"><a class="page-link" href="javascript:toPage('+i+')">'+ i + '</a></li>';
+            } else {
+                pagination += '<li class="page-item"><a class="page-link" href="javascript:toPage('+i+')">' + i + '</a></li>';
+            }
+        }
+        document.getElementById('page-container').innerHTML = pagination;
+    }
+
+    function toPage(page) {
+        let Query = {
+            "page": page,
+            "size": 10,
+            "query": document.getElementById('query').value
+        }
+        searchIpPages(Query);
+    }
+
+    function deleteBlackIp(id) {
+
+        Swal.fire({
+            title: '您确定吗?',
+            text: '确定要移除该黑名单吗?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if(result.value) {
+                $.ajax({
+                    url: rootPath + 'api/blackip/' + id,
+                    method: 'DELETE',
+                    dataType: 'json',
+                    success: function(res) {
+                        search();
+                    }
+                });
+            }
+        });
+    }
+
 
 </script>
 </body>

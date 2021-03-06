@@ -4,11 +4,8 @@
 <mapper namespace="com.qwli7.blog.mapper.BlackIpMapper">
 
     <insert id="insert" parameterType="BlackIp" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
-        <selectKey keyColumn="id" keyProperty="id" resultType="int" order="AFTER">
-            select last_insert_id()
-        </selectKey>
-        insert into blog_blackip (ip)
-            values (#{ip,jdbcType=VARCHAR})
+        insert into blog_blackip (ip, create_at)
+            values (#{ip,jdbcType=VARCHAR}, now())
     </insert>
 
 
@@ -25,5 +22,24 @@
 
     <select id="selectAll" resultType="BlackIp">
         select id, ip from blog_blackip
+    </select>
+
+    <select id="count" resultType="int" parameterType="CommonQueryParam">
+        select count(1) from blog_blackip
+        <where>
+            <if test="query != null and query != ''">
+                ip like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPage" resultType="BlackIp" parameterType="CommonQueryParam">
+        select id, ip, create_at from blog_blackip
+        <where>
+            <if test="query != null and query != ''">
+                ip like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        order by create_at desc limit #{start}, #{offset}
     </select>
 </mapper>

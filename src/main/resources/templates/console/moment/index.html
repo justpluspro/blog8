@@ -10,7 +10,7 @@
             <div class="row mb-3">
                 <div class="col-xl-4">
                     <div class="input-icon mb-3">
-                        <input type="text" id="query" class="form-control" placeholder="关键字">
+                        <input type="text" id="query" autocomplete="off" class="form-control" placeholder="关键字">
                         <span class="input-icon-addon" id="search-moment-btn" style="cursor: pointer;pointer-events: visible">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
                           </span>
@@ -35,24 +35,12 @@
                                     <th>操作</th>
                                 </tr>
                             </thead>
-                            <tbody id="momentContainer">
-
-
-                            </tbody>
+                            <tbody id="momentContainer"></tbody>
                         </table>
                     </div>
                 </div>
-<!--                <div class="col-12">-->
-
-<!--                </div>-->
             </div>
-            <ul id="page-container" class="pagination justify-content-center mt-2">
-<!--                <li class="page-item"><a class="page-link" href="#">1</a></li>-->
-<!--                <li class="page-item active"><a class="page-link" href="#">2</a></li>-->
-<!--                <li class="page-item"><a class="page-link" href="#">3</a></li>-->
-<!--                <li class="page-item"><a class="page-link" href="#">4</a></li>-->
-<!--                <li class="page-item"><a class="page-link" href="#">5</a></li>-->
-            </ul>
+            <ul id="page-container" class="pagination justify-content-center mt-2"></ul>
         </div>
         <div th:replace="/console/common/footer"></div>
     </div>
@@ -107,17 +95,17 @@
                             html += '<td><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="3" y1="3" x2="21" y2="21" /><path d="M11 11a1 1 0 0 1 -1 -1m0 -3.968v-2.032a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10l-3 -3h-3" /><path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" /></svg></td>'
                         }
                         html += '<td>' +
-                            '<a href="/console/moment/'+moment.id+'/edit" class="btn btn-primary btn-icon" aria-label="Button">' +
-                            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 15l8.385 -8.415a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3z" /><path d="M16 5l3 3" /><path d="M9 7.07a7.002 7.002 0 0 0 1 13.93a7.002 7.002 0 0 0 6.929 -5.999" /></svg>' +
+                            '<a href="/console/moment/'+moment.id+'/edit" class="text-success" aria-label="Button">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"> <path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3"/> <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3"/> <line x1="16" y1="5" x2="19" y2="8"/> </svg>'+
                             '</a>' +
-                            '<a href="javascript:void(0);" style="margin-left: 8px;" class="btn btn-danger btn-icon" data-trash="'+moment.id+'">' +
+                            '<a href="javascript:void(0);" style="margin-left: 8px;" class="text-danger" data-trash="'+moment.id+'">' +
                             '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>' +
                             '</a>' +
                             '</td>';
                         html += '</tr>';
                     }
                 } else {
-                    html += '<tr><td>无数据</td></tr>';
+                    html += '<tr><td style="text-align: center;" colspan="7">没有新动态哟，快去创建一个吧</td></tr>';
                 }
                 document.getElementById('momentContainer').innerHTML = html;
                 loadPagination(res);
@@ -218,39 +206,9 @@
         initialMoments(Query);
     }
 
-
-    // document.getElementById('query').addEventListener('keypress', function(event) {
-    //     if(event.keyCode === 13) {
-    //         search();
-    //     }
-    // });
-
     document.getElementById('search-moment-btn').addEventListener('click', function(){
         search();
-    })
-
-
-    function formatter(value, row, index){
-        let arr = value;
-        if(arr == null || arr === ""){
-            return "-";
-        } else {
-            for(let i = 0; i < arr.length; i++){
-                if(arr[i].length === 1){
-                    arr[i] = "0" + arr[i];
-                }
-            }
-            let getFormatTime;
-            if(arr.length === 5){
-                getFormatTime = arr[0] + "-" + arr[1] + "-" + arr[2] + "\t" + arr[3] + ":" + arr[4] + ":" + "00";
-            }else{
-                getFormatTime = arr[0] + "-" + arr[1] + "-" + arr[2] + "\t" + arr[3] + ":" + arr[4] + ":" + arr[5];
-            }
-
-            return getFormatTime;
-        }
-
-    }
+    });
 
 </script>
 

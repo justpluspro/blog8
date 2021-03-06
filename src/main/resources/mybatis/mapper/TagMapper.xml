@@ -33,9 +33,26 @@
     </update>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        <selectKey keyColumn="id" keyProperty="id" order="AFTER">
-            select last_insert_id()
-        </selectKey>
         insert into blog_tag(name, create_at, modify_at) values (#{name,jdbcType=VARCHAR}, now(), now())
     </insert>
+
+    <select id="count" resultType="int" parameterType="CommonQueryParam">
+        select count(1) from blog_tag
+        <where>
+            <if test="query != null and query != ''">
+                name like concat('%', #{query}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="selectPage"  parameterType="CommonQueryParam" resultType="Tag">
+        select id, name, create_at
+        from blog_tag
+        <where>
+            <if test="query != null and query != ''">
+                name like concat('%', #{query}, '%')
+            </if>
+        </where>
+        order by create_at desc
+        limit #{start}, #{offset}
+    </select>
 </mapper>

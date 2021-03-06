@@ -14,6 +14,11 @@ public class AbstractQueryParam {
 
     private int offset;
 
+
+    public boolean hasNoSize() {
+        return this.size <= 10;
+    }
+
     public void setOffset(int offset) {
         this.offset = offset;
     }

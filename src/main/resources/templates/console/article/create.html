@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>创建文章</title>
+    <link rel="stylesheet" href="/static/editor/codemirror/lib/codemirror.css">
+    <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
+    <style>
+        #toolbar {
+            background-color: #f9f9f7;
+            height: 30px;
+            position: fixed;
+            left: 0;
+            width: 50%;
+            padding-left: 10px;
+            padding-right: 10px;
+            line-height: 30px;
+            overflow: auto;
+            overflow-y: hidden;
+        }
+
+        #toolbar > a {
+            margin-right: 8px;
+        }
+
+        #in {
+            position: fixed;
+            top: 30px;
+            left: 0;
+            bottom: 0;
+            width: 50%;
+            height: auto;
+            overflow: auto;
+            color: #2c3e50;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .CodeMirror {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: auto;
+            height: auto;
+            background-color: #f9f9f7;
+            font-size: 1rem;
+        }
+
+        .CodeMirror-scroll {
+            padding: 10px;
+            box-sizing: border-box;
+            overflow-x: hidden !important;
+        }
+
+        #out {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 50%;
+            bottom: 0;
+            overflow: auto;
+            padding: 10px 10px 10px 20px;
+            color: #444;
+            font-size: 16px;
+            line-height: 1.5em;
+            -webkit-overflow-scrolling: touch;
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <div id="toolbar">
+            <a href="javascript:back();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>
+            </a>
+            <a href="javascript:showBase();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
+            </a>
+        </div>
+        <div id="in">
+            <textarea id="code" style="width: 100%; height: 100%;"></textarea>
+        </div>
+        <div id="out" class="markdown-body"></div>
+
+    </div>
+    <div class="modal modal-blur fade" id="baseModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">基本信息</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" id="error-tips" style="display: none;"></div>
+                    <div class="mb-3">
+                        <label class="form-label">博客标题</label>
+                        <input type="text" class="form-control" id="title" placeholder="博客标题(1-200个字符)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">别名</label>
+                        <input type="text" class="form-control" id="alias" placeholder="博客别名(1-200个字符，不能为纯数字以及包含'<'、'>','='和空格等字符)">
+                    </div>
+                    <div class="mb-3" id="tags-input-container">
+                        <label>标签</label>
+                        <div class="input-group">
+                            <input type="text" id="tags-input" class="form-control" placeholder="标签">
+                            <div class="input-group-text">
+                                <span>
+                                    <a href="javascript:void(0);" onclick="addTag();">添加</a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card my-1">
+                        <div class="card-body" id="tags-container"></div>
+                    </div>
+
+                    <div class="form-label">评论设置</div>
+                    <div>
+                        <label class="form-check">
+                            <input id="allowComment" class="form-check-input" type="checkbox">
+                            <span class="form-check-label">开启评论</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="javascript:void(0);" class="btn btn-primary ms-auto"  id="submit-art"  data-bs-dismiss="modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        发表文章
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/tabler/js/tabler.min.js"></script>
+    <script src="/static/editor/codemirror/lib/codemirror.js"></script>
+    <script src="/static/editor/codemirror/mode/markdown/markdown.js"></script>
+<!--    <script src="/static/editor/codemirror/mode/gfm/gfm.js"></script>-->
+    <script src="/static/js/sweetalert2.min.js"></script>
+<script>
+    let editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+        mode: 'markdown',
+        lineNumber: true,
+    });
+
+    function back() {
+
+    }
+
+    function showBase() {
+        $('#baseModal').modal('show');
+    }
+
+    let rootPath = '[[@{/}]]';
+    $(document).ready(function() {
+        document.getElementById('save_moment_btn').addEventListener('click', function() {
+            let content = document.getElementById('content').value;
+            let isPrivate = document.getElementById('is_private').checked;
+            let allowComment = document.getElementById('allow_comment').checked;
+            if(content == null || content.length === 0) {
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: '内容不能为空',
+                })
+                return;
+            }
+            $.ajax({
+                url: rootPath + 'api/moment',
+                method: 'POST',
+                dataType: 'json',
+                contentType:'application/json;charset=utf8',
+                data: JSON.stringify({"content": content, "private": isPrivate, "allowComment": allowComment}),
+                success: function(res) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
+                    Toast.fire({
+                        type: 'success',
+                        title: 'Signed in successfully'
+                    });
+                    setTimeout(function() {
+                        window.location.href = rootPath + 'console/moments'
+                    }, 800);
+                }
+            });
+        });
+    })
+</script>
+</body>
+</html>

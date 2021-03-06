@@ -23,9 +23,14 @@ public class ArticleMgrController {
         return "console/article/index";
     }
 
+
+    @GetMapping("article/create")
+    public String create() {
+        return "console/article/create";
+    }
+
     @GetMapping("article/{id}/edit")
     public String edit(@PathVariable("id") int id, Model model) {
-
         return "console/article/edit";
     }
 

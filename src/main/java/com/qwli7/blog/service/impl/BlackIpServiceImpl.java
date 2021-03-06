@@ -1,6 +1,8 @@
 package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.entity.BlackIp;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.mapper.BlackIpMapper;
 import com.qwli7.blog.service.BlackIpService;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +30,12 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public List<BlackIp> selectAll() {
-        return blackIpMapper.selectAll();
+    public PageDto<BlackIp> selectPage(CommonQueryParam queryParam) {
+        int count = blackIpMapper.count(queryParam);
+        if(count == 0) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+        return new PageDto<>(queryParam, count, blackIpMapper.selectPage(queryParam));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

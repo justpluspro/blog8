@@ -1,6 +1,10 @@
 package com.qwli7.blog.web.controller;
 
+import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Tag;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommonQueryParam;
+import com.qwli7.blog.entity.vo.TagQueryParam;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.TagService;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +18,26 @@ import java.util.List;
  * @date 2021/2/22 13:11
  * 功能：blog8
  **/
-@Authenticated
+//@Authenticated
 @RestController
 @RequestMapping("api")
 public class TagController {
 
     private final TagService tagService;
+    private final BlogProperties blogProperties;
 
-    public TagController(TagService tagService) {
+    public TagController(TagService tagService, BlogProperties blogProperties) {
         super();
         this.tagService = tagService;
+        this.blogProperties = blogProperties;
     }
 
     @GetMapping("tags")
-    public List<Tag> getTags() {
-        return tagService.findAllTags();
+    public PageDto<Tag> selectPage(CommonQueryParam queryParam) {
+        if(queryParam.hasNoSize()) {
+            queryParam.setSize(blogProperties.getDefaultPageSize());
+        }
+        return tagService.selectPage(queryParam);
     }
 
     @PostMapping("tag")
