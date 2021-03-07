@@ -92,3 +92,150 @@ insert into blog_blackip(ip) values('148.0.0.1');
 insert into blog_blackip(ip) values('149.0.0.1');
 insert into blog_blackip(ip) values('150.0.0.1');
 insert into blog_blackip(ip) values('151.0.0.1');
+
+
+/**init article **/
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 3);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 3);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 4);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 4);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 5);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 5);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 6);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 6);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+
+
+insert into blog_article_tag(article_id, tag_id) values(2, 12);
+insert into blog_article_tag(article_id, tag_id) values(3, 1);
+insert into blog_article_tag(article_id, tag_id) values(3, 4);
+insert into blog_article_tag(article_id, tag_id) values(4, 23);
+insert into blog_article_tag(article_id, tag_id) values(4, 26);
+insert into blog_article_tag(article_id, tag_id) values(4, 27);
+insert into blog_article_tag(article_id, tag_id) values(4, 28);
+insert into blog_article_tag(article_id, tag_id) values(5, 1);
+insert into blog_article_tag(article_id, tag_id) values(5, 2);
+insert into blog_article_tag(article_id, tag_id) values(5, 4);
+insert into blog_article_tag(article_id, tag_id) values(5, 6);
+insert into blog_article_tag(article_id, tag_id) values(6, 18);
+insert into blog_article_tag(article_id, tag_id) values(6, 24);
+insert into blog_article_tag(article_id, tag_id) values(6, 14);
+insert into blog_article_tag(article_id, tag_id) values(6, 6);
+insert into blog_article_tag(article_id, tag_id) values(7, 21);
+insert into blog_article_tag(article_id, tag_id) values(7, 22);
+insert into blog_article_tag(article_id, tag_id) values(7, 4);
+insert into blog_article_tag(article_id, tag_id) values(7, 6);
+insert into blog_article_tag(article_id, tag_id) values(8, 1);
+insert into blog_article_tag(article_id, tag_id) values(8, 17);
+insert into blog_article_tag(article_id, tag_id) values(8, 19);
+insert into blog_article_tag(article_id, tag_id) values(8, 16);
+insert into blog_article_tag(article_id, tag_id) values(9, 11);
+insert into blog_article_tag(article_id, tag_id) values(9, 21);
+insert into blog_article_tag(article_id, tag_id) values(9, 14);
+
+insert into blog_article_tag(article_id, tag_id) values(10, 1);
+insert into blog_article_tag(article_id, tag_id) values(10, 17);
+insert into blog_article_tag(article_id, tag_id) values(11, 19);
+insert into blog_article_tag(article_id, tag_id) values(12, 16);
+insert into blog_article_tag(article_id, tag_id) values(13, 11);
+insert into blog_article_tag(article_id, tag_id) values(13, 21);
+insert into blog_article_tag(article_id, tag_id) values(13, 14);
+
+insert into blog_article_tag(article_id, tag_id) values(14, 1);
+insert into blog_article_tag(article_id, tag_id) values(15, 17);
+insert into blog_article_tag(article_id, tag_id) values(16, 19);
+insert into blog_article_tag(article_id, tag_id) values(16, 16);
+insert into blog_article_tag(article_id, tag_id) values(16, 11);
+insert into blog_article_tag(article_id, tag_id) values(16, 21);
+insert into blog_article_tag(article_id, tag_id) values(17, 14);
+
+insert into blog_article_tag(article_id, tag_id) values(17, 1);
+insert into blog_article_tag(article_id, tag_id) values(18, 17);
+insert into blog_article_tag(article_id, tag_id) values(18, 19);
+insert into blog_article_tag(article_id, tag_id) values(18, 16);
+insert into blog_article_tag(article_id, tag_id) values(19, 11);
+insert into blog_article_tag(article_id, tag_id) values(19, 21);
+insert into blog_article_tag(article_id, tag_id) values(19, 14);
+
+insert into blog_article_tag(article_id, tag_id) values(20, 1);
+insert into blog_article_tag(article_id, tag_id) values(20, 17);
+insert into blog_article_tag(article_id, tag_id) values(20, 19);
+insert into blog_article_tag(article_id, tag_id) values(20, 16);
+insert into blog_article_tag(article_id, tag_id) values(20, 11);
+insert into blog_article_tag(article_id, tag_id) values(21, 21);
+insert into blog_article_tag(article_id, tag_id) values(21, 14);
+
+insert into blog_article_tag(article_id, tag_id) values(21, 1);
+insert into blog_article_tag(article_id, tag_id) values(21, 17);
+insert into blog_article_tag(article_id, tag_id) values(21, 19);
+insert into blog_article_tag(article_id, tag_id) values(22, 16);
+insert into blog_article_tag(article_id, tag_id) values(22, 11);
+insert into blog_article_tag(article_id, tag_id) values(22, 21);
+insert into blog_article_tag(article_id, tag_id) values(22, 14);
+
+insert into blog_article_tag(article_id, tag_id) values(22, 1);
+insert into blog_article_tag(article_id, tag_id) values(23, 17);
+insert into blog_article_tag(article_id, tag_id) values(23, 19);
+insert into blog_article_tag(article_id, tag_id) values(23, 16);
+insert into blog_article_tag(article_id, tag_id) values(23, 11);
+insert into blog_article_tag(article_id, tag_id) values(23, 21);

@@ -3,5 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qwli7.blog.mapper.ArticleTagMapper">
 
+    <insert id="insert" parameterType="ArticleTag">
+        insert into blog_article_tag(article_id, tag_id)
+            values (#{articleId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER})
+    </insert>
 
+    <delete id="deleteByArticle" parameterType="Article">
+        delete from blog_article_tag where article_id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByTag" parameterType="Tag" >
+        delete from blog_article_tag where tag_id = #{id,jdbcType=INTEGER}
+    </delete>
 </mapper>

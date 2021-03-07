@@ -37,4 +37,24 @@ CREATE TABLE blog_moment (
     modify_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_private boolean default false,
     allow_comment boolean default true
-)
+);
+
+create table blog_article (
+    id int primary key auto_increment,
+    title varchar(1024),
+    content text,
+    summary varchar(2048) comment '摘要',
+    alias varchar(64),
+    hits int not null,
+    comments int not null,
+    status tinyint(1) comment '状态',
+    feature_image varchar(128) comment '特征图像',
+    create_at timestamp not null default current_timestamp,
+    modify_at timestamp not null default current_timestamp on update current_timestamp,
+    post_at timestamp,
+    is_private boolean default false,
+    allow_comment boolean default true,
+    category_id int not null
+);
+
+

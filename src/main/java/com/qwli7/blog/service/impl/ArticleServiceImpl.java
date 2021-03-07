@@ -3,12 +3,10 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
+import com.qwli7.blog.event.ArticleDeleteEvent;
 import com.qwli7.blog.event.ArticlePostEvent;
 import com.qwli7.blog.exception.LogicException;
-import com.qwli7.blog.mapper.ArticleMapper;
-import com.qwli7.blog.mapper.ArticleTagMapper;
-import com.qwli7.blog.mapper.CategoryMapper;
-import com.qwli7.blog.mapper.TagMapper;
+import com.qwli7.blog.mapper.*;
 import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.Markdown2Html;
@@ -19,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,18 +34,21 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     private final ArticleMapper articleMapper;
     private final CategoryMapper categoryMapper;
     private final ArticleTagMapper articleTagMapper;
+    private final CommentMapper commentMapper;
     private final TagMapper tagMapper;
     private final Markdown2Html markdown2Html;
     private final ApplicationEventPublisher publisher;
 
     public ArticleServiceImpl(Markdown2Html markdown2Html, ArticleMapper articleMapper,
                               CategoryMapper categoryMapper, ArticleTagMapper articleTagMapper,
-                              TagMapper tagMapper, ApplicationEventPublisher publisher) {
+                              TagMapper tagMapper, CommentMapper commentMapper,
+                              ApplicationEventPublisher publisher) {
         this.markdown2Html = markdown2Html;
         this.articleMapper = articleMapper;
         this.articleTagMapper = articleTagMapper;
         this.categoryMapper = categoryMapper;
         this.tagMapper = tagMapper;
+        this.commentMapper = commentMapper;
         this.publisher = publisher;
     }
 
@@ -98,12 +100,42 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
     @Override
     public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
-        return null;
+        final Integer categoryId = queryParam.getCategoryId();
+        Category category = null;
+        if(categoryId != null && categoryId > 0) {
+            final Optional<Category> categoryOp = categoryMapper.findById(categoryId);
+            if(categoryOp.isPresent()) {
+                category = categoryOp.get();
+            }
+        }
+        if(category == null) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+
+        int count = articleMapper.count(queryParam);
+        if(count == 0) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+
+        List<Article> articles = articleMapper.selectPage(queryParam);
+
+
+        return new PageDto<>(queryParam, count, articles);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteById(int id) {
-//        articleMapper.select
+        final Optional<Article> articleOp = articleMapper.findById(id);
+        if(!articleOp.isPresent()) {
+            return;
+        }
+        final CommentModule commentModule = new CommentModule(articleOp.get().getId(), getModuleName());
+        commentMapper.deleteByModule(commentModule);
+        articleTagMapper.deleteByArticle(articleOp.get());
+        articleMapper.deleteById(articleOp.get().getId());
+        publisher.publishEvent(new ArticleDeleteEvent(this, articleOp.get()));
+        //        articleMapper.select
     }
 
     private void processArticleTags(Article article) {

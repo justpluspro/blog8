@@ -73,6 +73,7 @@
 </head>
 <body>
     <div>
+        <!-- 工具栏 -->
         <div id="toolbar">
             <a href="javascript:back();">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>
@@ -80,13 +81,24 @@
             <a href="javascript:showBase();">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
             </a>
+            <a href="javascript:uploadFile();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
+            </a>
+            <a id="fullscreen" href="javascript:void(0);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="16 4 20 4 20 8" /><line x1="14" y1="10" x2="20" y2="4" /><polyline points="8 20 4 20 4 16" /><line x1="4" y1="20" x2="10" y2="14" /><polyline points="16 20 20 20 20 16" /><line x1="14" y1="14" x2="20" y2="20" /><polyline points="8 4 4 4 4 8" /><line x1="4" y1="4" x2="10" y2="10" /></svg>
+            </a>
         </div>
+
+        <!-- 编辑器 -->
         <div id="in">
             <textarea id="code" style="width: 100%; height: 100%;"></textarea>
         </div>
-        <div id="out" class="markdown-body"></div>
 
+        <!-- 预览框 -->
+        <div id="out" class="markdown-body"></div>
     </div>
+
+    <!-- 发布框，一些基本信息 -->
     <div class="modal modal-blur fade" id="baseModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -98,11 +110,19 @@
                     <div class="alert alert-danger" id="error-tips" style="display: none;"></div>
                     <div class="mb-3">
                         <label class="form-label">博客标题</label>
-                        <input type="text" class="form-control" id="title" placeholder="博客标题(1-200个字符)">
+                        <input type="text" class="form-control" id="title" autocomplete="off" placeholder="博客标题(1-200个字符)">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">别名</label>
-                        <input type="text" class="form-control" id="alias" placeholder="博客别名(1-200个字符，不能为纯数字以及包含'<'、'>','='和空格等字符)">
+                        <input type="text" class="form-control" id="alias" autocomplete="off" placeholder="博客别名(1-200个字符，不能为纯数字以及包含'<'、'>','='和空格等字符)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">分类设置</label>
+                        <select class="form-control" id="category">
+                            <option value="1">java</option>
+                            <option value="2">web</option>
+                            <option value="3">life</option>
+                        </select>
                     </div>
                     <div class="mb-3" id="tags-input-container">
                         <label>标签</label>
@@ -145,16 +165,34 @@
 <script>
     let editor = CodeMirror.fromTextArea(document.getElementById('code'), {
         mode: 'markdown',
-        lineNumber: true,
+        matchBrackets: true,
+        lineWrapping: true,
+        extraKeys: {
+            "Enter": "newlineAndIndentContinueMarkdownList"
+        }
     });
 
-    function back() {
+    editor.on("change", update);
 
+
+    function saveInBrowser(code, name) {
+        let text = editor.getValue();
+        if(localStorage.getItem("content")) {
+
+        } else {
+            localStorage.setItem('content', text);
+        }
+    }
+
+    function back() {
+        window.location.href = '/console/articles';
     }
 
     function showBase() {
         $('#baseModal').modal('show');
     }
+
+
 
     let rootPath = '[[@{/}]]';
     $(document).ready(function() {

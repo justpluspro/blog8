@@ -2,6 +2,7 @@ package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.ArticleTag;
+import com.qwli7.blog.entity.Tag;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -15,4 +16,7 @@ public interface ArticleTagMapper {
     int insert(ArticleTag articleTag);
 
 
+    void deleteByArticle(Article article);
+
+    void deleteByTag(Tag tag);
 }

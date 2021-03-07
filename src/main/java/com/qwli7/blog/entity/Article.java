@@ -18,6 +18,8 @@ public class Article extends BaseEntity implements Serializable {
 
     private String content;
 
+    private String summary;
+
     private String alias;
 
     private Integer hits;
@@ -44,6 +46,14 @@ public class Article extends BaseEntity implements Serializable {
     private Boolean isPrivate;
 
     private String featureImage;
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
 
     public String getFeatureImage() {
         return featureImage;

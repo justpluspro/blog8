@@ -3,12 +3,125 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qwli7.blog.mapper.ArticleMapper">
 
+    <resultMap id="BaseResultMap" type="Article">
+        <id property="id" column="id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="summary" column="summary" />
+        <result property="alias" column="alias" />
+        <result property="hits" column="hits" />
+        <result property="comments" column="comments" />
+
+        <result property="postAt" column="post_at" />
+        <result property="createAt" column="create_at" />
+        <result property="modifyAt" column="modify_at" />
+        <result property="isPrivate" column="is_private" />
+        <result property="allowComment" column="allow_comment" />
+        <result property="featureImage" column="feature_image" />
+<!--        <result property="tags" typeHandler="com.qwli7.blog.mapper.TagsTypeHandler" />-->
+        <association property="category" javaType="com.qwli7.blog.entity.Category">
+            <id property="id" column="category_id" />
+            <result property="name" column="category_name" />
+        </association>
+    </resultMap>
+
+    <sql id="articlePageSql">
+        select ba.id as aid,
+               ba.title, ba.content,
+               ba.post_at, ba.create_at, ba.modify_at,
+               ba.is_private, ba.alias, ba.hits, ba.comments,
+                bc.id as category_id, bc.name as category_name
+
+        from blog_article ba
+                              left join blog_category bc
+                on ba.category_id = bc.id
+    </sql>
+
+    <sql id="articleDetailSql">
+        select ba.id as art_id
+        ba.title, ba.content, ba.summary, ba.create_at, ba.post_at, ba.modify_at,
+            ba.is_private, ba.alias, ba.hits, ba.comments, ba.status, ba.feature_image,
+            ba.allow_comment
+
+            from blog_article ba
+    </sql>
+
     <insert id="insert" parameterType="Article" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
         insert into blog_article(title, content)
         values(#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR})
     </insert>
 
-    <select id="findByAlias" parameterType="string" resultType="Article">
-        select id, content, title from blog_article where alias = #{alias,jdbcType=VARCHAR}
+    <select id="findByAlias" parameterType="string" resultMap="BaseResultMap">
+        <include refid="fullQuerySql" />
+        where ba.alias = #{alias,jdbcType=VARCHAR}
     </select>
+
+    <select id="count" parameterType="ArticleQueryParam" resultType="int">
+        select count(id) from blog_article
+        <where>
+            <if test="query != null and query != ''">
+                and content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                or summary like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPage" parameterType="HandledArticleQueryParam" resultMap="BaseResultMap">
+        <include refid="fullQuerySql" />
+
+        order by post_at desc
+        limit #{start}, #{offset}
+    </select>
+
+    <update id="addHits">
+        UPDATE blog_article SET hits = hits + #{hits} WHERE id = #{id}
+    </update>
+
+
+    <select id="findById" parameterType="int" resultMap="BaseResultMap">
+        <include refid="fullQuerySql" />
+        where ba.id = #{id}
+    </select>
+
+    <delete id="deleteById" parameterType="int">
+        delete from blog_article where id = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE
+            blog_article
+            <set>
+                <if test="content != null and content != ''">
+                    content = #{content,jdbcType=VARCHAR},
+                </if>
+                <if test="title != null and title != ''">
+                    title = #{title,jdbcType=VARCHAR},
+                </if>
+                <if test="isPrivate != null">
+                    is_private = #{isPrivate,jdbcType=BOOLEAN},
+                </if>
+                <if test="summary != null and summary != ''">
+                    summary = #{summary,jdbcType=VARCHAR},
+                </if>
+                <if test="status != null">
+                    status = #{status, javaType=ArticleStatus, typeHandler=EnumOrdinalTypeHandler},
+                </if>
+                <if test="category != null">
+                    category_id = #{category.id,jdbcType=INTEGER},
+                </if>
+                <if test="allowComment != null">
+                    allow_comment = #{allowComment,jdbcType=BOOLEAN},
+                </if>
+                post_at = #{postAt},
+                modify_at = now(),
+
+                <if test="alias != null and alias != ''">
+                    alias = #{alias,jdbcType=VARCHAR},
+                </if>
+                <if test="featureImage != null and featureImage != ''">
+                    feature_image = #{featureImage,jdbcType=VARCHAR},
+                </if>
+            </set>
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>
