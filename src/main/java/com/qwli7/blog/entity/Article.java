@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author qwli7
@@ -39,7 +40,7 @@ public class Article extends BaseEntity implements Serializable {
 
     private Category category;
 
-    private List<Tag> tags;
+    private Set<Tag> tags;
 
     private Boolean allowComment;
 
@@ -87,11 +88,11 @@ public class Article extends BaseEntity implements Serializable {
         this.status = status;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
 
