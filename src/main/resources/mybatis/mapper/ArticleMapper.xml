@@ -11,14 +11,14 @@
         <result property="alias" column="alias" />
         <result property="hits" column="hits" />
         <result property="comments" column="comments" />
-
+        <result property="status" column="status" typeHandler="EnumOrdinalTypeHandler" />
         <result property="postAt" column="post_at" />
         <result property="createAt" column="create_at" />
         <result property="modifyAt" column="modify_at" />
         <result property="isPrivate" column="is_private" />
         <result property="allowComment" column="allow_comment" />
         <result property="featureImage" column="feature_image" />
-<!--        <result property="tags" typeHandler="com.qwli7.blog.mapper.TagsTypeHandler" />-->
+        <result property="tags" column="tag_ids" typeHandler="com.qwli7.blog.mapper.TagsTypeHandler" />
         <association property="category" javaType="com.qwli7.blog.entity.Category">
             <id property="id" column="category_id" />
             <result property="name" column="category_name" />
@@ -27,14 +27,25 @@
 
     <sql id="articlePageSql">
         select ba.id as aid,
-               ba.title, ba.content,
-               ba.post_at, ba.create_at, ba.modify_at,
-               ba.is_private, ba.alias, ba.hits, ba.comments,
-                bc.id as category_id, bc.name as category_name
+               ba.title,
+               ba.summary,
+               ba.post_at,
+               ba.create_at,
+               ba.modify_at,
+               ba.is_private,
+               ba.alias,
+               ba.hits,
+               ba.comments,
+               ba.status,
+               ba.feature_image,
+               group_concat(batt.tag_id) as tag_ids,
+               bc.id as category_id,
+               bc.name as category_name
 
         from blog_article ba
-                              left join blog_category bc
-                on ba.category_id = bc.id
+        left join blog_category bc on ba.category_id = bc.id
+        left join (select bt.id as tag_id, bt.name as tag_name, bat.article_id from blog_tag bt left join blog_article_tag bat on bt.id = bat.tag_id)
+            batt on batt.article_id = ba.id
     </sql>
 
     <sql id="articleDetailSql">
@@ -51,8 +62,8 @@
         values(#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR})
     </insert>
 
-    <select id="findByAlias" parameterType="string" resultMap="BaseResultMap">
-        <include refid="fullQuerySql" />
+    <select id="selectByAlias" parameterType="string" resultMap="BaseResultMap">
+        <include refid="articleDetailSql" />
         where ba.alias = #{alias,jdbcType=VARCHAR}
     </select>
 
@@ -67,9 +78,31 @@
     </select>
 
     <select id="selectPage" parameterType="HandledArticleQueryParam" resultMap="BaseResultMap">
-        <include refid="fullQuerySql" />
+        <include refid="articlePageSql" />
 
-        order by post_at desc
+        <where>
+            <if test="aids != null and !aids.isEmpty()">
+                and ba.id in
+                <foreach collection="aids" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="statuses != null and !statuses.isEmpty()">
+                and ba.status in
+                <foreach collection="statuses" item="status" open="(" close=")" separator=",">
+                    #{status, javaType=ArticleStatus, typeHandler=EnumOrdinalTypeHandler}
+                </foreach>
+            </if>
+            <if test="query != null and query != ''">
+                and ba.title like #{query,jdbcType=VARCHAR}
+                or ba.content like #{query,jdbcType=VARCHAR}
+                or ba.summary like #{query,jdbcType=VARCHAR}
+            </if>
+        </where>
+
+        group by ba.id
+
+        order by ba.id desc
         limit #{start}, #{offset}
     </select>
 
@@ -77,9 +110,20 @@
         UPDATE blog_article SET hits = hits + #{hits} WHERE id = #{id}
     </update>
 
+    <update id="updateHits">
+        UPDATE blog_article SET hits = #{hits} WHERE id = #{id}
+    </update>
 
-    <select id="findById" parameterType="int" resultMap="BaseResultMap">
-        <include refid="fullQuerySql" />
+    <update id="addComments">
+        UPDATE blog_article SET comments = comments + #{comments} WHERE id = #{id}
+    </update>
+
+    <update id="updateComments">
+        UPDATE blog_article SET comments = #{comments} WHERE id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="int" resultMap="BaseResultMap">
+        <include refid="articleDetailSql" />
         where ba.id = #{id}
     </select>
 
