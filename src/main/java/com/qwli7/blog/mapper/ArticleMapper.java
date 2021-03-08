@@ -2,6 +2,7 @@ package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
+import com.qwli7.blog.entity.vo.HandledArticleQueryParam;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,15 +17,21 @@ import java.util.Optional;
 public interface ArticleMapper {
     void insert(Article article);
 
-    Optional<Article> findByAlias(String alias);
+    Optional<Article> selectByAlias(String alias);
 
-    Optional<Article> findById(int id);
+    Optional<Article> selectById(int id);
 
     int count(ArticleQueryParam queryParam);
 
-    List<Article> selectPage(ArticleQueryParam queryParam);
+    List<Article> selectPage(HandledArticleQueryParam queryParam);
 
     void addHits(int id, int hits);
+
+    void updateHits(int id, int hits);
+
+    void addComments(int id, int comments);
+
+    void updateComments(int id, int comments);
 
     void update(Article article);
 
