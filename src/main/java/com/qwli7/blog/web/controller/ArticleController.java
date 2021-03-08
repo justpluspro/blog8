@@ -39,7 +39,7 @@ public class ArticleController {
     @GetMapping("articles")
     public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
-            queryParam.setPage(blogProperties.getDefaultPageSize());
+            queryParam.setSize(blogProperties.getDefaultPageSize());
         }
         return articleService.selectPage(queryParam);
     }
