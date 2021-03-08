@@ -3,6 +3,7 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
+import com.qwli7.blog.entity.vo.HandledArticleQueryParam;
 import com.qwli7.blog.event.ArticleDeleteEvent;
 import com.qwli7.blog.event.ArticlePostEvent;
 import com.qwli7.blog.exception.LogicException;
@@ -14,12 +15,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -66,7 +67,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
         final String alias = article.getAlias();
         if(!StringUtils.isEmpty(alias)) {
-            Optional<Article> articleOp = articleMapper.findByAlias(alias);
+            Optional<Article> articleOp = articleMapper.selectByAlias(alias);
             if(articleOp.isPresent()) {
                 throw new LogicException("alias.exists", "别名已经存在");
             }
@@ -100,33 +101,54 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
     @Override
     public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
-        final Integer categoryId = queryParam.getCategoryId();
-        Category category = null;
-        if(categoryId != null && categoryId > 0) {
-            final Optional<Category> categoryOp = categoryMapper.findById(categoryId);
-            if(categoryOp.isPresent()) {
-                category = categoryOp.get();
-            }
-        }
-        if(category == null) {
-            return new PageDto<>(queryParam, 0, new ArrayList<>());
-        }
+//        final Integer categoryId = queryParam.getCategoryId();
+//        Category category = null;
+//        if(categoryId != null && categoryId > 0) {
+//            final Optional<Category> categoryOp = categoryMapper.findById(categoryId);
+//            if(categoryOp.isPresent()) {
+//                category = categoryOp.get();
+//            }
+//        }
+//        if(category == null) {
+//            return new PageDto<>(queryParam, 0, new ArrayList<>());
+//        }
 
         int count = articleMapper.count(queryParam);
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
 
-        List<Article> articles = articleMapper.selectPage(queryParam);
+        HandledArticleQueryParam handledArticleQueryParam = new HandledArticleQueryParam();
+        handledArticleQueryParam.setPage(queryParam.getPage());
+        handledArticleQueryParam.setSize(queryParam.getSize());
+        handledArticleQueryParam.setStart(0);
+        handledArticleQueryParam.setOffset(queryParam.getSize());
+        List<Article> articles = articleMapper.selectPage(handledArticleQueryParam);
+
+        processArticles(articles);
 
 
         return new PageDto<>(queryParam, count, articles);
     }
 
+    private void processArticles(List<Article> articles) {
+        if(CollectionUtils.isEmpty(articles)) {
+            return;
+        }
+        for(Article article: articles){
+            Set<Tag> tags = article.getTags();
+            if(CollectionUtils.isEmpty(tags)) {
+                continue;
+            }
+            article.setTags(tags.stream().map(Tag::getId).map(tagMapper::findById).filter(Optional::isPresent)
+                    .map(Optional::get).collect(Collectors.toCollection(HashSet::new)));
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteById(int id) {
-        final Optional<Article> articleOp = articleMapper.findById(id);
+        final Optional<Article> articleOp = articleMapper.selectById(id);
         if(!articleOp.isPresent()) {
             return;
         }
@@ -139,7 +161,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     }
 
     private void processArticleTags(Article article) {
-        final List<Tag> tags = article.getTags();
+        final Set<Tag> tags = article.getTags();
         if(tags == null || tags.size() == 0) {
             return;
         }
