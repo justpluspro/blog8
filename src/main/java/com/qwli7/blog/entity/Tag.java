@@ -24,6 +24,12 @@ public class Tag extends BaseEntity implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyAt;
 
+
+    public Tag(int id) {
+        super();
+        this.id = id;
+    }
+
     public Tag () {
         super();
     }
