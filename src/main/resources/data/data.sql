@@ -97,10 +97,10 @@ insert into blog_blackip(ip) values('151.0.0.1');
 /**init article **/
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 1, now(), now(), now(), false, true, 2);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 2, now(), now(), now(), false, true, 2);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
 values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 3);
@@ -115,43 +115,43 @@ insert into blog_article(title, content, summary, hits, comments,
 values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 4);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 5);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 2, now(), now(), now(), false, true, 5);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 5);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 2, now(), now(), now(), false, true, 5);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 6);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 2, now(), now(), now(), false, true, 6);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 6);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 1, now(), now(), now(), false, true, 6);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
-insert into blog_article(title, content, summary, hits, comments,
-                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 1, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
 values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 1, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
 values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 1, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
 values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 1);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 2, now(), now(), now(), false, true, 1);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
-values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 1, now(), now(), now(), false, true, 1);
+insert into blog_article(title, content, summary, hits, comments,
+                         alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
+values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 2, now(), now(), now(), false, true, 2);
 insert into blog_article(title, content, summary, hits, comments,
                          alias, status, create_at, modify_at, post_at, is_private, allow_comment, category_id)
 values ('测试文章', '这里是测试文章内容', '', 23, 4, '', 0, now(), now(), now(), false, true, 2);

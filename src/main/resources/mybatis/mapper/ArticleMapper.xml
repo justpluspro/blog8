@@ -4,7 +4,7 @@
 <mapper namespace="com.qwli7.blog.mapper.ArticleMapper">
 
     <resultMap id="BaseResultMap" type="Article">
-        <id property="id" column="id" />
+        <id property="id" column="aid" />
         <result property="title" column="title" />
         <result property="content" column="content" />
         <result property="summary" column="summary" />
@@ -49,7 +49,7 @@
     </sql>
 
     <sql id="articleDetailSql">
-        select ba.id as art_id
+        select ba.id as aid
         ba.title, ba.content, ba.summary, ba.create_at, ba.post_at, ba.modify_at,
             ba.is_private, ba.alias, ba.hits, ba.comments, ba.status, ba.feature_image,
             ba.allow_comment
