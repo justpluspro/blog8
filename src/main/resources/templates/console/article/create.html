@@ -138,19 +138,28 @@
                     <div class="card my-1">
                         <div class="card-body" id="tags-container"></div>
                     </div>
-
-                    <div class="form-label">评论设置</div>
-                    <div>
-                        <label class="form-check">
-                            <input id="allowComment" class="form-check-input" type="checkbox">
-                            <span class="form-check-label">开启评论</span>
-                        </label>
+                    <div class="mb-3">
+                        <div class="form-label">评论设置</div>
+                        <div>
+                            <label class="form-check">
+                                <input id="allowComment" checked class="form-check-input" type="checkbox">
+                                <span class="form-check-label">开启评论</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-label">私密设置</div>
+                        <div>
+                            <label class="form-check">
+                                <input id="is_private" class="form-check-input" type="checkbox">
+                                <span class="form-check-label">私人</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="javascript:void(0);" class="btn btn-primary ms-auto"  id="submit-art"  data-bs-dismiss="modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                        发表文章
+                    <a href="javascript:void(0);" class="btn btn-primary ms-auto" id="submit-art">
+                        发布
                     </a>
                 </div>
             </div>
@@ -163,6 +172,8 @@
 <!--    <script src="/static/editor/codemirror/mode/gfm/gfm.js"></script>-->
     <script src="/static/js/sweetalert2.min.js"></script>
 <script>
+
+    let rootPath = '[[@{/}]]';
     let editor = CodeMirror.fromTextArea(document.getElementById('code'), {
         mode: 'markdown',
         matchBrackets: true,
@@ -172,7 +183,7 @@
         }
     });
 
-    editor.on("change", update);
+    // editor.on("change", update);
 
 
     function saveInBrowser(code, name) {
@@ -194,45 +205,87 @@
 
 
 
-    let rootPath = '[[@{/}]]';
-    $(document).ready(function() {
-        document.getElementById('save_moment_btn').addEventListener('click', function() {
-            let content = document.getElementById('content').value;
-            let isPrivate = document.getElementById('is_private').checked;
-            let allowComment = document.getElementById('allow_comment').checked;
-            if(content == null || content.length === 0) {
-                Swal.fire({
-                    type: 'error',
-                    title: 'Oops...',
-                    text: '内容不能为空',
-                })
-                return;
-            }
-            $.ajax({
-                url: rootPath + 'api/moment',
-                method: 'POST',
-                dataType: 'json',
-                contentType:'application/json;charset=utf8',
-                data: JSON.stringify({"content": content, "private": isPrivate, "allowComment": allowComment}),
-                success: function(res) {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
+    document.getElementById('submit-art').addEventListener('click', function() {
+        let Article = getArticle();
+        let errorTips = document.getElementById('error-tips');
+        if(Article.title === '') {
+            errorTips.style.display = '';
+            errorTips.innerText = '标题不能为空';
+            return ;
+        }
+        if(Article.content === '') {
+            errorTips.style.display = '';
+            errorTips.innerText = '内容不能为空';
+            return ;
+        }
 
-                    Toast.fire({
-                        type: 'success',
-                        title: 'Signed in successfully'
-                    });
-                    setTimeout(function() {
-                        window.location.href = rootPath + 'console/moments'
-                    }, 800);
-                }
-            });
+        $.ajax({
+            url: rootPath + 'api/article',
+            method: 'POST',
+            dataType: 'json',
+            contentType:'application/json;charset=utf8',
+            data: JSON.stringify(Article),
+            success: function(res) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+
+                Toast.fire({
+                    type: 'success',
+                    title: 'Signed in successfully'
+                });
+                setTimeout(function() {
+                    window.location.href = rootPath + 'console/moments'
+                }, 800);
+            },
+            error: function(error, XHRStatus) {
+
+            }
         });
+
+
     })
+
+
+    function getArticle() {
+        let Article = {};
+        Article.title = document.getElementById('title').value;
+        Article.content = editor.getValue();
+        let Category = {};
+        Category.id = document.getElementById('category').value;
+        Article.category = Category;
+        Article.alias = document.getElementById('alias').value;
+        Article.allowComment = document.getElementById('allowComment').checked;
+        Article.private = document.getElementById('is_private').checked;
+
+        return Article;
+
+    }
+
+    $(document).ready(function() {
+        selectCategories();
+    })
+
+
+    function selectCategories(){
+        $.ajax({
+            url: '/api/categories',
+            method: 'GET',
+            success: function (res) {
+                let categoryHtml = '';
+                for(let i = 0; i < res.length; i++) {
+                    categoryHtml += '<option value="'+res[i].id+'">'+res[i].name+'</option>';
+                }
+                document.getElementById('category').innerHTML = categoryHtml;
+            },
+            error: function(error, XHRStatus) {
+
+            }
+        })
+    }
 </script>
 </body>
 </html>
