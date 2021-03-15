@@ -14,18 +14,20 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api")
 public class FileController {
 
-//    private final FileService fileService;
-//
-//    public FileController(FileService fileService) {
-//        this.fileService = fileService;
-//    }
-//
-//
-//    @PostMapping(value = "file/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> uploadFile(@RequestParam("path") String dirPath, @RequestParam MultipartFile file) {
-//        FileInfoDetail fileInfoDetail = fileService.uploadFile(dirPath, file);
-//        return ResponseEntity.ok(fileInfoDetail);
-//    }
+    private final FileService fileService;
+
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
+    }
+
+
+    @PostMapping(value = "file/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadFile(FileUploadModel fileUploadModel) {
+        final MultipartFile file = fileUploadModel.getFile();
+        final String path = fileUploadModel.getPath();
+        FileInfoDetail fileInfoDetail = fileService.uploadFile(path, file);
+        return ResponseEntity.ok(fileInfoDetail);
+    }
 
 
     @GetMapping("files")

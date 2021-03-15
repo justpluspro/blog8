@@ -1,100 +1,154 @@
-//package com.qwli7.blog.file;
-//
-//import com.qwli7.blog.exception.LogicException;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.StringUtils;
-//import org.springframework.web.multipart.MultipartFile;
-//
-//import java.io.BufferedInputStream;
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.nio.file.FileAlreadyExistsException;
-//import java.nio.file.Files;
-//import java.nio.file.Path;
-//import java.nio.file.Paths;
-//import java.util.concurrent.locks.ReadWriteLock;
-//import java.util.concurrent.locks.ReentrantReadWriteLock;
-//
-///**
-// * @author qwli7
-// * @date 2021/3/2 8:37
-// * 功能：blog
-// **/
-//@Service
-//public class FileService {
-//
-//    private final Path rootPath;
-//    private final Path thumbPath;
-//    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-//
-//    private final FileProperties fileProperties;
-//
-//    public FileService(FileProperties fileProperties) throws IOException {
-//        this.fileProperties = fileProperties;
-//        this.rootPath = Paths.get(fileProperties.getUploadPath());
-//        this.thumbPath = Paths.get(fileProperties.getUploadThumbPath());
-//        if(!rootPath.toFile().exists() && rootPath.toFile().isDirectory()) {
-//            Files.createDirectories(rootPath);
-//        }
-//        if(!thumbPath.toFile().exists() && thumbPath.toFile().isDirectory()) {
-//            Files.createDirectories(thumbPath);
-//        }
-//    }
-//
-//    public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
-//        readWriteLock.writeLock().lock();
-//        try {
-//            if (StringUtils.startsWithIgnoreCase(dirPath, "/")) {
-//                dirPath = dirPath.substring(1);
-//            }
-//            Path path;
-//            if (!StringUtils.isEmpty(dirPath)) {
-//                path = rootPath.resolve(dirPath);
-//            } else {
-//                path = rootPath;
-//            }
+package com.qwli7.blog.file;
+
+import com.qwli7.blog.exception.LogicException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+/**
+ * @author qwli7
+ * @date 2021/3/2 8:37
+ * 功能：blog
+ **/
+@Service
+public class FileService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
+    private final Path rootPath;
+    private final Path thumbPath;
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+    private final FileProperties fileProperties;
+
+    public FileService(FileProperties fileProperties) throws IOException {
+        this.fileProperties = fileProperties;
+
+        this.rootPath = Paths.get(System.getProperty("user.dir") ,fileProperties.getUploadPath(), "/");
+        this.thumbPath = Paths.get(System.getProperty("user.dir"), fileProperties.getUploadThumbPath(), "/");
+        logger.info("rootPath:[{}]", rootPath);
+        logger.info("thumbPath:[{}]", thumbPath);
+        if(!rootPath.toFile().exists() && rootPath.toFile().isDirectory()) {
+            Files.createDirectories(rootPath);
+        }
+        if(!thumbPath.toFile().exists() && thumbPath.toFile().isDirectory()) {
+            Files.createDirectories(thumbPath);
+        }
+    }
+
+    public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
+        readWriteLock.writeLock().lock();
+        try {
+            Path path;
+            if(StringUtils.isEmpty(dirPath) || StringUtils.pathEquals(dirPath, File.pathSeparator)) {
+                path = rootPath;
+            } else {
+                while (StringUtils.startsWithIgnoreCase(dirPath, File.pathSeparator)) {
+                    dirPath = dirPath.substring(1);
+                }
+                path = rootPath.resolve(dirPath);
+            }
+
+            logger.info("filePath:[{}]", path.toAbsolutePath());
+            final Path parent = path.getParent();
+            System.out.println(rootPath.compareTo(parent));
+            try {
+//                if (rootPath.compareTo(parent) != 0) {
+                    createDirectories(parent);
+//                }
+            }catch (IOException ex){
+                throw new LogicException("", "");
+            }
+
 //            createDirectories(path);
+
+            String fileName = file.getOriginalFilename();
+            //去除文件中的非法字符
+            if(!StringUtils.isEmpty(fileName)) {
+
+                Path dest = path.resolve(fileName);
+                try(InputStream in = new BufferedInputStream(file.getInputStream())) {
+                    Files.copy(path, dest);
+                } catch (IOException ex) {
+                    throw new LogicException("file.already.exists", "文件已经存在");
+                }
+
+
+//                try {
+//                    if(!dest.toFile().exists()) {
+//                        Files.createFile(dest);
+//                        Files.copy(file.getInputStream(), dest);
+//                    }
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
+
+                return getFileInfoDetail(dest);
+            }
+
 //
-//            String fileName = file.getName();
-//            //去除文件中的非法字符
-//
-//            Path dest = path.resolve(fileName);
-//
-//
-//            try(InputStream in = new BufferedInputStream(file.getInputStream())) {
-//                Files.copy(path, dest);
-//            } catch (FileAlreadyExistsException ex) {
-//                throw new LogicException("file.already.exists", "文件已经存在");
-//            }
-//
+
 //            String fileExtension = FileUtil.getFileExtension(fileName);
 //            if(MediaHandler.canHandle(fileExtension)) {
 //
 //
 //            }
-//
-//            return getFileInfoDetail(dest);
-//
-//        } finally {
-//            readWriteLock.writeLock().unlock();
-//        }
-//    }
-//
-//    private FileInfoDetail getFileInfoDetail(Path dest) {
-//        return null;
-//    }
-//
-//
-//    private void createDirectories(Path path) throws IOException {
-//        if(path == null) {
-//            return;
-//        }
-//        if(path.toFile().exists()) {
-//            return;
-//        }
-//        if(!path.toFile().isDirectory()) {
-//            return;
-//        }
-//        Files.createDirectories(path);
-//    }
-//}
+
+
+            return null;
+
+
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * /1/2/3   2/3
+     * @param start
+     * @param end
+     * @return
+     */
+    private List<Path> getPaths(Paths start, Paths end) {
+        if(start.equals(end)) {
+            return new ArrayList<>();
+        }
+
+        return null;
+    }
+
+
+    private FileInfoDetail getFileInfoDetail(Path dest) {
+        return null;
+    }
+
+
+    private void createDirectories(Path path) throws IOException {
+        if(path == null) {
+            return;
+        }
+        if(path.toFile().exists()) {
+            return;
+        }
+        if(!path.toFile().isDirectory()) {
+            return;
+        }
+        Files.createDirectories(path);
+    }
+}
