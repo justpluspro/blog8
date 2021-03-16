@@ -3,10 +3,13 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.service.ConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -24,6 +27,8 @@ import java.util.Properties;
  **/
 @Service
 public class ConfigServiceImpl implements ConfigService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private static final Path CONFIG_PATH = Paths.get(System.getProperty("user.home")).resolve("blog/config.properties");
 
@@ -60,11 +65,15 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public boolean authenticate(String name, String password) {
+        logger.info("method[authenticate] name:[{}], password:[{}]", name, password);
         loadConfig();
-        if(StringUtils.isEmpty(this.blogConfig.getLoginName()) &&  StringUtils.isEmpty(this.blogConfig.getPassword())) {
+        if(StringUtils.isEmpty(this.blogConfig.getLoginName()) || StringUtils.isEmpty(this.blogConfig.getPassword())) {
             return false;
         }
-        return this.blogConfig.getLoginName().equals(name) && this.blogConfig.getLoginName().equals(password);
+        final String encryptPassword = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
+        logger.info("encryptPassword:[{}]", encryptPassword);
+
+        return this.blogConfig.getLoginName().equals(name) && this.blogConfig.getLoginName().equals(encryptPassword);
     }
 
 

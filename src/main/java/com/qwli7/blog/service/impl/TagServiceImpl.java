@@ -7,6 +7,7 @@ import com.qwli7.blog.entity.vo.TagQueryParam;
 import com.qwli7.blog.event.TagDeleteEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
+import com.qwli7.blog.mapper.ArticleTagMapper;
 import com.qwli7.blog.mapper.TagMapper;
 import com.qwli7.blog.service.TagService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,10 +32,13 @@ public class TagServiceImpl implements TagService {
 
     private final TagMapper tagMapper;
 
+    private final ArticleTagMapper articleTagMapper;
+
     private final ApplicationEventPublisher publisher;
 
-    public TagServiceImpl(TagMapper tagMapper, ApplicationEventPublisher publisher) {
+    public TagServiceImpl(TagMapper tagMapper, ArticleTagMapper articleTagMapper, ApplicationEventPublisher publisher) {
         this.tagMapper = tagMapper;
+        this.articleTagMapper = articleTagMapper;
         this.publisher = publisher;
     }
 
@@ -69,6 +73,7 @@ public class TagServiceImpl implements TagService {
             return;
         }
         tagMapper.deleteById(id);
+        articleTagMapper.deleteByTag(tagOp.get());
         publisher.publishEvent(new TagDeleteEvent(this, tagOp.get()));
     }
 

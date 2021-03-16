@@ -84,7 +84,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>
             </a>
             <a href="javascript:uploadFile();">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1" /><polyline points="9 15 12 12 15 15" /><line x1="12" y1="12" x2="12" y2="21" /></svg>
+            </a>
+            <a href="javascript:void(0);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="5" cy="5" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="19" cy="5" r="1" /><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="19" r="1" /><circle cx="12" cy="19" r="1" /><circle cx="19" cy="19" r="1" /></svg>
             </a>
             <a id="fullscreen" href="javascript:void(0);">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="16 4 20 4 20 8" /><line x1="14" y1="10" x2="20" y2="4" /><polyline points="8 20 4 20 4 16" /><line x1="4" y1="20" x2="10" y2="14" /><polyline points="16 20 20 20 20 16" /><line x1="14" y1="14" x2="20" y2="20" /><polyline points="8 4 4 4 4 8" /><line x1="4" y1="4" x2="10" y2="10" /></svg>
@@ -125,7 +128,7 @@
                         </div>
                         <div class="col-lg-3">
                             <label for="category" class="form-label">分类设置</label>
-                            <select type="text" class="form-select" value="" id="category">
+                            <select type="text" class="form-select" id="category">
                                 <option value="1">java</option>
                                 <option value="2">web</option>
                                 <option value="3">life</option>
@@ -140,7 +143,7 @@
                         <div class="col-lg-8">
                             <label for="status" class="form-label">状态</label>
                             <select id="status" type="text" class="form-select">
-                                <option value="POSTED" selected>发布</option>
+                                <option value="POST" selected>发布</option>
                                 <option value="DRAFT">草稿</option>
                                 <option value="SCHEDULED">定时发布</option>
                             </select>
@@ -275,7 +278,16 @@
         }
     });
 
-    // editor.on("change", update);
+    editor.on("change", update);
+
+
+    function update() {
+        console.log("update");
+
+        // saveInBrowser("")
+
+
+    }
 
 
     function deleteSpan(obj) {
@@ -290,7 +302,7 @@
     }
 
 
-    function saveInBrowser(code, name) {
+    function saveInBrowser() {
         let text = editor.getValue();
         if(localStorage.getItem("content")) {
 
@@ -378,7 +390,7 @@
         Article.status = document.getElementById('status').value;
         Article.featureImage = document.getElementById('featureImage').value;
 
-        let tagList = new Array();
+        let tagList = [];
 
         if(tagsName.length > 0) {
             for(let i = 0; i < tagsName.length; i++) {

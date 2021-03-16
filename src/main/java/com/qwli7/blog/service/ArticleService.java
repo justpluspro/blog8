@@ -13,6 +13,8 @@ import com.qwli7.blog.entity.vo.ArticleQueryParam;
 public interface ArticleService {
     ArticleSaved save(Article article);
 
+    void update(Article article);
+
     PageDto<Article> selectPage(ArticleQueryParam queryParam);
 
     void deleteById(int id);
