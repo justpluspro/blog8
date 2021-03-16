@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
@@ -7,6 +7,7 @@
     <title>创建文章</title>
     <link rel="stylesheet" href="/static/editor/codemirror/lib/codemirror.css">
     <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/tabler/css/demo.min.css">
     <style>
         #toolbar {
             background-color: #f9f9f7;
@@ -21,8 +22,12 @@
             overflow-y: hidden;
         }
 
+
         #toolbar > a {
             margin-right: 8px;
+        }
+        #toolbar > a:hover {
+            text-decoration: none;
         }
 
         #in {
@@ -75,17 +80,17 @@
     <div>
         <!-- 工具栏 -->
         <div id="toolbar">
-            <a href="javascript:back();">
+            <a href="javascript:goBack();">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>
-            </a>
-            <a href="javascript:showBase();">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
             </a>
             <a href="javascript:uploadFile();">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
             </a>
             <a id="fullscreen" href="javascript:void(0);">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="16 4 20 4 20 8" /><line x1="14" y1="10" x2="20" y2="4" /><polyline points="8 20 4 20 4 16" /><line x1="4" y1="20" x2="10" y2="14" /><polyline points="16 20 20 20 20 16" /><line x1="14" y1="14" x2="20" y2="20" /><polyline points="8 4 4 4 4 8" /><line x1="4" y1="4" x2="10" y2="10" /></svg>
+            </a>
+            <a style="float:right;" href="javascript:showBase();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
             </a>
         </div>
 
@@ -100,7 +105,7 @@
 
     <!-- 发布框，一些基本信息 -->
     <div class="modal modal-blur fade" id="baseModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">基本信息</h5>
@@ -109,51 +114,93 @@
                 <div class="modal-body">
                     <div class="alert alert-danger" id="error-tips" style="display: none;"></div>
                     <div class="mb-3">
-                        <label class="form-label">博客标题</label>
+                        <label for="title" class="form-label">博客标题</label>
                         <input type="text" class="form-control" id="title" autocomplete="off" placeholder="博客标题(1-200个字符)">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">别名</label>
-                        <input type="text" class="form-control" id="alias" autocomplete="off" placeholder="博客别名(1-200个字符，不能为纯数字以及包含'<'、'>','='和空格等字符)">
+                    <div class="mb-3 row">
+                        <div class="col-lg-4">
+                            <label for="alias" class="form-label">别名</label>
+                            <input type="text" class="form-control" id="alias" autocomplete="off"
+                                   placeholder="别名(不能为纯数字以及包含'<'、'>','='和空格等字符)">
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="category" class="form-label">分类设置</label>
+                            <select type="text" class="form-select" value="" id="category">
+                                <option value="1">java</option>
+                                <option value="2">web</option>
+                                <option value="3">life</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-5">
+                            <label for="featureImage" class="form-label">特征图像</label>
+                            <input type="url" class="form-control" id="featureImage" autocomplete="off">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">分类设置</label>
-                        <select class="form-control" id="category">
-                            <option value="1">java</option>
-                            <option value="2">web</option>
-                            <option value="3">life</option>
-                        </select>
+                    <div class="row mb-3">
+                        <div class="col-lg-8">
+                            <label for="status" class="form-label">状态</label>
+                            <select id="status" type="text" class="form-select">
+                                <option value="POSTED" selected>发布</option>
+                                <option value="DRAFT">草稿</option>
+                                <option value="SCHEDULED">定时发布</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4" id="postAtContainer" style="display: none;">
+                            <label for="postAt" class="form-label">发布时间</label>
+                            <input id="postAt" type="datetime-local" class="form-control">
+                        </div>
                     </div>
-                    <div class="mb-3" id="tags-input-container">
-                        <label>标签</label>
-                        <div class="input-group">
-                            <input type="text" id="tags-input" class="form-control" placeholder="标签">
-                            <div class="input-group-text">
-                                <span>
-                                    <a href="javascript:void(0);" onclick="addTag();">添加</a>
-                                </span>
+                    <div class="row mb-3">
+                        <div class="col-lg-6" id="tags-input-container">
+                            <label class="form-label" for="tagContainer">已选择标签</label>
+                            <div id="tagContainer" class="form-control">
+                                <span class="badge"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="tags-input" class="form-label">标签</label>
+                            <input type="text" id="tags-input" class="form-control" list="datalistOptions">
+                            <datalist id="datalistOptions">
+                                <option value="Aruba"></option>
+                                <option value="Afghanistan"></option>
+                                <option value="Angola"></option>
+                                <option value="Anguilla"></option>
+                                <option value="Albania"></option>
+                                <option value="Andorra"></option>
+                                <option value="United Arab Emirates"></option>
+                                <option value="Argentina"></option>
+                                <option value="Armenia"></option>
+                                <option value="American Samoa"></option>
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-lg-6">
+                            <div class="form-label">评论设置</div>
+                            <div>
+                                <label class="form-check">
+                                    <input id="allowComment" checked class="form-check-input" type="checkbox">
+                                    <span class="form-check-label">开启评论</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-label">私密设置</div>
+                            <div>
+                                <label class="form-check">
+                                    <input id="is_private" class="form-check-input" type="checkbox">
+                                    <span class="form-check-label">私人</span>
+                                </label>
                             </div>
                         </div>
                     </div>
-                    <div class="card my-1">
-                        <div class="card-body" id="tags-container"></div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-label">评论设置</div>
-                        <div>
-                            <label class="form-check">
-                                <input id="allowComment" checked class="form-check-input" type="checkbox">
-                                <span class="form-check-label">开启评论</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-label">私密设置</div>
-                        <div>
-                            <label class="form-check">
-                                <input id="is_private" class="form-check-input" type="checkbox">
-                                <span class="form-check-label">私人</span>
-                            </label>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div>
+                                <label for="summary" class="form-label">摘要</label>
+                                <textarea id="summary" class="form-control" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -169,7 +216,6 @@
     <script src="/static/tabler/js/tabler.min.js"></script>
     <script src="/static/editor/codemirror/lib/codemirror.js"></script>
     <script src="/static/editor/codemirror/mode/markdown/markdown.js"></script>
-<!--    <script src="/static/editor/codemirror/mode/gfm/gfm.js"></script>-->
     <script src="/static/js/sweetalert2.min.js"></script>
 <script>
 
@@ -183,7 +229,65 @@
         }
     });
 
+    document.getElementById('status').addEventListener('change', function(event) {
+        let status = document.getElementById('status');
+        let selectedIndex = status.selectedIndex;
+        let selectedValue = status.options[selectedIndex].value;
+        if(selectedValue === 'SCHEDULED') {
+            document.getElementById('postAtContainer').style.display = 'block';
+        } else {
+            document.getElementById('postAtContainer').style.display = 'none';
+        }
+    });
+
+    let tagsName = new Array();
+    let tagInput = document.getElementById('tags-input');
+
+    tagInput.addEventListener('keydown', function(event){
+        if(event.keyCode === 13) {
+            let tagContainer = $('#tagContainer');
+            if(tagInput.value === null || tagInput.value === '') {
+                return;
+            }
+            if(tagsName.length >= 5) {
+                tagInput.value = '';
+                return;
+            }
+
+            if(tagsName.length === 0) {
+                tagsName[0] = tagInput.value;
+            } else {
+                if(tagsName.includes(tagInput.value)) {
+                    tagInput.value = '';
+                    return;
+                }
+                tagsName[tagsName.length] = tagInput.value;
+            }
+            if(tagsName.length === 5) {
+                tagInput.disabled = true;
+            }
+            let tagHtml = "<span onclick='deleteSpan(this);' style='margin-right: 8px; cursor:pointer;' " +
+                "class='badge bg-primary'>" + tagInput.value + '</span>';
+            console.log(tagsName);
+
+            tagContainer.append(tagHtml);
+            tagInput.value = '';
+        }
+    });
+
     // editor.on("change", update);
+
+
+    function deleteSpan(obj) {
+        $(obj).remove();
+        let removeValue = $(obj).text();
+        for(let i = tagsName.length-1; i> -1; i--) {
+            if(tagsName[i] === removeValue) {
+                tagsName.splice(i, 1);
+                tagInput.disabled = '';
+            }
+        }
+    }
 
 
     function saveInBrowser(code, name) {
@@ -195,14 +299,25 @@
         }
     }
 
-    function back() {
-        window.location.href = '/console/articles';
+    function goBack() {
+        Swal.fire({
+            title: '您确定吗？',
+            text: '您所编写的东西将不会被保存',
+            icon: 'warning',
+            showConfirmButton: true,
+            confirmButtonText: '确定',
+            showCancelButton: true,
+            cancelButtonText: '取消'
+        }).then(result => {
+            if(result.value) {
+                window.location.href = rootPath + 'console/articles'
+            }
+        });
     }
 
     function showBase() {
         $('#baseModal').modal('show');
     }
-
 
 
     document.getElementById('submit-art').addEventListener('click', function() {
@@ -238,7 +353,7 @@
                     title: 'Signed in successfully'
                 });
                 setTimeout(function() {
-                    window.location.href = rootPath + 'console/moments'
+                    window.location.href = rootPath + 'console/articles'
                 }, 800);
             },
             error: function(error, XHRStatus) {
@@ -260,6 +375,19 @@
         Article.alias = document.getElementById('alias').value;
         Article.allowComment = document.getElementById('allowComment').checked;
         Article.private = document.getElementById('is_private').checked;
+        Article.status = document.getElementById('status').value;
+        Article.featureImage = document.getElementById('featureImage').value;
+
+        let tagList = new Array();
+
+        if(tagsName.length > 0) {
+            for(let i = 0; i < tagsName.length; i++) {
+                tagList[i] = {
+                    name: tagsName[i]
+                };
+            }
+        }
+        Article.tags = tagList;
 
         return Article;
 
