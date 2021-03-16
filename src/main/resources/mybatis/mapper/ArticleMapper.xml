@@ -49,7 +49,7 @@
     </sql>
 
     <sql id="articleDetailSql">
-        select ba.id as aid
+        select ba.id as aid,
         ba.title, ba.content, ba.summary, ba.create_at, ba.post_at, ba.modify_at,
             ba.is_private, ba.alias, ba.hits, ba.comments, ba.status, ba.feature_image,
             ba.allow_comment
@@ -58,8 +58,11 @@
     </sql>
 
     <insert id="insert" parameterType="Article" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
-        insert into blog_article(title, content)
-        values(#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR})
+        insert into blog_article(title, content, hits, comments, create_at, modify_at,
+                                 post_at, status, feature_image, allow_comment, is_private, category_id)
+        values(#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{hits,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER},
+                      #{createAt}, #{modifyAt}, #{postAt}, #{status, javaType=ArticleStatus}, #{featureImage,jdbcType=VARCHAR},
+                      #{allowComment,jdbcType=BOOLEAN}, #{isPrivate,jdbcType=BOOLEAN}, #{category.id,jdbcType=INTEGER})
     </insert>
 
     <select id="selectByAlias" parameterType="string" resultMap="BaseResultMap">
