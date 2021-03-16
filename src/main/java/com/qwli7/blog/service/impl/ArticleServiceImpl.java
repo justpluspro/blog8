@@ -1,5 +1,6 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
@@ -7,10 +8,16 @@ import com.qwli7.blog.entity.vo.HandledArticleQueryParam;
 import com.qwli7.blog.event.ArticleDeleteEvent;
 import com.qwli7.blog.event.ArticlePostEvent;
 import com.qwli7.blog.exception.LogicException;
+import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.*;
 import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.Markdown2Html;
+import com.qwli7.blog.template.helper.Jsoups;
+import com.qwli7.blog.util.JsoupUtil;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +27,9 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 
@@ -31,18 +41,19 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleServiceImpl implements ArticleService, CommentModuleHandler {
 
-
     private final ArticleMapper articleMapper;
     private final CategoryMapper categoryMapper;
     private final ArticleTagMapper articleTagMapper;
     private final CommentMapper commentMapper;
     private final TagMapper tagMapper;
     private final Markdown2Html markdown2Html;
+    private final BlogProperties blogProperties;
     private final ApplicationEventPublisher publisher;
 
     public ArticleServiceImpl(Markdown2Html markdown2Html, ArticleMapper articleMapper,
                               CategoryMapper categoryMapper, ArticleTagMapper articleTagMapper,
                               TagMapper tagMapper, CommentMapper commentMapper,
+                              BlogProperties blogProperties,
                               ApplicationEventPublisher publisher) {
         this.markdown2Html = markdown2Html;
         this.articleMapper = articleMapper;
@@ -50,6 +61,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         this.categoryMapper = categoryMapper;
         this.tagMapper = tagMapper;
         this.commentMapper = commentMapper;
+        this.blogProperties = blogProperties;
         this.publisher = publisher;
     }
 
@@ -58,12 +70,20 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     public ArticleSaved save(Article article) {
         article.setHits(0);
         article.setComments(0);
+        article.setCreateAt(LocalDateTime.now());
+
+        Set<Tag> tags = article.getTags();
+        if(tags != null || tags.size() > 5) {
+            throw new LogicException("tags.exceed.limit", "标签最多不能超过5个");
+        }
+
         final Category category = article.getCategory();
         if(category != null && category.getId() != null) {
             final Optional<Category> categoryOp = categoryMapper.findById(category.getId());
             if(!categoryOp.isPresent()) {
                 throw new LogicException("category.notExists", "分类不存在");
             }
+            article.setCategory(categoryOp.get());
         }
         final String alias = article.getAlias();
         if(!StringUtils.isEmpty(alias)) {
@@ -72,8 +92,6 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
                 throw new LogicException("alias.exists", "别名已经存在");
             }
         }
-
-        article.setCreateAt(LocalDateTime.now());
 
         ArticleStatus status = article.getStatus();
         if(status == null ) {
@@ -89,6 +107,26 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
                 article.setModifyAt(LocalDateTime.now());
                 article.setPostAt(LocalDateTime.now());
                 break;
+            case SCHEDULED:
+                LocalDateTime postAt = article.getPostAt();
+                if(postAt == null || postAt.isBefore(LocalDateTime.now())) {
+                    article.setPostAt(LocalDateTime.now());
+                    article.setModifyAt(LocalDateTime.now());
+                    article.setStatus(ArticleStatus.POST);
+                } else {
+                    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
+//                    exe
+//                    cutorService.scheduleWithFixedDelay()
+                }
+                break;
+            default:
+                throw new LogicException("illegal.status", "非法状态");
+        }
+
+        String featureImage = article.getFeatureImage();
+        if(StringUtils.isEmpty(featureImage)) {
+            String html = markdown2Html.toHtml(article.getContent());
+            JsoupUtil.getFirstImage(html).ifPresent(article::setFeatureImage);
         }
 
         articleMapper.insert(article);
@@ -97,6 +135,44 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         publisher.publishEvent(new ArticlePostEvent(this, article));
 
         return new ArticleSaved(article.getId(), true);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = LogicException.class)
+    @Override
+    public void update(Article article) {
+
+        Optional<Article> articleOp = articleMapper.selectById(article.getId());
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException("article.notFound", "文章未找到");
+        }
+        String alias = article.getAlias();
+        if(!StringUtils.isEmpty(alias)) {
+            Optional<Article> oldOp = articleMapper.selectByAlias(alias);
+            if(oldOp.isPresent() && !oldOp.get().getId().equals(article.getId())) {
+                throw new LogicException("article.alias.exists", "文章别名已被使用");
+            }
+        }
+        Article oldArticle = articleOp.get();
+
+        article.setModifyAt(LocalDateTime.now());
+        article.setCreateAt(LocalDateTime.now());
+
+        if(article.getStatus().equals(ArticleStatus.POST)) {
+            article.setPostAt(oldArticle.getPostAt());
+            if(article.getPostAt() == null || article.getPostAt().isAfter(LocalDateTime.now())) {
+                article.setPostAt(LocalDateTime.now());
+            }
+        } else if(article.getStatus().equals(ArticleStatus.DRAFT)) {
+            article.setPostAt(oldArticle.getPostAt());
+        }
+        processArticleTags(article);
+        articleMapper.update(article);
+
+        if(article.getStatus().equals(ArticleStatus.POST)) {
+            //重构索引
+        }
+        //事务提交之后，需要删除之前的文档
+
     }
 
     @Override
@@ -135,7 +211,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         if(CollectionUtils.isEmpty(articles)) {
             return;
         }
-        for(Article article: articles){
+        for(Article article: articles) {
             Set<Tag> tags = article.getTags();
             if(CollectionUtils.isEmpty(tags)) {
                 continue;
@@ -161,18 +237,22 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     }
 
     private void processArticleTags(Article article) {
-        final Set<Tag> tags = article.getTags();
-        if(tags == null || tags.size() == 0) {
-            return;
-        }
-        if(tags.size() > 5) {
-            throw new LogicException("max.tags", "最多标签不能超过 5 个");
-        }
-        for(Tag tag: tags) {
-            final Optional<Tag> tagOp = tagMapper.findById(tag.getId());
-            if(tagOp.isPresent()) {
-//                tag
+        articleTagMapper.deleteByArticle(article);
+        for(Tag tag: article.getTags()) {
+            String name = tag.getName();
+            name = StringUtils.trimAllWhitespace(name);
+            Optional<Tag> tagOp = tagMapper.findByName(name);
+            Tag oldTag;
+            if(tagOp.isPresent()){
+                oldTag = tagOp.get();
+            } else {
+                oldTag = new Tag();
+                oldTag.setName(name);
+                oldTag.setCreateAt(LocalDateTime.now());
+                oldTag.setModifyAt(LocalDateTime.now());
+                tagMapper.insert(oldTag);
             }
+            articleTagMapper.insert(new ArticleTag(article.getId(), oldTag.getId()));
         }
     }
 
