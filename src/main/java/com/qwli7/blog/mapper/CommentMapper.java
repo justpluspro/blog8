@@ -1,7 +1,10 @@
 package com.qwli7.blog.mapper;
 
+import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.CommentModule;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.Optional;
 
 /**
  * @author qwli7
@@ -11,4 +14,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CommentMapper {
     void deleteByModule(CommentModule commentModule);
+
+    Optional<Comment> selectById(Integer id);
+
+    void insert(Comment comment);
 }

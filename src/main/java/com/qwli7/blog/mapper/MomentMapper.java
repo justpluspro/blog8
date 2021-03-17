@@ -23,6 +23,10 @@ public interface MomentMapper {
 
     void deleteById(int id);
 
+    void updateHits(int id, int hits);
+
+    void addHits(int id, int hits);
+
     List<Moment> selectPage(MomentQueryParam queryParam);
 
     int count(MomentQueryParam queryParam);

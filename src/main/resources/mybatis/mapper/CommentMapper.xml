@@ -7,4 +7,24 @@
         delete from blog_comment where module_id = #{id,jdbcType=INTEGER}
         and module_name = #{name,jdbcType=VARCHAR}
     </delete>
+
+    <select id="selectById" parameterType="integer" resultType="com.qwli7.blog.entity.Comment">
+
+        SELECT * FROM blog_comment WHERE id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" parameterType="Comment" keyProperty="id" keyColumn="id">
+        INSERT INTO blog_comment (
+            <if test="parent != null">
+                parent_id,
+            </if>
+                path, nickname, email, ip, admin, content, module_id, create_at,
+                                  modify_at, avatar, module_name) VALUES (
+            <if test="parent != null">
+                #{parent.id,jdbcType=INTEGER},
+            </if>
+        #{parentPath,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{admin,jdbcType=BOOLEAN}, #{content,jdbcType=VARCHAR}, #{module.id,jdbcType=INTEGER},
+        #{createAt}, #{modifyAt}, #{avatar,jdbcType=VARCHAR}, #{module.name,jdbcType=VARCHAR})
+    </insert>
 </mapper>

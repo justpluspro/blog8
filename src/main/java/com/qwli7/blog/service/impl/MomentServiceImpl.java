@@ -1,6 +1,5 @@
 package com.qwli7.blog.service.impl;
 
-import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.dto.PageDto;
@@ -29,8 +28,6 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class MomentServiceImpl implements MomentService, CommentModuleHandler {
-
-    private final static String MODULE_NAME = "moment";
 
     private final MomentMapper momentMapper;
     private final ApplicationEventPublisher publisher;
@@ -74,6 +71,18 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.deleteById(id);
         commentMapper.deleteByModule(new CommentModule(id, getModuleName()));
         publisher.publishEvent(new MomentDeleteEvent(this, oldMoment));
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void updateHits(int id, int hits) {
+        final Optional<Moment> momentOp = momentMapper.selectById(id);
+        if(!momentOp.isPresent()) {
+            throw new ResourceNotFoundException("moment.notExists", "动态不存在");
+        }
+        final Moment moment = momentOp.get();
+        momentMapper.addHits(moment.getId(), 1);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.BlogContext;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.PageDto;
@@ -257,7 +258,38 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     }
 
 
+    @Override
+    public void validateBeforeInsert(CommentModule module) {
+        if(module == null) {
+            throw new LogicException("invalid.module", "模块不能为空");
+        }
+        final Optional<Article> articleOp = articleMapper.selectById(module.getId());
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException("article.notExists", "内容不存在");
+        }
+        final Article article = articleOp.get();
 
+        final Boolean allowComment = article.getAllowComment();
+        if(allowComment != null && !allowComment) {
+            throw new LogicException("comment.notAllowed", "评论已关闭");
+        }
+
+        final ArticleStatus status = article.getStatus();
+
+
+        if(ArticleStatus.POST.equals(status)) {
+            if(article.getPrivate() != null && article.getPrivate() && !BlogContext.isAuthenticated()) {
+                throw new LogicException("operation.notAllowed", "不允许评论私人动态");
+            }
+        }
+
+
+
+        if(!ArticleStatus.POST.equals(status) && !BlogContext.isAuthenticated()) {
+            //非发布状态，并且未登录
+            throw new LogicException("operation.notAllowed", "操作不允许");
+        }
+    }
 
     @Override
     public String getModuleName() {

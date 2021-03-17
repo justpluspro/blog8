@@ -17,4 +17,8 @@ public class BlogContext {
     public static void clear() {
         authenticateMap.remove();
     }
+
+    public static Boolean isAuthenticated() {
+        return authenticateMap.get() != null && authenticateMap.get();
+    }
 }

@@ -20,6 +20,8 @@ public interface MomentService {
 
     Moment getMomentForEdit(int id);
 
+    void updateHits(int id, int hits);
+
     Optional<Moment> getMoment(int id);
 
     PageDto<Moment> selectPage(MomentQueryParam queryParam);

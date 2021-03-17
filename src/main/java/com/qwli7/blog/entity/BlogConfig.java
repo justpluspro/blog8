@@ -28,7 +28,17 @@ public class BlogConfig implements Serializable {
 
     private String nickname;
 
+    private String defaultAvatar;
+
     private String email;
+
+    public String getDefaultAvatar() {
+        return defaultAvatar;
+    }
+
+    public void setDefaultAvatar(String defaultAvatar) {
+        this.defaultAvatar = defaultAvatar;
+    }
 
     public String getAvatar() {
         return avatar;

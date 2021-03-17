@@ -1,5 +1,6 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.CommentStrategy;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.service.ConfigService;
@@ -36,6 +37,7 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String LOGIN_PWD = "login.password";
     private static final String USER_EMAIL = "user.email";
     private static final String USER_NICKNAME = "user.nickname";
+    private static final String USER_AVATAR = "user.avatar";
 
     private static Properties PROPERTIES;
 
@@ -62,6 +64,13 @@ public class ConfigServiceImpl implements ConfigService {
         return config;
     }
 
+
+    @Override
+    public CommentStrategy getCommentStrategy() {
+        loadConfig();
+
+        return CommentStrategy.EACH;
+    }
 
     @Override
     public boolean authenticate(String name, String password) {
@@ -112,11 +121,13 @@ public class ConfigServiceImpl implements ConfigService {
         String loginPwd = PROPERTIES.getProperty(LOGIN_PWD);
         String userEmail = PROPERTIES.getProperty(USER_EMAIL);
         String nickname = PROPERTIES.getProperty(USER_NICKNAME);
+        String avatar = PROPERTIES.getProperty(USER_AVATAR);
 
         blogConfig = new BlogConfig();
         blogConfig.setLoginName(loginName);
         blogConfig.setPassword(loginPwd);
         blogConfig.setNickname(nickname);
         blogConfig.setEmail(userEmail);
+        blogConfig.setAvatar(avatar);
     }
 }

@@ -1,5 +1,6 @@
 package com.qwli7.blog.service;
 
+import com.qwli7.blog.CommentStrategy;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.entity.User;
 
@@ -11,6 +12,9 @@ import com.qwli7.blog.entity.User;
 public interface ConfigService {
 
     boolean authenticate(String name, String password);
+
+
+    CommentStrategy getCommentStrategy();
 
 
     void updatePassword(String password, String oldPassword);

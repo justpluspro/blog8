@@ -10,7 +10,6 @@
     </insert>
 
     <update id="update" parameterType="integer">
-
         update blog_moment
             <set>
                 <if test="content != null  and content != ''">
@@ -41,6 +40,14 @@
     <delete id="deleteById" parameterType="int">
         delete from blog_moment where id = #{id}
     </delete>
+
+    <update id="updateHits">
+        UPDATE blog_moment SET hits = #{hits} WHERE id = #{id}
+    </update>
+
+    <update id="addHits">
+        UPDATE blog_moment set hits = hits + #{hits} WHERE id = #{id}
+    </update>
 
     <select id="count" parameterType="MomentQueryParam" resultType="int">
         select count(id) from blog_moment
