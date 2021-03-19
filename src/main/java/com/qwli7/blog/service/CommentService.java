@@ -2,6 +2,9 @@ package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.SavedComment;
+import com.qwli7.blog.entity.dto.CommentDto;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommentQueryParam;
 
 /**
  * @author qwli7
@@ -12,4 +15,10 @@ public interface CommentService {
 
 
     SavedComment saveComment(Comment comment);
+
+
+    PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam);
+
+
+    void delete(Comment comment);
 }

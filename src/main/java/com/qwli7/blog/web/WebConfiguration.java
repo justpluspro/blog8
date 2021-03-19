@@ -12,6 +12,10 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.qwli7.blog.BlogProperties;
+import com.qwli7.blog.entity.Comment;
+import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.queue.DataContainer;
+import com.qwli7.blog.queue.MemoryDataContainer;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.service.impl.DefaultMarkdown2Html;
 import com.qwli7.blog.template.MyAutoDialect;
@@ -52,6 +56,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private Markdown2Html markdown2Html;
 
+
+    @Bean("commentNotifyContainer")
+    public DataContainer<Comment> dataContainer() {
+        return new MemoryDataContainer<>();
+    }
 
     @Bean
     @Primary

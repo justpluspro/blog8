@@ -20,4 +20,6 @@ public interface CommentMapper {
     void insert(Comment comment);
 
     Optional<Comment> selectLatestCommentByIp(String ip);
+
+    void deleteById(Integer id);
 }

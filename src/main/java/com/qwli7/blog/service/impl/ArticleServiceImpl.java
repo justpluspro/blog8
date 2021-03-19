@@ -23,6 +23,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -289,6 +290,19 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
             //非发布状态，并且未登录
             throw new LogicException("operation.notAllowed", "操作不允许");
         }
+    }
+
+    @Override
+    public void validateBeforeQuery(CommentModule module) {
+        Assert.notNull(module, "module cannot be null");
+
+
+        final Optional<Article> articleOp = articleMapper.selectById(module.getId());
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException("article.notExists", "内容不存在");
+        }
+
+
     }
 
     @Override

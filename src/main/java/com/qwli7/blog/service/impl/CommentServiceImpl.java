@@ -3,8 +3,12 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.BlogContext;
 import com.qwli7.blog.CommentStrategy;
 import com.qwli7.blog.entity.*;
+import com.qwli7.blog.entity.dto.CommentDto;
+import com.qwli7.blog.entity.dto.PageDto;
+import com.qwli7.blog.entity.vo.CommentQueryParam;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.mapper.CommentMapper;
+import com.qwli7.blog.queue.DataContainer;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.CommentService;
 import com.qwli7.blog.service.ConfigService;
@@ -43,13 +47,16 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper commentMapper;
     private final ConfigService configService;
+    private final DataContainer<Comment> dataContainer;
 
     private final List<CommentModuleHandler> moduleHandlers;
 
     public CommentServiceImpl(CommentMapper commentMapper, ConfigService configService,
+                              DataContainer<Comment> dataContainer,
                               ObjectProvider<CommentModuleHandler> objectProvider) {
         this.commentMapper = commentMapper;
         this.configService = configService;
+        this.dataContainer = dataContainer;
         this.moduleHandlers = objectProvider.stream().collect(Collectors.toList());
     }
 
@@ -148,12 +155,42 @@ public class CommentServiceImpl implements CommentService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                final Comment _parent = comment.getParent();
+                dataContainer.push(comment);
+//                final Comment _parent = comment.getParent();
                 //email notify
 
             }
         });
         return new SavedComment(comment.getId(), checking);
 
+    }
+
+
+    @Override
+    public PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam) {
+        final CommentModule commentModule = commentQueryParam.getCommentModule();
+        final Optional<CommentModuleHandler> commentModuleHandlerOp = moduleHandlers.stream().filter(e ->
+                e.getModuleName().equals(commentModule.getName())
+        ).findAny();
+
+        if(!commentModuleHandlerOp.isPresent()) {
+            throw new LogicException("module.notExists", "模块[" + commentModule.getName() + "]不存在");
+        }
+        commentModuleHandlerOp.get().validateBeforeQuery(commentModule);
+
+
+        return null;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void delete(Comment comment) {
+        final Optional<Comment> commentOp = commentMapper.selectById(comment.getId());
+        if(!commentOp.isPresent()) {
+            throw new LogicException("comment.notExists", "评论不存在");
+        }
+
+        commentMapper.deleteById(commentOp.get().getId());
+        dataContainer.remove(comment);
     }
 }

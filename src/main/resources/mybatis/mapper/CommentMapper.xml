@@ -31,4 +31,8 @@
     <select id="selectLatestCommentByIp" resultType="com.qwli7.blog.entity.Comment">
         select * from blog_comment where ip = #{ip,jdbcType=VARCHAR}
     </select>
+
+    <delete id="deleteById">
+        delete from blog_comment where id = #{id,jdbcType=INTEGER}
+    </delete>
 </mapper>

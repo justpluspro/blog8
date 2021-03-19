@@ -8,4 +8,6 @@ public interface CommentModuleHandler {
     String getModuleName();
 
     void validateBeforeInsert(CommentModule module);
+
+    void validateBeforeQuery(CommentModule module);
 }
