@@ -18,4 +18,6 @@ public interface CommentMapper {
     Optional<Comment> selectById(Integer id);
 
     void insert(Comment comment);
+
+    Optional<Comment> selectLatestCommentByIp(String ip);
 }

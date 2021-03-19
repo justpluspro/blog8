@@ -27,4 +27,8 @@
         #{admin,jdbcType=BOOLEAN}, #{content,jdbcType=VARCHAR}, #{module.id,jdbcType=INTEGER},
         #{createAt}, #{modifyAt}, #{avatar,jdbcType=VARCHAR}, #{module.name,jdbcType=VARCHAR})
     </insert>
+
+    <select id="selectLatestCommentByIp" resultType="com.qwli7.blog.entity.Comment">
+        select * from blog_comment where ip = #{ip,jdbcType=VARCHAR}
+    </select>
 </mapper>

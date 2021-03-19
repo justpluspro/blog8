@@ -120,13 +120,20 @@ public class CommentServiceImpl implements CommentService {
 
             final CommentStrategy commentStrategy = configService.getCommentStrategy();
             switch (commentStrategy) {
-                case EACH:
+                case EACH: //每次评论都需要审核
                     checking = true;
                     break;
-                case FIRST:
-
+                case FIRST: //第一次评论需要审核
+                    Optional<Comment> commentOp = commentMapper.selectLatestCommentByIp(ip);
+                    if(commentOp.isPresent()) {
+                        final Comment ipComment = commentOp.get();
+                        final CommentStatus status = ipComment.getStatus();
+                        checking = CommentStatus.CHECKING == status;
+                    } else {
+                        checking = true;
+                    }
                     break;
-                case NEVER:
+                case NEVER: //从来不要审核
                     checking = false;
                     break;
                 default:
