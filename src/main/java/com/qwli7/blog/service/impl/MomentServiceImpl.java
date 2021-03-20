@@ -1,10 +1,12 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.event.MomentDeleteEvent;
+import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.CommentMapper;
 import com.qwli7.blog.mapper.MomentMapper;
@@ -15,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -139,5 +142,24 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Override
     public String getModuleName() {
         return Moment.class.getName();
+    }
+
+    @Override
+    public void validateBeforeInsert(CommentModule module) {
+        Assert.notNull(module, "commentModule not null.");
+        final Integer id = module.getId();
+        final Optional<Moment> momentOp = momentMapper.selectById(id);
+        if(!momentOp.isPresent()) {
+            throw new ResourceNotFoundException("comment.notExists", "动态不存在");
+        }
+        final Moment moment = momentOp.get();
+        if(!moment.getAllowComment()) {
+            throw new LogicException("moment.notAllow", "动态不允许评论");
+        }
+    }
+
+    @Override
+    public void validateBeforeQuery(CommentModule module) {
+
     }
 }

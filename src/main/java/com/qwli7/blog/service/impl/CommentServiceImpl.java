@@ -65,6 +65,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public SavedComment saveComment(Comment comment) {
+        logger.info("method[saveComment] comment:[{}]", comment.toString());
         final CommentModule module = comment.getModule();
         if(moduleHandlers.isEmpty()) {
             throw new LogicException("module.notExists", "模块不存在");
