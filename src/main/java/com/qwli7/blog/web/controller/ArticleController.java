@@ -6,6 +6,7 @@ import com.qwli7.blog.entity.ArticleSaved;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.service.ArticleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,8 +45,16 @@ public class ArticleController {
         return articleService.selectPage(queryParam);
     }
 
+    @PutMapping("article/{id}")
+    public ResponseEntity<Void> update(@PathVariable("id") int id, @RequestBody Article article) {
+        article.setId(id);
+        articleService.update(article);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @DeleteMapping("article/{id}")
-    public void delete(@PathVariable("id") int id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") int id) {
         articleService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

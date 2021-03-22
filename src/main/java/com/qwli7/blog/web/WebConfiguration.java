@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.dialect.IProcessorDialect;
@@ -56,6 +57,20 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private Markdown2Html markdown2Html;
 
+
+    /**
+     * 解决跨域请求问题
+     * @param registry registry
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .allowedMethods("*")
+                .allowedOrigins("*")
+                .maxAge(5000);
+    }
 
     @Bean("commentNotifyContainer")
     public DataContainer<Comment> dataContainer() {

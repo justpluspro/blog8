@@ -1,5 +1,6 @@
 package com.qwli7.blog.web.controller;
 
+import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.BlackIp;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommonQueryParam;
@@ -17,9 +18,11 @@ import java.util.List;
 public class BlackIpController {
 
     private final BlackIpService blackIpService;
+    private final BlogProperties blogProperties;
 
-    public BlackIpController(BlackIpService blackIpService) {
+    public BlackIpController(BlackIpService blackIpService, BlogProperties blogProperties) {
         this.blackIpService = blackIpService;
+        this.blogProperties = blogProperties;
     }
 
 
