@@ -1,9 +1,6 @@
 package com.qwli7.blog.exception;
 
-import com.qwli7.blog.exception.reader.AuthenticatedExceptionReader;
-import com.qwli7.blog.exception.reader.ExceptionReader;
-import com.qwli7.blog.exception.reader.LogicExceptionReader;
-import com.qwli7.blog.exception.reader.MethodArgumentNotValidExceptionReader;
+import com.qwli7.blog.exception.reader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -35,7 +32,12 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
         this.exceptionReaders = new ArrayList<>();
         this.exceptionReaders.add(new LogicExceptionReader());
         this.exceptionReaders.add(new AuthenticatedExceptionReader());
+        // json 格式提交数据时走此异常
         this.exceptionReaders.add(new MethodArgumentNotValidExceptionReader());
+        //表单提交时走此异常
+        this.exceptionReaders.add(new ConstraintViolationExceptionReader());
+        // 方法不支持时走此异常
+        this.exceptionReaders.add(new HttpRequestMethodNotSupportedExceptionReader());
     }
 
     @Override
