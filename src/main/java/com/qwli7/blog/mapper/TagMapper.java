@@ -32,4 +32,6 @@ public interface TagMapper {
     int count(CommonQueryParam queryParam);
 
     List<Tag> selectPage(CommonQueryParam queryParam);
+
+    Optional<Tag> selectById(int id);
 }

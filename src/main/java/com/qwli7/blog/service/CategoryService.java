@@ -14,6 +14,7 @@ public interface CategoryService {
 
     int saveCategory(Category category);
 
+    Optional<Category> selectById(int id);
 
     List<Category> findAllCategories();
 

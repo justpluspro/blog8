@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.exception.BlogExceptionResolver;
 import com.qwli7.blog.queue.DataContainer;
 import com.qwli7.blog.queue.MemoryDataContainer;
 import com.qwli7.blog.service.Markdown2Html;
@@ -22,6 +23,8 @@ import com.qwli7.blog.template.MyAutoDialect;
 import com.qwli7.blog.template.SayToAttributeTagProcessor;
 import com.qwli7.blog.template.data.DataElementTagProcessor;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -30,10 +33,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.dialect.IProcessorDialect;
+import org.thymeleaf.expression.Lists;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
@@ -46,17 +51,37 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+
     private Markdown2Html markdown2Html;
 
+
+    @Bean
+    public BlogExceptionResolver exceptionResolver() {
+        return new BlogExceptionResolver();
+    }
+
+
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        logger.info("method<extendHandlerExceptionResolvers> resolvers: [{}]", resolvers.size());
+        logger.info("method<extendHandlerExceptionResolvers> resolvers: [{}]", resolvers.toArray().toString());
+        // resolvers 已经有值了
+        // 将自定义的插在第一个位置上
+        resolvers.add(0, exceptionResolver());
+    }
+
+    @Override
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        logger.info("method<configureHandlerExceptionResolvers> resolvers: [{}]", resolvers.size());
+        logger.info("method<configureHandlerExceptionResolvers> resolvers: [{}]", resolvers.toArray().toString());
+    }
 
     /**
      * 解决跨域请求问题

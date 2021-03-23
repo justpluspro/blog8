@@ -7,6 +7,7 @@ import com.qwli7.blog.entity.vo.TagQueryParam;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author qwli7
@@ -23,4 +24,6 @@ public interface TagService {
 
 
     void updateTag(final Tag tag);
+
+    Optional<Tag> selectById(int id);
 }

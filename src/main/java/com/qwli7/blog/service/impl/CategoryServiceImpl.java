@@ -48,6 +48,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.findByName(name);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Category> selectById(int id) {
+        return categoryMapper.findById(id);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteCategory(int id) {

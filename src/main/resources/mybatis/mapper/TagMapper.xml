@@ -55,4 +55,9 @@
         order by create_at desc
         limit #{start}, #{offset}
     </select>
+
+    <select id="selectById" resultType="Tag">
+        select id, name, create_at, modify_at
+        from blog_tag where id = #{id}
+    </select>
 </mapper>

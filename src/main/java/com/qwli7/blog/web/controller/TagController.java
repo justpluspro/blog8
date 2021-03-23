@@ -5,6 +5,7 @@ import com.qwli7.blog.entity.Tag;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommonQueryParam;
 import com.qwli7.blog.entity.vo.TagQueryParam;
+import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.TagService;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,13 @@ public class TagController {
         }
         return tagService.selectPage(queryParam);
     }
+
+    @GetMapping("tag/{id}")
+    public Tag selectById(@PathVariable("id") int id) {
+        return tagService.selectById(id).orElseThrow(()
+                -> new ResourceNotFoundException("tag.notExists","标签不存在"));
+    }
+
 
     @PostMapping("tag")
     public ResponseEntity<?> save(@RequestBody @Valid Tag tag) {

@@ -65,6 +65,12 @@ public class TagServiceImpl implements TagService {
         return new PageDto<>(queryParam, count, tagMapper.selectPage(queryParam));
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Tag> selectById(int id) {
+        return tagMapper.selectById(id);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteTag(int id) {
@@ -88,8 +94,8 @@ public class TagServiceImpl implements TagService {
         if(old.getName().equals(tag.getName())) {
             return;
         }
-        old.setName(tag.getName());
-        old.setModifyAt(LocalDateTime.now());
+        tag.setName(tag.getName());
+        tag.setModifyAt(LocalDateTime.now());
         tagMapper.update(tag);
     }
 }
