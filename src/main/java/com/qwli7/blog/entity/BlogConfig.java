@@ -1,5 +1,7 @@
 package com.qwli7.blog.entity;
 
+import com.qwli7.blog.CommentStrategy;
+
 import java.io.Serializable;
 
 /**
@@ -31,6 +33,16 @@ public class BlogConfig implements Serializable {
     private String defaultAvatar;
 
     private String email;
+
+    private CommentStrategy commentStrategy;
+
+    public CommentStrategy getCommentStrategy() {
+        return commentStrategy;
+    }
+
+    public void setCommentStrategy(CommentStrategy commentStrategy) {
+        this.commentStrategy = commentStrategy;
+    }
 
     public String getDefaultAvatar() {
         return defaultAvatar;

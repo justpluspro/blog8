@@ -16,7 +16,6 @@ public interface ConfigService {
 
     CommentStrategy getCommentStrategy();
 
-
     void updatePassword(String password, String oldPassword);
 
     BlogConfig getConfig();

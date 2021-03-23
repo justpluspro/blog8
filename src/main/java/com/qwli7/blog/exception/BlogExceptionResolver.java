@@ -1,7 +1,9 @@
 package com.qwli7.blog.exception;
 
+import com.qwli7.blog.exception.reader.AuthenticatedExceptionReader;
 import com.qwli7.blog.exception.reader.ExceptionReader;
 import com.qwli7.blog.exception.reader.LogicExceptionReader;
+import com.qwli7.blog.exception.reader.MethodArgumentNotValidExceptionReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 自定义异常解析器
@@ -31,6 +34,8 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
     public BlogExceptionResolver() {
         this.exceptionReaders = new ArrayList<>();
         this.exceptionReaders.add(new LogicExceptionReader());
+        this.exceptionReaders.add(new AuthenticatedExceptionReader());
+        this.exceptionReaders.add(new MethodArgumentNotValidExceptionReader());
     }
 
     @Override
@@ -38,6 +43,16 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
                                          HttpServletResponse httpServletResponse,
                                          Object o, Exception e) {
         logger.info("exception occurred! ");
+
+        filterReader(e).ifPresent(exceptionReader ->  {
+
+            final Map<String, Object> stringObjectMap = exceptionReader.readErrors(e);
+
+
+
+        });
+
+
         return null;
     }
 
@@ -46,6 +61,11 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
     public Map<String, Object> getErrorAttributes(WebRequest webRequest,
                                                   ErrorAttributeOptions options) {
         return null;
+    }
+
+
+    public Optional<ExceptionReader> filterReader(Exception e){
+        return this.exceptionReaders.stream().filter(exceptionReader -> exceptionReader.match(e)).findFirst();
     }
 
     @Override

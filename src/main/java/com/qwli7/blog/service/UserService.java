@@ -6,4 +6,5 @@ package com.qwli7.blog.service;
  * 功能：blog8
  **/
 public interface UserService {
+
 }

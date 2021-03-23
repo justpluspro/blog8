@@ -13,7 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Comment;
-import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.exception.BlogExceptionResolver;
 import com.qwli7.blog.queue.DataContainer;
 import com.qwli7.blog.queue.MemoryDataContainer;
@@ -23,12 +22,12 @@ import com.qwli7.blog.template.MyAutoDialect;
 import com.qwli7.blog.template.SayToAttributeTagProcessor;
 import com.qwli7.blog.template.data.DataElementTagProcessor;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
+import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -38,7 +37,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.dialect.IProcessorDialect;
-import org.thymeleaf.expression.Lists;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
@@ -46,6 +44,9 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -82,6 +83,17 @@ public class WebConfiguration implements WebMvcConfigurer {
         logger.info("method<configureHandlerExceptionResolvers> resolvers: [{}]", resolvers.size());
         logger.info("method<configureHandlerExceptionResolvers> resolvers: [{}]", resolvers.toArray().toString());
     }
+
+
+    @Bean
+    public Validator validator() {
+        ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)
+                .configure()
+                .failFast(true)
+                .buildValidatorFactory();
+        return validatorFactory.getValidator();
+    }
+
 
     /**
      * 解决跨域请求问题

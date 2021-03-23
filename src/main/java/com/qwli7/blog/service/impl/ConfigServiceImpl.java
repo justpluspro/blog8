@@ -3,6 +3,7 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.CommentStrategy;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.entity.User;
+import com.qwli7.blog.exception.AuthenticatedException;
 import com.qwli7.blog.service.ConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,8 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String USER_NICKNAME = "user.nickname";
     private static final String USER_AVATAR = "user.avatar";
 
+    private static final String COMMENT_STRATEGY = "comment.strategy";
+
     private static Properties PROPERTIES;
 
     private User user;
@@ -50,9 +53,10 @@ public class ConfigServiceImpl implements ConfigService {
             if(!Files.exists(CONFIG_PATH)) {
                 Files.createFile(CONFIG_PATH);
             }
-            PROPERTIES = PropertiesLoaderUtils.loadProperties(new EncodedResource(new FileSystemResource(CONFIG_PATH), StandardCharsets.UTF_8));
-        }catch (IOException ex) {
-            ex.printStackTrace();
+            PROPERTIES = PropertiesLoaderUtils.loadProperties(new EncodedResource(new FileSystemResource(CONFIG_PATH),
+                    StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            throw new RuntimeException("配置文件初始化失败");
         }
     }
 
@@ -76,13 +80,20 @@ public class ConfigServiceImpl implements ConfigService {
     public boolean authenticate(String name, String password) {
         logger.info("method[authenticate] name:[{}], password:[{}]", name, password);
         loadConfig();
-        if(StringUtils.isEmpty(this.blogConfig.getLoginName()) || StringUtils.isEmpty(this.blogConfig.getPassword())) {
+        final String loginName = this.blogConfig.getLoginName();
+        final String configPassword = this.blogConfig.getPassword();
+        if(StringUtils.isEmpty(loginName) ||
+                StringUtils.isEmpty(configPassword)) {
             return false;
         }
         final String encryptPassword = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
         logger.info("encryptPassword:[{}]", encryptPassword);
 
-        return this.blogConfig.getLoginName().equals(name) && this.blogConfig.getLoginName().equals(encryptPassword);
+        if(!loginName.equals(name) ||  !configPassword.equals(encryptPassword)) {
+            throw new AuthenticatedException();
+        }
+
+        return true;
     }
 
 
@@ -102,6 +113,7 @@ public class ConfigServiceImpl implements ConfigService {
         User user = new User();
         user.setUsername(this.blogConfig.getLoginName());
         user.setEmail(this.blogConfig.getEmail());
+        user.setAvatar(this.blogConfig.getAvatar());
         return user;
     }
 
@@ -122,12 +134,20 @@ public class ConfigServiceImpl implements ConfigService {
         String userEmail = PROPERTIES.getProperty(USER_EMAIL);
         String nickname = PROPERTIES.getProperty(USER_NICKNAME);
         String avatar = PROPERTIES.getProperty(USER_AVATAR);
+        String commentStrategy = PROPERTIES.getProperty(COMMENT_STRATEGY, CommentStrategy.NEVER.name());
 
         blogConfig = new BlogConfig();
+        // 设置登录名称
         blogConfig.setLoginName(loginName);
+        // 登录密码
         blogConfig.setPassword(loginPwd);
+        // 别名
         blogConfig.setNickname(nickname);
+        // 邮箱
         blogConfig.setEmail(userEmail);
+        // avatar
         blogConfig.setAvatar(avatar);
+        // 设置评论策略
+        blogConfig.setCommentStrategy(Enum.valueOf(CommentStrategy.class, commentStrategy));
     }
 }

@@ -1,7 +1,9 @@
 package com.qwli7.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
  **/
 public class Category extends BaseEntity implements Serializable {
 
+    @NotBlank(message = "分类名称不能为空")
+    @Length(max = 10, message = "分类名称的长度不能超过 {max}")
     private String name;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

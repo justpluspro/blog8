@@ -6,6 +6,7 @@ import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,7 +42,7 @@ public class CategoryController {
     }
 
     @PostMapping("category")
-    public ResponseEntity<?> save(@RequestBody @Valid Category category) {
+    public ResponseEntity<?> save(@RequestBody @Validated Category category) {
         categoryService.saveCategory(category);
         return ResponseEntity.noContent().build();
     }
