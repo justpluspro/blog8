@@ -1,5 +1,8 @@
 package com.qwli7.blog.exception.reader;
 
+import com.qwli7.blog.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +18,9 @@ import java.util.Map;
  * 给定  /api/tag/fds    fds 字符串 与 int 类型不匹配
  **/
 public class MethodArgumentTypeMismatchExceptionReader implements ExceptionReader {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+
     @Override
     public boolean match(Exception e) {
         return e instanceof MethodArgumentTypeMismatchException;
@@ -22,7 +28,12 @@ public class MethodArgumentTypeMismatchExceptionReader implements ExceptionReade
 
     @Override
     public Map<String, Object> readErrors(Exception ex) {
-        return Collections.singletonMap("error", "method argument type mismatch");
+        MethodArgumentTypeMismatchException methodArgumentTypeMismatchException = (MethodArgumentTypeMismatchException) ex;
+        logger.error("method<readErrors>: [{}]", ex.getMessage(), ex);
+        Message error = new Message();
+        error.setCode("invalid.argumentType");
+        error.setMessage("无效的参数类型");
+        return Collections.singletonMap("errors", error);
     }
 
     @Override
