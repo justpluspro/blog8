@@ -18,9 +18,9 @@ public interface CategoryService {
 
     List<Category> findAllCategories();
 
-    Optional<Category> getCategory(String name);
+    Optional<Category> selectByName(String name);
 
     void deleteCategory(final int id);
 
-    void updateCategory(final Category category);
+    void update(final Category category);
 }

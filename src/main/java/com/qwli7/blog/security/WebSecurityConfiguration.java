@@ -26,9 +26,10 @@ import java.util.EnumSet;
 @Configuration
 public class WebSecurityConfiguration implements WebMvcConfigurer {
 
-
     @Bean
     public FilterRegistrationBean<BlackIpFilter> registrationBean(BlackIpService blackIpService) {
+
+
         FilterRegistrationBean<BlackIpFilter> filterRegistrationBean = new FilterRegistrationBean<>();
 
         filterRegistrationBean.setFilter(new BlackIpFilter(blackIpService));

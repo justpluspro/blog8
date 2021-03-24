@@ -2,6 +2,7 @@ package com.qwli7.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  **/
 public class BlackIp extends BaseEntity implements Serializable {
 
+    @NotBlank(message = "ip 地址不能为空")
     private String ip;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

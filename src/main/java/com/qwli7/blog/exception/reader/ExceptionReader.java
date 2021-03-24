@@ -9,6 +9,8 @@ import java.util.Map;
  */
 public interface ExceptionReader {
 
+    String ERROR_KEY = "errors";
+
 
     boolean match(Exception e);
 
@@ -17,4 +19,5 @@ public interface ExceptionReader {
 
 
     int getStatus(HttpServletRequest request, HttpServletResponse response, Exception ex);
+
 }

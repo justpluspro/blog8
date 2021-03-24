@@ -11,6 +11,8 @@ public class BlogProperties {
 
     private String markdownServerUrl;
 
+    private String ipHeader;
+
     private int defaultPageSize;
 
     public void setMarkdownServerUrl(String markdownServerUrl) {
@@ -27,5 +29,14 @@ public class BlogProperties {
 
     public String getMarkdownServerUrl() {
         return markdownServerUrl;
+    }
+
+
+    public String getIpHeader() {
+        return ipHeader;
+    }
+
+    public void setIpHeader(String ipHeader) {
+        this.ipHeader = ipHeader;
     }
 }

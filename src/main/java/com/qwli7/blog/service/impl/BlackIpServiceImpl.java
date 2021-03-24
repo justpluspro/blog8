@@ -38,6 +38,12 @@ public class BlackIpServiceImpl implements BlackIpService {
         return new PageDto<>(queryParam, count, blackIpMapper.selectPage(queryParam));
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public boolean isBlackIp(String ip) {
+        return blackIpMapper.selectByIp(ip).isPresent();
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void save(BlackIp blackIp) {

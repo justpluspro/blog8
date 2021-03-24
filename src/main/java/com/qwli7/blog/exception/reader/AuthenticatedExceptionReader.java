@@ -18,8 +18,9 @@ public class AuthenticatedExceptionReader implements ExceptionReader {
     public Map<String, Object> readErrors(Exception ex) {
         final AuthenticatedException authenticatedException = (AuthenticatedException) ex;
         final String message = authenticatedException.getMessage();
+
         if(StringUtils.hasText(message)) {
-            return Collections.singletonMap("error", message);
+            return Collections.singletonMap(ERROR_KEY, message);
         }
         return Collections.singletonMap("error", "认证失败");
     }

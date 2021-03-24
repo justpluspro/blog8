@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Category> getCategory(String name) {
+    public Optional<Category> selectByName(String name) {
         return categoryMapper.findByName(name);
     }
 
@@ -80,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void updateCategory(final Category category) {
+    public void update(final Category category) {
         final Optional<Category> categoryOp = categoryMapper.findById(category.getId());
         if(!categoryOp.isPresent()) {
             throw new ResourceNotFoundException("category.notExists", "分类不存在");

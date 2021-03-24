@@ -1,9 +1,7 @@
 package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.entity.Category;
-import com.qwli7.blog.entity.Tag;
 import com.qwli7.blog.exception.ResourceNotFoundException;
-import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -58,7 +56,7 @@ public class CategoryController {
     @PutMapping("category/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody @Valid Category category) {
         category.setId(id);
-        categoryService.updateCategory(category);
+        categoryService.update(category);
         return ResponseEntity.noContent().build();
     }
 }

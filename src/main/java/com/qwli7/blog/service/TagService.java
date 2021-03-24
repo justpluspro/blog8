@@ -22,7 +22,6 @@ public interface TagService {
 
     void deleteTag(final int id);
 
-
     void updateTag(final Tag tag);
 
     Optional<Tag> selectById(int id);

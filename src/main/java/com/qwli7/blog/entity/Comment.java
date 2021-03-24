@@ -1,5 +1,9 @@
 package com.qwli7.blog.entity;
 
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -11,10 +15,15 @@ import java.time.LocalDateTime;
 public class Comment extends BaseEntity implements Serializable {
 
 
+    @NotBlank(message = "名称不能为空")
+    @Length(max = 16, message = "名称长度不能超过{max}")
     private String name;
 
+    @Email(message = "请输入合法的邮箱地址")
     private String email;
 
+    @NotBlank(message = "内容不能为空")
+    @Length(max = 1024, message = "评论长度不能超过{max}")
     private String content;
 
     private String ip;

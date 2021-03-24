@@ -44,6 +44,7 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
         this.exceptionReaders.add(new MethodArgumentTypeMismatchExceptionReader());
         this.exceptionReaders.add(new IllegalArgumentExceptionReader());
         this.exceptionReaders.add(new BindExceptionReader());
+        this.exceptionReaders.add(new LoginFailExceptionReader());
     }
 
     @Override

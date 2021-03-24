@@ -4,6 +4,7 @@ import com.qwli7.blog.CommentStrategy;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.exception.AuthenticatedException;
+import com.qwli7.blog.exception.LoginFailException;
 import com.qwli7.blog.service.ConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
@@ -76,6 +78,7 @@ public class ConfigServiceImpl implements ConfigService {
         return CommentStrategy.EACH;
     }
 
+    @Transactional(readOnly = true, rollbackFor = LoginFailException.class)
     @Override
     public boolean authenticate(String name, String password) {
         logger.info("method[authenticate] name:[{}], password:[{}]", name, password);
@@ -90,7 +93,7 @@ public class ConfigServiceImpl implements ConfigService {
         logger.info("encryptPassword:[{}]", encryptPassword);
 
         if(!loginName.equals(name) ||  !configPassword.equals(encryptPassword)) {
-            throw new AuthenticatedException();
+            throw new LoginFailException("login.fail", "登录失败");
         }
 
         return true;

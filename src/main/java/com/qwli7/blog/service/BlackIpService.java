@@ -15,6 +15,8 @@ import java.util.List;
 public interface BlackIpService {
     PageDto<BlackIp> selectPage(CommonQueryParam queryParam);
 
+    boolean isBlackIp(String ip);
+
     void save(BlackIp blackIp);
 
     void delete(int id);

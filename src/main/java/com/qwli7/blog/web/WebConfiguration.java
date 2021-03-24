@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.qwli7.blog.BlogContextFilter;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.exception.BlogExceptionResolver;
@@ -26,10 +27,12 @@ import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.Ordered;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -44,6 +47,7 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import javax.servlet.DispatcherType;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -61,6 +65,18 @@ public class WebConfiguration implements WebMvcConfigurer {
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private Markdown2Html markdown2Html;
+
+
+    @Bean
+    public FilterRegistrationBean<BlogContextFilter> contextFilter(BlogProperties blogProperties) {
+        FilterRegistrationBean<BlogContextFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new BlogContextFilter(blogProperties));
+        registrationBean.setDispatcherTypes(EnumSet.allOf(DispatcherType.class));
+        registrationBean.setName(BlogContextFilter.class.getSimpleName());
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+
+        return registrationBean;
+    }
 
 
     @Bean

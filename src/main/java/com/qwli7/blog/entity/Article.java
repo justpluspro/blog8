@@ -2,7 +2,10 @@ package com.qwli7.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,8 +18,11 @@ import java.util.Set;
  **/
 public class Article extends BaseEntity implements Serializable {
 
+    @NotBlank(message = "标题不能为空")
+    @Length(max = 128, min = 1, message = "标题长度不能超过 {max}")
     private String title ;
 
+    @NotBlank(message = "内容不能为空")
     private String content;
 
     private String summary;
@@ -36,6 +42,7 @@ public class Article extends BaseEntity implements Serializable {
     private LocalDateTime modifyAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @FutureOrPresent(message = "发布时间不能是过去的时间")
     private LocalDateTime postAt;
 
     private Category category;
