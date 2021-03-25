@@ -160,6 +160,6 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
 
     @Override
     public void validateBeforeQuery(CommentModule module) {
-
+//        momentMapper.selectById()
     }
 }

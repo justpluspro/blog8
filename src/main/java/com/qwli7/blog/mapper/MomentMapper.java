@@ -1,5 +1,6 @@
 package com.qwli7.blog.mapper;
 
+import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import org.apache.ibatis.annotations.Mapper;
@@ -30,4 +31,6 @@ public interface MomentMapper {
     List<Moment> selectPage(MomentQueryParam queryParam);
 
     int count(MomentQueryParam queryParam);
+
+    Optional<Moment> selectByModule(CommentModule commentModule);
 }
