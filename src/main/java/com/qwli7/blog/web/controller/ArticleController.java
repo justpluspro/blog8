@@ -5,12 +5,16 @@ import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.ArticleSaved;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
+import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.service.ArticleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import java.util.Optional;
 
 /**
  * @author qwli7
@@ -19,6 +23,7 @@ import javax.validation.Valid;
  **/
 @RestController
 @RequestMapping("api")
+@Validated
 public class ArticleController {
 
 
@@ -45,8 +50,17 @@ public class ArticleController {
         return articleService.selectPage(queryParam);
     }
 
+    @GetMapping("article/{id}")
+    public Article getArticleForEdit(@PathVariable("id") @Min(value = 1, message = "invalid id") int id) {
+        final Optional<Article> articleOp = articleService.getArticleForEdit(id);
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException("article.notFound", "内容没找到");
+        }
+        return articleOp.get();
+    }
+
     @PutMapping("article/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") int id, @RequestBody Article article) {
+    public ResponseEntity<Void> update(@PathVariable("id") int id, @RequestBody @Valid Article article) {
         article.setId(id);
         articleService.update(article);
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -4,13 +4,11 @@ import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.BlackIp;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommonQueryParam;
-import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.BlackIpService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 //@Authenticated
 @RestController
@@ -29,7 +27,7 @@ public class BlackIpController {
     @GetMapping("blackips")
     public PageDto<BlackIp> getAllBlackIps(CommonQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
-            queryParam.setSize(10);
+            queryParam.setSize(blogProperties.getDefaultPageSize());
         }
         return blackIpService.selectPage(queryParam);
     }

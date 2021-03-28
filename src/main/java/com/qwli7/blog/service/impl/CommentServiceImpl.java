@@ -167,6 +167,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
+    @Transactional(readOnly = true)
     @Override
     public PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam) {
         final CommentModule commentModule = commentQueryParam.getCommentModule();

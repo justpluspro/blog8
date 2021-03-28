@@ -1,6 +1,7 @@
 package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.Category;
+import com.qwli7.blog.exception.LogicException;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,15 +13,15 @@ import java.util.Optional;
  **/
 public interface CategoryService {
 
-    int saveCategory(Category category);
+    void save(Category category) throws LogicException;
 
-    Optional<Category> selectById(int id);
+    Optional<Category> selectById(int id) throws LogicException;
 
     List<Category> findAllCategories();
 
-    Optional<Category> selectByName(String name);
+    Optional<Category> selectByName(String name) throws LogicException;
 
-    void deleteCategory(final int id);
+    void delete(final int id) throws LogicException;
 
-    void update(final Category category);
+    void update(final Category category) throws LogicException;
 }

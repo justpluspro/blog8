@@ -1,5 +1,6 @@
 package com.qwli7.blog.web.controller;
 
+import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.service.MomentService;
@@ -19,9 +20,11 @@ import javax.xml.ws.Response;
 public class MomentController {
 
     private final MomentService momentService;
+    private final BlogProperties blogProperties;
 
-    public MomentController(MomentService momentService) {
+    public MomentController(MomentService momentService, BlogProperties blogProperties) {
         this.momentService = momentService;
+        this.blogProperties = blogProperties;
     }
 
 
@@ -36,9 +39,8 @@ public class MomentController {
         if(page < 1) {
             queryParam.setPage(1);
         }
-        int size = queryParam.getSize();
-        if(size < 10) {
-            queryParam.setSize(10);
+        if(queryParam.hasNoSize()) {
+            queryParam.setSize(blogProperties.getDefaultPageSize());
         }
         return ResponseEntity.ok(momentService.selectPage(queryParam));
     }
@@ -66,6 +68,4 @@ public class MomentController {
     public Moment getMomentForEdit(@PathVariable("id") int id) {
         return momentService.getMomentForEdit(id);
     }
-
-
 }

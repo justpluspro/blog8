@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @ConfigurationProperties(prefix = "blog.core")
-@PropertySource(value = "classpath:file.properties")
+@PropertySource(value = "classpath:blog.properties")
 @Configuration
 public class BlogProperties {
 
@@ -13,7 +13,17 @@ public class BlogProperties {
 
     private String ipHeader;
 
+    private String tokenHeader;
+
     private int defaultPageSize;
+
+    public String getTokenHeader() {
+        return tokenHeader;
+    }
+
+    public void setTokenHeader(String tokenHeader) {
+        this.tokenHeader = tokenHeader;
+    }
 
     public void setMarkdownServerUrl(String markdownServerUrl) {
         this.markdownServerUrl = markdownServerUrl;

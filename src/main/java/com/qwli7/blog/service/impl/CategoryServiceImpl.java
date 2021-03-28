@@ -1,7 +1,6 @@
 package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.entity.Category;
-import com.qwli7.blog.entity.Tag;
 import com.qwli7.blog.event.CategoryDeleteEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
@@ -34,13 +33,11 @@ public class CategoryServiceImpl implements CategoryService {
         this.publisher = publisher;
     }
 
-
     @Transactional(readOnly = true)
     @Override
     public List<Category> findAllCategories() {
         return categoryMapper.findAll();
     }
-
 
     @Transactional(readOnly = true)
     @Override
@@ -56,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void deleteCategory(int id) {
+    public void delete(int id) {
         final Optional<Category> categoryOp = categoryMapper.findById(id);
         if(!categoryOp.isPresent()) {
             return;
@@ -67,15 +64,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public int saveCategory(Category category) {
-        if(categoryMapper.findByName(category.getName()).isPresent()) {
+    public void save(Category category) {
+        final Optional<Category> categoryOp = categoryMapper.findByName(category.getName());
+        if(categoryOp.isPresent()) {
             throw new LogicException("category.exists", "分类存在");
         }
         category.setCreateAt(LocalDateTime.now());
         category.setModifyAt(LocalDateTime.now());
         categoryMapper.insert(category);
-
-        return category.getId();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

@@ -1,6 +1,7 @@
 package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.BlogContext;
+import com.qwli7.blog.security.TokenUtil;
 import com.qwli7.blog.service.ConfigService;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author qwli7
@@ -23,8 +22,8 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class LoginController {
 
-
     private final ConfigService configService;
+
 
     public LoginController(ConfigService configService) {
         this.configService = configService;
@@ -35,6 +34,14 @@ public class LoginController {
                                      @NotBlank(message = "密码不能为空") @Length(message = "密码长度不能小于 {min}", min = 6) String password){
         boolean authenticate = configService.authenticate(name, password);
         BlogContext.setAuthenticated(authenticate);
-        return ResponseEntity.ok(authenticate);
+        final String token = TokenUtil.createNew();
+        return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<Void> logout() {
+        BlogContext.setAuthenticated(false);
+        TokenUtil.remove();
+        return ResponseEntity.noContent().build();
     }
 }

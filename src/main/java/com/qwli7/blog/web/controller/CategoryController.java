@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author qwli7
@@ -18,6 +19,7 @@ import java.util.List;
 //@Authenticated
 @RestController
 @RequestMapping("api")
+@Validated
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -33,22 +35,21 @@ public class CategoryController {
     }
 
     @GetMapping("category/{id}")
-    public ResponseEntity<Category>selectById(@PathVariable("id") int id) {
+    public ResponseEntity<Category> getCategoryForEdit(@PathVariable("id") int id) {
         final Category category = categoryService.selectById(id).orElseThrow(() ->
                 new ResourceNotFoundException("category.notExists", "分类不存在"));
         return ResponseEntity.ok(category);
     }
 
     @PostMapping("category")
-    public ResponseEntity<?> save(@RequestBody @Validated Category category) {
-        categoryService.saveCategory(category);
+    public ResponseEntity<?> save(@RequestBody Category category) {
+        categoryService.save(category);
         return ResponseEntity.noContent().build();
     }
 
-
     @DeleteMapping("category/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) {
-        categoryService.deleteCategory(id);
+        categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }
 

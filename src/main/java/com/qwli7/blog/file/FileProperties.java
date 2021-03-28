@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySource;
  **/
 @Configuration
 @ConfigurationProperties(prefix = "blog.file")
-@PropertySource(value = "classpath:file.properties")
+@PropertySource(value = "classpath:blog.properties")
 public class FileProperties {
 
     private String uploadPath;

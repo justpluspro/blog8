@@ -88,6 +88,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.addHits(moment.getId(), 1);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Moment getMomentForEdit(int id) {
         return momentMapper.selectById(id).orElseThrow(()
@@ -107,6 +108,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return momentOp;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public PageDto<Moment> selectPage(MomentQueryParam queryParam) {
         int count = momentMapper.count(queryParam);
@@ -161,5 +163,6 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Override
     public void validateBeforeQuery(CommentModule module) {
 //        momentMapper.selectById()
+
     }
 }

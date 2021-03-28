@@ -223,6 +223,12 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Article> getArticleForEdit(int id) {
+        return articleMapper.selectById(id);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteById(int id) {

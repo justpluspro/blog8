@@ -76,7 +76,9 @@
         limit #{start}, #{offset}
     </select>
 
-    <select id="selectByModule" resultType="com.qwli7.blog.entity.Moment">
-
+    <select id="selectByModule" parameterType="CommentModule" resultType="Moment">
+        select * from blog_moment
+        WHERE module_id = #{id,jdbcType=INTEGER}
+        and module_name = #{name,jdbcType=VARCHAR}
     </select>
 </mapper>

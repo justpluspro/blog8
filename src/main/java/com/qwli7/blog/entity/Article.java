@@ -1,14 +1,14 @@
 package com.qwli7.blog.entity;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,6 +27,7 @@ public class Article extends BaseEntity implements Serializable {
 
     private String summary;
 
+//    @Pattern(regexp = :)
     private String alias;
 
     private Integer hits;
@@ -36,9 +37,11 @@ public class Article extends BaseEntity implements Serializable {
     private ArticleStatus status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
