@@ -19,6 +19,5 @@ public interface CommentService {
 
     PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam);
 
-
     void delete(Comment comment);
 }

@@ -26,8 +26,14 @@ public class Comment extends BaseEntity implements Serializable {
     @Length(max = 1024, message = "评论长度不能超过{max}")
     private String content;
 
+    /**
+     * 评论 ip
+     */
     private String ip;
 
+    /**
+     * 父评论
+     */
     private Comment parent;
 
     /**
@@ -35,16 +41,29 @@ public class Comment extends BaseEntity implements Serializable {
      */
     private String parentPath;
 
-
+    /**
+     * 评论状态
+     */
     private CommentStatus status;
 
+    /**
+     * 创建时间
+     */
     private LocalDateTime createAt;
 
+    /**
+     * 修改时间
+     */
     private LocalDateTime modifyAt;
 
-
+    /**
+     * 是否是管理员评论
+     */
     private Boolean admin;
 
+    /**
+     * 评论是否在审核中
+     */
     private Boolean checking;
 
 

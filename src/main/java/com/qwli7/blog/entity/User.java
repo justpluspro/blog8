@@ -9,12 +9,24 @@ import java.io.Serializable;
  **/
 public class User implements Serializable {
 
+    /**
+     * 用户名称
+     */
     private String username;
 
+    /**
+     * 用户密码
+     */
     private String password;
 
+    /**
+     * 邮箱
+     */
     private String email;
 
+    /**
+     * 头像
+     */
     private String avatar;
 
     public String getAvatar() {

@@ -81,4 +81,52 @@
         WHERE module_id = #{id,jdbcType=INTEGER}
         and module_name = #{name,jdbcType=VARCHAR}
     </select>
+
+    <select id="countArchive" resultType="int" parameterType="MomentQueryParam">
+        select count(1)
+        from blog_moment
+        <where>
+            <if test="query != null and query !=''">
+                content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        group by date_format(create_at, '%Y-%m-%d') as archiveDate order by archiveDate desc
+    </select>
+
+
+    <resultMap id="ArchiveMomentResult" type="MomentArchive">
+        <result column="archiveDate" property="archiveDate" />
+        <collection property="moments" ofType="com.qwli7.blog.entity.Moment">
+            <id property="id" column="id" />
+            <result property="content" column="content" />
+            <result property="hits" column="hits" />
+            <result property="comments" column="comments" />
+            <result property="allowComment" column="allow_comment" />
+            <result property="isPrivate" column="is_private" />
+            <result property="createAt" column="create_at" />
+            <result property="modifyAt" column="modify_at" />
+        </collection>
+    </resultMap>
+    <select id="selectArchivePage" parameterType="MomentQueryParam" resultMap="ArchiveMomentResult">
+        select archive.archiveDate, bm.id, bm.content, bm.hits,
+                bm.comments, bm.allow_comment, bm.create_at,
+                bm.modify_at, bm.is_private from (
+              select date_format(create_at, '%Y-%m-%d') as archiveDate
+              from blog_moment
+              <where>
+                  <if test="query != null and query != ''">
+                      and content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                  </if>
+              </where>
+            group by archiveDate order by archiveDate desc
+                              ) archive
+        left join blog_moment bm on archive.archiveDate = DATE_FORMAT(bm.create_at, '%Y-%m-%d')
+        <where>
+            <if test="query != null and query != ''">
+                bm.content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        order by bm.create_at desc
+        limit #{start}, #{offset}
+    </select>
 </mapper>

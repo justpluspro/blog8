@@ -2,9 +2,19 @@ package com.qwli7.blog.entity;
 
 import java.io.Serializable;
 
+/**
+ * @author liqiwen
+ * 评论模块
+ */
 public class CommentModule implements Serializable {
+    /**
+     * 模块 id
+     */
     private Integer id;
 
+    /**
+     * 模块名称
+     */
     private String name;
 
     public CommentModule() {

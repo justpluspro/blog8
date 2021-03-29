@@ -1,6 +1,7 @@
 package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
  * 功能：blog8
  **/
 public interface MomentService {
+
     int saveMoment(Moment moment);
 
     void update(Moment moment);
@@ -25,5 +27,12 @@ public interface MomentService {
     Optional<Moment> getMoment(int id);
 
     PageDto<Moment> selectPage(MomentQueryParam queryParam);
+
+    /**
+     * 获取归档动态列表
+     * @return list
+     */
+    PageDto<MomentArchive> selectArchivePage(MomentQueryParam queryParam);
+
 }
 

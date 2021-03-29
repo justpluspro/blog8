@@ -1,8 +1,8 @@
 package com.qwli7.blog.service.impl;
 
-import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.event.MomentDeleteEvent;
@@ -124,21 +124,39 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return pageDto;
     }
 
+
+    @Transactional(readOnly = true)
+    @Override
+    public PageDto<MomentArchive> selectArchivePage(MomentQueryParam queryParam) {
+        int count = momentMapper.countArchive(queryParam);
+        if(count == 0) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+
+        final List<MomentArchive> momentArchives = momentMapper.selectArchivePage(queryParam);
+        if(CollectionUtils.isEmpty(momentArchives)) {
+            return new PageDto<>(queryParam, 0, new ArrayList<>());
+        }
+        momentArchives.forEach(e -> {
+            final List<Moment> moments = e.getMoments();
+            processMoments(moments);
+        });
+
+        return new PageDto<>(queryParam, count, momentArchives);
+    }
+
     private void processMoment(Moment moment) {
         processMoments(Collections.singletonList(moment));
     }
 
     private void processMoments(List<Moment> moments) {
-
         Map<Integer, String> contentMap = moments.stream().filter(m -> m.getContent() != null)
                 .collect(Collectors.toMap(Moment::getId, Moment::getContent));
         if(contentMap.isEmpty()) {
             return;
         }
         Map<Integer, String> markdownMap = markdown2Html.toHtmls(contentMap);
-        moments.forEach(e -> {
-            e.setContent(markdownMap.get(e.getId()));
-        });
+        moments.forEach(e -> e.setContent(markdownMap.get(e.getId())));
     }
 
     @Override
