@@ -9,7 +9,7 @@
                    #{modifyAt}, #{hits,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER})
     </insert>
 
-    <update id="update" parameterType="integer">
+    <update id="update"  parameterType="Moment">
         update blog_moment
             <set>
                 <if test="content != null  and content != ''">

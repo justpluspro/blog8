@@ -19,7 +19,7 @@ import java.util.List;
  * @date 2021/2/22 13:11
  * 功能：blog8
  **/
-//@Authenticated
+@Authenticated
 @RestController
 @RequestMapping("api")
 public class TagController {

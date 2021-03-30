@@ -5,14 +5,25 @@ import com.qwli7.blog.entity.Category;
 
 import java.util.List;
 
+/**
+ * 文章查询参数
+ * @author liqiwen
+ * @since 1.0
+ */
 public class HandledArticleQueryParam extends AbstractQueryParam {
 
     private String query;
 
     private Category category;
 
+    /**
+     * 文章 ids
+     */
     private List<Integer> aids;
 
+    /**
+     * 文章状态集合
+     */
     private List<ArticleStatus> statuses;
 
     public List<ArticleStatus> getStatuses() {
@@ -52,6 +63,7 @@ public class HandledArticleQueryParam extends AbstractQueryParam {
     }
 
     public HandledArticleQueryParam(ArticleQueryParam queryParam) {
+        super();
         this.setPage(queryParam.getPage());
         this.setSize(queryParam.getSize());
         this.setOffset(queryParam.getOffset());

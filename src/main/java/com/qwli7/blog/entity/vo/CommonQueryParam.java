@@ -1,5 +1,10 @@
 package com.qwli7.blog.entity.vo;
 
+/**
+ * 通用查询参数
+ * @author liqiwen
+ * @since 1.2
+ */
 public class CommonQueryParam extends AbstractQueryParam {
 
     private String query;

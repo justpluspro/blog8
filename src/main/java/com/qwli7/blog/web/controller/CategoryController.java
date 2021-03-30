@@ -2,6 +2,7 @@ package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.entity.Category;
 import com.qwli7.blog.exception.ResourceNotFoundException;
+import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,7 +17,7 @@ import java.util.Optional;
  * @date 2021/2/22 13:11
  * 功能：blog8
  **/
-//@Authenticated
+@Authenticated
 @RestController
 @RequestMapping("api")
 @Validated

@@ -101,7 +101,6 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         final Optional<Moment> momentOp= momentMapper.selectById(id);
         if(momentOp.isPresent()) {
             Moment moment = momentOp.get();
-//           markdown2Html.
             processMoment(moment);
             return Optional.of(moment);
         }

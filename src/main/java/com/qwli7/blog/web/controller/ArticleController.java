@@ -6,6 +6,7 @@ import com.qwli7.blog.entity.ArticleSaved;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.exception.ResourceNotFoundException;
+import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.ArticleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * @date 2021/2/22 13:11
  * 功能：blog8
  **/
+@Authenticated
 @RestController
 @RequestMapping("api")
 @Validated
@@ -35,13 +37,22 @@ public class ArticleController {
         this.blogProperties = blogProperties;
     }
 
-
+    /**
+     * 保存文章
+     * @param article article
+     * @return ResponseEntity
+     */
     @PostMapping("article")
     public ResponseEntity<?> save(@RequestBody @Valid Article article) {
             ArticleSaved articleSaved = articleService.save(article);
             return ResponseEntity.ok(articleSaved);
     }
 
+    /**
+     * 获取文章列表
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     @GetMapping("articles")
     public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
@@ -50,6 +61,11 @@ public class ArticleController {
         return articleService.selectPage(queryParam);
     }
 
+    /**
+     * 获取文章，编辑
+     * @param id id
+     * @return Article
+     */
     @GetMapping("article/{id}")
     public Article getArticleForEdit(@PathVariable("id") @Min(value = 1, message = "invalid id") int id) {
         final Optional<Article> articleOp = articleService.getArticleForEdit(id);
@@ -59,16 +75,27 @@ public class ArticleController {
         return articleOp.get();
     }
 
+    /**
+     * 更新文章
+     * @param id id
+     * @param article article
+     * @return ResponseEntity
+     */
     @PutMapping("article/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") int id, @RequestBody @Valid Article article) {
+    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody @Valid Article article) {
         article.setId(id);
         articleService.update(article);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 删除文章
+     * @param id id
+     * @return ResponseEntity
+     */
     @DeleteMapping("article/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") int id) {
+    public ResponseEntity<?> delete(@PathVariable("id") int id) {
         articleService.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.noContent().build();
     }
 }

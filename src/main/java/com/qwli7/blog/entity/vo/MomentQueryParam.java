@@ -1,13 +1,22 @@
 package com.qwli7.blog.entity.vo;
 
+import java.io.Serializable;
+
 /**
  * @author qwli7 
  * @date 2021/3/2 10:17
- * 功能：blog
+ * 功能：动态查询参数
  **/
-public class MomentQueryParam extends AbstractQueryParam {
+public class MomentQueryParam extends AbstractQueryParam implements Serializable {
+
+    /**
+     * 关键字
+     */
     private String query;
 
+    /**
+     * 是否倒序排列
+     */
     private Boolean orderDesc;
 
     public String getQuery() {

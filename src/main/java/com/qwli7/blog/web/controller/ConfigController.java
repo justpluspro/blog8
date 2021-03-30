@@ -1,6 +1,7 @@
 package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.entity.BlogConfig;
+import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.ConfigService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021/2/26 14:26
  * 功能：blog
  **/
+@Authenticated
 @RestController
 @RequestMapping("api")
 public class ConfigController {

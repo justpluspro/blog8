@@ -1,8 +1,11 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
+import javafx.fxml.Initializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,17 +28,32 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * @author qwli7
  * @date 2021/3/2 8:37
- * 功能：blog
+ * 功能：FileService
  **/
+@Conditional(value = FileCondition.class)
 @Service
-public class FileService {
+public class FileService implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
+    /**
+     * 文件存放根路径
+     */
     private final Path rootPath;
+
+    /**
+     * 缩略图存放路径
+     */
     private final Path thumbPath;
+
+    /**
+     * 读写锁
+     */
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
+    /**
+     * 文件属性
+     */
     private final FileProperties fileProperties;
 
     public FileService(FileProperties fileProperties) throws IOException {
@@ -52,6 +70,23 @@ public class FileService {
             Files.createDirectories(thumbPath);
         }
     }
+
+
+    /**
+     * 查询文件
+     * @param queryParam queryParam
+     * @return FilePageResult
+     */
+    @Transactional(readOnly = true)
+    public FilePageResult queryFiles(FileQueryParam queryParam) {
+        final String path = queryParam.getPath();
+
+
+
+
+        return new FilePageResult();
+    }
+
 
     public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
         readWriteLock.writeLock().lock();
@@ -121,6 +156,15 @@ public class FileService {
     }
 
     /**
+     * 创建文件
+     * @param fileCreate fileCreate
+     */
+    public void createFile(FileCreate fileCreate) {
+
+
+    }
+
+    /**
      * /1/2/3   2/3
      * @param start
      * @param end
@@ -140,6 +184,9 @@ public class FileService {
     }
 
 
+
+
+
     private void createDirectories(Path path) throws IOException {
         if(path == null) {
             return;
@@ -157,5 +204,10 @@ public class FileService {
 
     public Resource processFile(String requestPath) {
         return null;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
     }
 }

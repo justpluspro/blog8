@@ -3,6 +3,7 @@ package com.qwli7.blog.web.controller;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
+import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.MomentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import javax.xml.ws.Response;
  * @date 2021/2/22 13:11
  * 功能：blog8
  **/
+@Authenticated
 @RestController
 @RequestMapping("api")
 public class MomentController {
