@@ -8,6 +8,7 @@ import com.qwli7.blog.entity.MomentNav;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.event.MomentDeleteEvent;
+import com.qwli7.blog.event.MomentPostEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.CommentMapper;
@@ -29,8 +30,8 @@ import java.util.stream.Collectors;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:09
- * 功能：blog8
+ * 2021/2/22 13:09
+ * 功能：MomentServiceImpl
  **/
 @Service
 public class MomentServiceImpl implements MomentService, CommentModuleHandler {
@@ -42,11 +43,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
 
     public MomentServiceImpl(MomentMapper momentMapper, Markdown2Html markdown2Html,
                              CommentMapper commentMapper,
-                             ApplicationEventPublisher applicationEventPublisher) {
+                             ApplicationEventPublisher publisher) {
         this.momentMapper = momentMapper;
         this.markdown2Html = markdown2Html;
         this.commentMapper = commentMapper;
-        this.publisher = applicationEventPublisher;
+        this.publisher = publisher;
     }
 
     /**
@@ -62,6 +63,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         moment.setCreateAt(LocalDateTime.now());
         moment.setModifyAt(LocalDateTime.now());
         momentMapper.insert(moment);
+        publisher.publishEvent(new MomentPostEvent(this, moment));
         return moment.getId();
     }
 
