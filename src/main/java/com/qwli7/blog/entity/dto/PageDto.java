@@ -7,21 +7,39 @@ import java.util.List;
 
 /**
  * @author qwli7
- * @date 2021/3/2 10:15
- * 功能：blog
+ * 2021/3/2 10:15
+ * 功能：PageDto
  **/
 public class PageDto<T> implements Serializable {
 
+    /**
+     * 查询参数，用以回显
+     */
     private AbstractQueryParam queryParam;
 
+    /**
+     * 当前页数
+     */
     private Integer page;
 
+    /**
+     * 页大小
+     */
     private Integer size;
 
+    /**
+     * 总记录数
+     */
     private Integer totalRows;
 
+    /**
+     * 总页数
+     */
     private Integer totalPage;
 
+    /**
+     * 数据集合
+     */
     private List<T> data;
 
     public PageDto(AbstractQueryParam queryParam, Integer totalRows, List<T> data) {

@@ -9,23 +9,55 @@ import java.util.Optional;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:49
- * 功能：blog8
+ * 2021/2/22 13:49
+ * 功能：BlackIpMapper
  **/
 @Mapper
 public interface BlackIpMapper {
 
+    /**
+     * 插入黑名单
+     * @param blackIp blackIp
+     */
     void insert(BlackIp blackIp);
 
+    /**
+     * 删除黑名单
+     * @param id id
+     */
     void deleteById(int id);
 
+    /**
+     * 获取所有的黑名单
+     * @return List
+     */
     List<BlackIp> selectAll();
 
+    /**
+     * 查询黑名单根据 ip
+     * @param ip ip
+     * @return BlackIp
+     */
     Optional<BlackIp> selectByIp(String ip);
 
+    /**
+     * 查询黑名单根据 id
+     * @param id id
+     * @return BlackIp
+     */
     Optional<BlackIp> selectById(int id);
 
+    /**
+     * 统计黑名单的数量
+     * @param queryParam queryParam
+     * @return int
+     */
     int count(CommonQueryParam queryParam);
 
+    /**
+     * 查询黑名单列表
+     * @param queryParam queryParam
+     * @return List
+     */
     List<BlackIp> selectPage(CommonQueryParam queryParam);
 }

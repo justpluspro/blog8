@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:05
- * 功能：blog8
+ * 2021/2/22 13:05
+ * 功能：User
  **/
 public class User implements Serializable {
 

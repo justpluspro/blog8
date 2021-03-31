@@ -10,6 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+/**
+ * 上下文 Filter
+ * @author liqiwen
+ * @since 1.2
+ */
 public class BlogContextFilter implements Filter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());

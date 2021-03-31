@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author qwli7 
- * @date 2021/3/2 8:42
- * 功能：blog
+ * 2021/3/2 8:42
+ * 功能：FileController
  **/
 @Authenticated
 @RestController

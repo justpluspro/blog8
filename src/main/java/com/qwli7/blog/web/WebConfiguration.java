@@ -58,7 +58,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-
+/**
+ * Web 相关配置
+ * @author liqiwen
+ * @since 1.2
+ * @version 1.2
+ */
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 

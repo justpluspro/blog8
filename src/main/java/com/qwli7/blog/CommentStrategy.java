@@ -3,6 +3,7 @@ package com.qwli7.blog;
 /**
  * 评论策略
  * @author liqiwen
+ * @since 1.2
  */
 public enum CommentStrategy {
 

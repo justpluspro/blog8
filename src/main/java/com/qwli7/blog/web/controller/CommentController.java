@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:11
- * 功能：blog8
+ * 2021/2/22 13:11
+ * 功能：CommentController
  **/
 @RestController
 @RequestMapping("api")
@@ -30,7 +30,14 @@ public class CommentController {
         this.blogProperties = blogProperties;
     }
 
-
+    /**
+     * 保存评论
+     * @param comment comment
+     * @param module module
+     * @param id id
+     * @return SavedComment
+     */
+    @Authenticated
     @GetMapping("{module}/{id}/comment")
     public SavedComment save(@RequestBody Comment comment, @PathVariable("module") String module,
                              @PathVariable("id") int id) {
@@ -39,6 +46,13 @@ public class CommentController {
         return commentService.saveComment(comment);
     }
 
+    /**
+     * 获取某个模块某个内容的评论列表
+     * @param commentQueryParam commentQueryParam
+     * @param module module
+     * @param id id
+     * @return PageDto
+     */
     @GetMapping("{module}/{id}/comments")
     public PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam,
                                           @PathVariable("module") String module,
@@ -51,7 +65,12 @@ public class CommentController {
         return commentService.selectPage(commentQueryParam);
     }
 
-
+    /**
+     * 删除某个评论
+     * @param id id
+     * @return ResponseEntity
+     */
+    @Authenticated
     @DeleteMapping("comment/{id}/delete")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) {
         final Comment comment = new Comment();

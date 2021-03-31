@@ -1,7 +1,6 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
-import javafx.fxml.Initializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,7 +15,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,7 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author qwli7
- * @date 2021/3/2 8:37
+ * 2021/3/2 8:37
  * 功能：FileService
  **/
 @Conditional(value = FileCondition.class)
@@ -87,7 +85,12 @@ public class FileService implements InitializingBean {
         return new FilePageResult();
     }
 
-
+    /**
+     * 上传文件
+     * @param dirPath dirPath
+     * @param file file
+     * @return
+     */
     public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
         readWriteLock.writeLock().lock();
         try {

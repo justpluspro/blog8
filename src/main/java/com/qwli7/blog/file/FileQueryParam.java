@@ -1,8 +1,10 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.entity.vo.AbstractQueryParam;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -25,7 +27,8 @@ public class FileQueryParam extends AbstractQueryParam implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime createAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createAt;
 
     /**
      * 扩展名
@@ -48,11 +51,11 @@ public class FileQueryParam extends AbstractQueryParam implements Serializable {
         this.fileName = fileName;
     }
 
-    public LocalDateTime getCreateAt() {
+    public LocalDate getCreateAt() {
         return createAt;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
+    public void setCreateAt(LocalDate createAt) {
         this.createAt = createAt;
     }
 

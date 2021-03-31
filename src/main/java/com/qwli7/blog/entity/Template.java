@@ -5,17 +5,29 @@ import java.time.LocalDateTime;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:05
- * 功能：blog8
+ * 2021/2/22 13:05
+ * 功能：Template
  **/
 public class Template extends BaseEntity implements Serializable {
 
+    /**
+     * 模板名称
+     */
     private String name;
 
+    /**
+     * 模板内容
+     */
     private String content;
 
+    /**
+     * 创建时间
+     */
     private LocalDateTime createAt;
 
+    /**
+     * 修改时间
+     */
     private LocalDateTime modifyAt;
 
     public LocalDateTime getModifyAt() {

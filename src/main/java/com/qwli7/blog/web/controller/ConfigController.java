@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author qwli7 
- * @date 2021/2/26 14:26
- * 功能：blog
+ * 2021/2/26 14:26
+ * 功能：ConfigController
  **/
 @Authenticated
 @RestController
@@ -23,6 +23,10 @@ public class ConfigController {
         this.configService = configService;
     }
 
+    /**
+     * 获取全部的配置
+     * @return BlogConfig
+     */
     @GetMapping("configs")
     public BlogConfig getAllConfig() {
         return configService.getConfig();

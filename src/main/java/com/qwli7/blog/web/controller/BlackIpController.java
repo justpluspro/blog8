@@ -29,7 +29,11 @@ public class BlackIpController {
         this.blogProperties = blogProperties;
     }
 
-
+    /**
+     * 获取所有的黑名单列表
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     @GetMapping("blackips")
     public PageDto<BlackIp> getAllBlackIps(CommonQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
@@ -38,12 +42,22 @@ public class BlackIpController {
         return blackIpService.selectPage(queryParam);
     }
 
+    /**
+     * 保存黑名单
+     * @param blackIp blackIp
+     * @return ResponseEntity
+     */
     @PostMapping("blackip")
     public ResponseEntity<?> save(@RequestBody @Valid BlackIp blackIp) {
         blackIpService.save(blackIp);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 删除黑名单
+     * @param id id
+     * @return ResponseEntity
+     */
     @DeleteMapping("blackip/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         blackIpService.delete(id);

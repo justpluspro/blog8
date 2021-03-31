@@ -15,6 +15,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * TagsTypeHandler
+ * @author liqiwen
+ * @since 1.2
+ */
 public class TagsTypeHandler extends BaseTypeHandler<Set<Tag>> {
 
 

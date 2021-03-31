@@ -10,6 +10,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 时间工具类
+ * @author liqiwen
+ * @since 1.2
+ * @version 1.2
+ */
 public class TimeUtils {
 
     private static final String STANDARD_FORMAT = "yyyy-MM-dd HH:mm:ss";

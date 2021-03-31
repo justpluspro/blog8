@@ -4,11 +4,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+/**
+ * 博客属性配置
+ * @author liqiwen
+ * @since 1.2
+ * @version 1.2
+ */
 @ConfigurationProperties(prefix = "blog.core")
 @PropertySource(value = "classpath:blog.properties")
 @Configuration
 public class BlogProperties {
 
+    /**
+     * MarkdownServerUrl
+     * 基于 NodeJs
+     */
     private String markdownServerUrl;
 
     private String ipHeader;

@@ -4,21 +4,31 @@ import java.io.Serializable;
 
 /**
  * @author qwli7 
- * @date 2021/3/2 8:30
- * 功能：blog
+ * 2021/3/2 8:30
+ * 功能：图片信息
  **/
 public class ImageInfo implements Serializable {
+
+    /**
+     * 图片宽度
+     */
     private final int width;
 
+    /**
+     * 图片高度
+     */
     private final int height;
 
-    private final String type;
+    /**
+     * 图片类型
+     */
+    private final String extension;
 
-    public ImageInfo(int width, int height, String type) {
+    public ImageInfo(int width, int height, String extension) {
         super();
         this.width = width;
         this.height = height;
-        this.type = type;
+        this.extension = extension;
     }
 
     public int getWidth() {
@@ -29,7 +39,7 @@ public class ImageInfo implements Serializable {
         return height;
     }
 
-    public String getType() {
-        return type;
+    public String getExtension() {
+        return extension;
     }
 }

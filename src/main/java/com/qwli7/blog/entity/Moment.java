@@ -1,7 +1,6 @@
 package com.qwli7.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -10,28 +9,54 @@ import java.time.LocalDateTime;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:05
- * 功能：blog8
+ * 2021/2/22 13:05
+ * 功能：Moment
  **/
 public class Moment extends BaseEntity implements Serializable {
 
+    /**
+     * 动态内容
+     */
     @NotBlank(message = "动态内容不能为空")
     @Size(max = 2048, message = "动态内容不能超过 2048 个字符")
     private String content;
 
+    /**
+     * 点击量
+     */
     private Integer hits;
 
+    /**
+     * 评论量
+     */
     private Integer comments;
 
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
+    /**
+     * 修改时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyAt;
 
+    /**
+     * 是否私人
+     */
     private Boolean isPrivate;
 
+    /**
+     * 允许评论
+     */
     private Boolean allowComment;
+
+    /**
+     * 动态特征图像
+     */
+    private String featureImage;
 
     public String getContent() {
         return content;
@@ -87,5 +112,13 @@ public class Moment extends BaseEntity implements Serializable {
 
     public void setAllowComment(Boolean allowComment) {
         this.allowComment = allowComment;
+    }
+
+    public String getFeatureImage() {
+        return featureImage;
+    }
+
+    public void setFeatureImage(String featureImage) {
+        this.featureImage = featureImage;
     }
 }

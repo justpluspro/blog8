@@ -4,12 +4,19 @@ import java.util.Optional;
 
 /**
  * @author qwli7
- * @date 2021/2/26 14:07
- * 功能：blog
+ * 2021/2/26 14:07
+ * 功能：BlogContext
  **/
 public class BlogContext {
+
+    /**
+     * 是否登录
+     */
     private static final ThreadLocal<Boolean> AUTHENTICATE_THREAD_LOCAL = new ThreadLocal<>();
 
+    /**
+     * 存放 ip
+     */
     private static final ThreadLocal<String> IP_THREAD_LOCAL  = new ThreadLocal<>();
 
 

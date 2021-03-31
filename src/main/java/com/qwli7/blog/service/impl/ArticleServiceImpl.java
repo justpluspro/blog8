@@ -14,11 +14,7 @@ import com.qwli7.blog.mapper.*;
 import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.Markdown2Html;
-import com.qwli7.blog.template.helper.Jsoups;
 import com.qwli7.blog.util.JsoupUtil;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,7 +25,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -67,6 +62,11 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         this.publisher = publisher;
     }
 
+    /**
+     * 保存文章
+     * @param article article
+     * @return ArticleSaved
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public ArticleSaved save(Article article) {
@@ -139,6 +139,10 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         return new ArticleSaved(article.getId(), true);
     }
 
+    /**
+     * 更新文章
+     * @param article article
+     */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = LogicException.class)
     @Override
     public void update(Article article) {
@@ -177,6 +181,11 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
     }
 
+    /**
+     * 分页查询文章
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     @Override
     public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
 //        final Integer categoryId = queryParam.getCategoryId();
@@ -209,6 +218,10 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         return new PageDto<>(queryParam, count, articles);
     }
 
+    /**
+     * 处理文章 | 主要是处理标签
+     * @param articles article
+     */
     private void processArticles(List<Article> articles) {
         if(CollectionUtils.isEmpty(articles)) {
             return;
@@ -223,12 +236,70 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
     }
 
+    /**
+     * 获取文章为编辑
+     * @param id id
+     * @return Article
+     */
     @Transactional(readOnly = true)
     @Override
     public Optional<Article> getArticleForEdit(int id) {
         return articleMapper.selectById(id);
     }
 
+    /**
+     * 获取文章
+     * @param idOrAlias id 或者别名
+     * @return Article
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Article> getArticle(String idOrAlias) {
+        Integer id = null;
+        try{
+            id = Integer.parseInt(idOrAlias);
+        } catch (NumberFormatException ignored) {
+            // ignored this exception
+        }
+        Optional<Article> articleOp;
+        if(id == null) {
+            articleOp = articleMapper.selectByAlias(idOrAlias);
+        } else {
+            articleOp = articleMapper.selectById(id);
+        }
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException("article.notExists", "文章不存在");
+        }
+        final Article article = articleOp.get();
+        final ArticleStatus status = article.getStatus();
+
+        // 未登录情况下
+        if(!BlogContext.isAuthenticated()) {
+            // 非发布状态  || 私人动态不允许访问
+            if (!ArticleStatus.POST.equals(status) || article.getPrivate() == null || article.getPrivate()) {
+                throw new LogicException("invalid.articleStatus", "无效的状态");
+            }
+        }
+        processArticles(Collections.singletonList(article));
+        processContent(article);
+        return Optional.of(article);
+    }
+
+    /**
+     * 获取文章导航
+     * @param id id
+     * @return ArticleNav
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<ArticleNav> selectArticleNav(int id) {
+        return Optional.empty();
+    }
+
+    /**
+     * 删除文章
+     * @param id id
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteById(int id) {
@@ -244,6 +315,61 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         //        articleMapper.select
     }
 
+
+    @Transactional(readOnly = true)
+    @Override
+    public void hits(int id) {
+        final Article article = articleMapper.selectById(id).orElseThrow(()
+                -> new ResourceNotFoundException("article.notExists", "文章不存在"));
+        // 登录情况下不统计点击量
+        if(!BlogContext.isAuthenticated()) {
+            return;
+        }
+        articleMapper.addHits(id, article.getHits() + 1);
+    }
+
+
+    /**
+     * 处理内容
+     * @param article article
+     */
+    private void processContent(Article article) {
+        final String content = article.getContent();
+        final String featureImage = article.getFeatureImage();
+        if(StringUtils.isEmpty(featureImage)) {
+            JsoupUtil.getFirstImage(markdown2Html.toHtml(content)).ifPresent(article::setFeatureImage);
+        }
+        article.setContent(markdown2Html.toHtml(content));
+    }
+
+
+    /**
+     * 处理内容
+     * @param articles
+     */
+    private void processContents(List<Article> articles) {
+        if(CollectionUtils.isEmpty(articles)) {
+            return;
+        }
+        Map<Integer, String> markdownMap = articles.stream().filter(e -> e.getContent() != null)
+                .collect(Collectors.toMap(Article::getId, Article::getContent));
+        markdown2Html.toHtmls(markdownMap);
+
+        articles.forEach(e -> {
+            final String featureImage = e.getFeatureImage();
+            if(!StringUtils.isEmpty(featureImage)) {
+                JsoupUtil.getFirstImage(markdownMap.get(e.getId())).ifPresent(e::setFeatureImage);
+            }
+            e.setContent(markdownMap.get(e.getId()));
+        });
+
+    }
+
+
+    /**
+     * 处理文章标签
+     * @param article article
+     */
     private void processArticleTags(Article article) {
         articleTagMapper.deleteByArticle(article);
         for(Tag tag: article.getTags()) {
@@ -264,7 +390,10 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
     }
 
-
+    /**
+     * 插入评论前判断文章状态
+     * @param module module
+     */
     @Override
     public void validateBeforeInsert(CommentModule module) {
         if(module == null) {
@@ -283,21 +412,24 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
         final ArticleStatus status = article.getStatus();
 
-
+        // 发布状态的文章，私人状态并且登录的情况下才能评论
         if(ArticleStatus.POST.equals(status)) {
             if(article.getPrivate() != null && article.getPrivate() && !BlogContext.isAuthenticated()) {
                 throw new LogicException("operation.notAllowed", "不允许评论私人动态");
             }
         }
 
-
-
+        // 非发布状态并且未登录的情况下不能评论
         if(!ArticleStatus.POST.equals(status) && !BlogContext.isAuthenticated()) {
             //非发布状态，并且未登录
             throw new LogicException("operation.notAllowed", "操作不允许");
         }
     }
 
+    /**
+     * 查询评论前校验
+     * @param module module
+     */
     @Override
     public void validateBeforeQuery(CommentModule module) {
         Assert.notNull(module, "module cannot be null");
@@ -311,6 +443,10 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
     }
 
+    /**
+     * 模块名称
+     * @return String
+     */
     @Override
     public String getModuleName() {
         return Article.class.getSimpleName().toLowerCase();

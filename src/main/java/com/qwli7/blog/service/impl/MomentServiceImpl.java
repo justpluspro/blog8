@@ -1,8 +1,10 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.BlogContext;
 import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.MomentArchive;
+import com.qwli7.blog.entity.MomentNav;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.event.MomentDeleteEvent;
@@ -13,6 +15,7 @@ import com.qwli7.blog.mapper.MomentMapper;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.service.MomentService;
+import com.qwli7.blog.util.JsoupUtil;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,6 +49,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         this.publisher = applicationEventPublisher;
     }
 
+    /**
+     * 保存动态
+     * @param moment moment
+     * @return int
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public int saveMoment(Moment moment) {
@@ -57,6 +65,10 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return moment.getId();
     }
 
+    /**
+     * 更新动态
+     * @param moment moment
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void update(Moment moment) {
@@ -66,6 +78,10 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.update(moment);
     }
 
+    /**
+     * 删除动态
+     * @param id id
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void delete(int id) {
@@ -76,7 +92,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         publisher.publishEvent(new MomentDeleteEvent(this, oldMoment));
     }
 
-
+    /**
+     * 更新点击量
+     * @param id id
+     * @param hits hits
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void updateHits(int id, int hits) {
@@ -88,13 +108,22 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.addHits(moment.getId(), 1);
     }
 
+    /**
+     * 获取动态用以编辑
+     * @param id id
+     * @return Moment
+     */
     @Transactional(readOnly = true)
     @Override
-    public Moment getMomentForEdit(int id) {
-        return momentMapper.selectById(id).orElseThrow(()
-                -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
+    public Optional<Moment> getMomentForEdit(int id) {
+        return momentMapper.selectById(id);
     }
 
+    /**
+     * 获取动态
+     * @param id id
+     * @return Moment
+     */
     @Transactional(readOnly = true)
     @Override
     public Optional<Moment> getMoment(int id) {
@@ -107,6 +136,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return momentOp;
     }
 
+    /**
+     * 分页查询动态
+     * @param queryParam queryParam
+     * @return PageDto<Moment>
+     */
     @Transactional(readOnly = true)
     @Override
     public PageDto<Moment> selectPage(MomentQueryParam queryParam) {
@@ -123,7 +157,12 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return pageDto;
     }
 
-
+    /**
+     * 分页查询动态
+     * 归档
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     @Transactional(readOnly = true)
     @Override
     public PageDto<MomentArchive> selectArchivePage(MomentQueryParam queryParam) {
@@ -144,10 +183,27 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return new PageDto<>(queryParam, count, momentArchives);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<MomentNav> selectMomentNav(int id) {
+        momentMapper.selectById(id).orElseThrow(() ->
+                new ResourceNotFoundException("moment.notExists", "动态不存在"));
+
+        return Optional.empty();
+    }
+
+    /**
+     * 处理动态
+     * @param moment moment
+     */
     private void processMoment(Moment moment) {
         processMoments(Collections.singletonList(moment));
     }
 
+    /**
+     * 批量处理动态
+     * @param moments moments
+     */
     private void processMoments(List<Moment> moments) {
         Map<Integer, String> contentMap = moments.stream().filter(m -> m.getContent() != null)
                 .collect(Collectors.toMap(Moment::getId, Moment::getContent));
@@ -155,14 +211,37 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
             return;
         }
         Map<Integer, String> markdownMap = markdown2Html.toHtmls(contentMap);
-        moments.forEach(e -> e.setContent(markdownMap.get(e.getId())));
+        moments.forEach(e -> {
+            JsoupUtil.getFirstImage(markdownMap.get(e.getId())).ifPresent(e::setFeatureImage);
+            e.setContent(markdownMap.get(e.getId()));
+        });
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void hits(int id) {
+        final Moment moment = momentMapper.selectById(id).orElseThrow(()
+                -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
+        // 登录的情况下不增加点击量
+        if(BlogContext.isAuthenticated()) {
+            return;
+        }
+        momentMapper.updateHits(id, moment.getHits()+1);
+    }
+
+    /**
+     * 获取模块名称
+     * @return String
+     */
     @Override
     public String getModuleName() {
         return Moment.class.getName();
     }
 
+    /**
+     * 插入评论之前校验动态
+     * @param module module
+     */
     @Override
     public void validateBeforeInsert(CommentModule module) {
         Assert.notNull(module, "commentModule not null.");
@@ -177,6 +256,10 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         }
     }
 
+    /**
+     * 查询评论之前校验动态
+     * @param module module
+     */
     @Override
     public void validateBeforeQuery(CommentModule module) {
 //        momentMapper.selectById()

@@ -16,8 +16,8 @@ import java.util.List;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:11
- * 功能：blog8
+ * 2021/2/22 13:11
+ * 功能：TagController
  **/
 @Authenticated
 @RestController
@@ -33,6 +33,11 @@ public class TagController {
         this.blogProperties = blogProperties;
     }
 
+    /**
+     * 分类获取标签列表
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     @GetMapping("tags")
     public PageDto<Tag> selectPage(CommonQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
@@ -41,27 +46,45 @@ public class TagController {
         return tagService.selectPage(queryParam);
     }
 
+    /**
+     * 根据 id 获取标签
+     * @param id id
+     * @return Tag
+     */
     @GetMapping("tag/{id}")
     public Tag selectById(@PathVariable("id") int id) {
         return tagService.selectById(id).orElseThrow(()
                 -> new ResourceNotFoundException("tag.notExists","标签不存在"));
     }
 
-
+    /**
+     * 保存标签
+     * @param tag tag
+     * @return ResponseEntity
+     */
     @PostMapping("tag")
     public ResponseEntity<?> save(@RequestBody @Valid Tag tag) {
         tagService.save(tag);
         return ResponseEntity.noContent().build();
     }
 
-
+    /**
+     * 删除标签
+     * @param id id
+     * @return ResponseEntity
+     */
     @DeleteMapping("tag/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) {
         tagService.deleteTag(id);
         return ResponseEntity.noContent().build();
     }
 
-
+    /**
+     * 更新标签
+     * @param id id
+     * @param tag tag
+     * @return ResponseEntity
+     */
     @PutMapping("tag/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody Tag tag) {
         tag.setId(id);

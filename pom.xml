@@ -20,6 +20,7 @@
         <java.version>1.8</java.version>
         <commonmark.version>0.14.0</commonmark.version>
         <easy-captcha.version>1.6.2</easy-captcha.version>
+        <lucene.version>8.8.1</lucene.version>
     </properties>
 
     <dependencies>
@@ -120,6 +121,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- lucene 索引 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

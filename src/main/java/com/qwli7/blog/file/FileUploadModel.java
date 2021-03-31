@@ -4,6 +4,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
+/**
+ * 文件上传模型
+ * @author liqiwen
+ * @since 1.2
+ */
 public class FileUploadModel implements Serializable {
 
     /**
@@ -11,6 +16,9 @@ public class FileUploadModel implements Serializable {
      */
     private String path;
 
+    /**
+     * 待上传的文件
+     */
     private MultipartFile file;
     
     public String getPath() {

@@ -8,7 +8,12 @@ import com.qwli7.blog.service.ConfigService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * 评论通知定时器
+ * @author liqiwen
+ * @since 1.2
+ * @version 1.2
+ */
 @Component
 public class CommentNotifyScheduler {
 

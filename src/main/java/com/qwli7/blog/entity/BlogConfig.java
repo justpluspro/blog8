@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 /**
  * @author qwli7
- * @date 2021/2/26 13:55
- * 功能：blog
+ * 2021/2/26 13:55
+ * 功能：BlogConfig
  **/
 public class BlogConfig implements Serializable {
 
@@ -24,16 +24,34 @@ public class BlogConfig implements Serializable {
         this.avatar = blogConfig.getAvatar();
     }
 
+    /**
+     * 头像
+     */
     private String avatar;
 
+    /**
+     * 登录名称
+     */
     private String loginName;
 
+    /**
+     * 昵称
+     */
     private String nickname;
 
+    /**
+     * 默认头像
+     */
     private String defaultAvatar;
 
+    /**
+     * 邮箱
+     */
     private String email;
 
+    /**
+     * 评论审核策略
+     */
     private CommentStrategy commentStrategy;
 
     public CommentStrategy getCommentStrategy() {

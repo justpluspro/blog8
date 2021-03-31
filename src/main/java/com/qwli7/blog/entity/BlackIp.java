@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:05
- * 功能：blog8
+ * 2021/2/22 13:05
+ * 功能：BlackIp
  **/
 public class BlackIp extends BaseEntity implements Serializable {
 

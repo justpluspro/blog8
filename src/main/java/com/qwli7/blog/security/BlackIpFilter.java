@@ -11,8 +11,8 @@ import java.io.IOException;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:14
- * 功能：blog8
+ * 2021/2/22 13:14
+ * 功能：BlackIpFilter
  **/
 public class BlackIpFilter implements Filter {
 

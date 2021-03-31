@@ -12,8 +12,14 @@ import java.util.List;
  */
 public class HandledArticleQueryParam extends AbstractQueryParam {
 
+    /**
+     * 关键字
+     */
     private String query;
 
+    /**
+     * 分类
+     */
     private Category category;
 
     /**

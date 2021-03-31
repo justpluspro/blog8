@@ -6,16 +6,17 @@ import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.CommentDto;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommentQueryParam;
+import com.qwli7.blog.event.CommentPostEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.mapper.CommentMapper;
 import com.qwli7.blog.queue.DataContainer;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.CommentService;
 import com.qwli7.blog.service.ConfigService;
-import javafx.beans.property.ObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,19 +27,17 @@ import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:09
- * 功能：blog8
+ * 2021/2/22 13:09
+ * 功能：CommentServiceImpl
  **/
 @Service
 public class CommentServiceImpl implements CommentService {
-
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -48,24 +47,30 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
     private final ConfigService configService;
     private final DataContainer<Comment> dataContainer;
+    private final ApplicationEventPublisher publisher;
 
     private final List<CommentModuleHandler> moduleHandlers;
 
     public CommentServiceImpl(CommentMapper commentMapper, ConfigService configService,
                               DataContainer<Comment> dataContainer,
+                              ApplicationEventPublisher publisher,
                               ObjectProvider<CommentModuleHandler> objectProvider) {
         this.commentMapper = commentMapper;
         this.configService = configService;
         this.dataContainer = dataContainer;
+        this.publisher = publisher;
         this.moduleHandlers = objectProvider.stream().collect(Collectors.toList());
     }
 
-
-
+    /**
+     * 待保存的评论
+     * @param comment comment
+     * @return commentSaved
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public SavedComment saveComment(Comment comment) {
-        logger.info("method[saveComment] comment:[{}]", comment.toString());
+        logger.info("method<saveComment> comment:[{}]", comment.toString());
         final CommentModule module = comment.getModule();
         if(moduleHandlers.isEmpty()) {
             throw new LogicException("module.notExists", "模块不存在");
@@ -152,6 +157,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentMapper.insert(comment);
+        publisher.publishEvent(new CommentPostEvent(this, comment));
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -166,7 +172,11 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
-
+    /**
+     * 分页查询评论
+     * @param commentQueryParam 评论查询参数
+     * @return PageDto
+     */
     @Transactional(readOnly = true)
     @Override
     public PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam) {
@@ -184,6 +194,10 @@ public class CommentServiceImpl implements CommentService {
         return null;
     }
 
+    /**
+     * 删除评论
+     * @param comment
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void delete(Comment comment) {

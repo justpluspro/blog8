@@ -20,8 +20,8 @@ import java.util.EnumSet;
 
 /**
  * @author qwli7
- * @date 2021/2/26 13:10
- * 功能：blog
+ * 2021/2/26 13:10
+ * 功能：WebSecurityConfiguration
  **/
 @Configuration
 public class WebSecurityConfiguration implements WebMvcConfigurer {

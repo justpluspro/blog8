@@ -13,6 +13,7 @@ import java.awt.*;
 /**
  * 验证码
  * @author liqiwen
+ * @since 1.2
  */
 @Controller
 public class CaptchaController {

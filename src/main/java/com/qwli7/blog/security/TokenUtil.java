@@ -3,6 +3,11 @@ package com.qwli7.blog.security;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * TokenUtil 工具类
+ * @author liqiwen
+ * @since 1.2
+ */
 public class TokenUtil implements Serializable {
 
     private static final Long LIVE = 30 * 60 * 1000L;

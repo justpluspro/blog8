@@ -18,8 +18,14 @@ public class SavedComment implements Serializable {
         super();
     }
 
+    /**
+     * 保存评论后的 id
+     */
     private Integer id;
 
+    /**
+     * 评论是否在审核中
+     */
     private Boolean checking;
 
     public Integer getId() {

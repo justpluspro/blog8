@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * @author qwli7
- * @date 2021/3/2 10:16
+ * 2021/3/2 10:16
  * 功能：AbstractQueryParam 基础查询参数
  **/
 public class AbstractQueryParam implements Serializable {

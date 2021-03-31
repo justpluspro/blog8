@@ -15,4 +15,12 @@
     <delete id="deleteByTag" parameterType="Tag" >
         delete from blog_article_tag where tag_id = #{id,jdbcType=INTEGER}
     </delete>
+
+    <insert id="batchInsert" parameterType="list">
+        insert into blog_article_tag (article_id, tag_id)
+            values
+            <foreach collection="articleTags" open="(" close=")" separator="," item="item">
+                #{item.articleId}, #{item.tagId}
+            </foreach>
+    </insert>
 </mapper>

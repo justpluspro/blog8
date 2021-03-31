@@ -1,5 +1,7 @@
 package com.qwli7.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
@@ -11,8 +13,15 @@ import java.util.List;
  */
 public class MomentArchive implements Serializable {
 
+    /**
+     * 归档日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate archiveDate;
 
+    /**
+     * 动态列表
+     */
     private List<Moment> moments;
 
     public LocalDate getArchiveDate() {

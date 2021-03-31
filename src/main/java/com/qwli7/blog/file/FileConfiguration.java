@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguratio
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
@@ -24,10 +25,11 @@ import java.util.Collections;
 
 /**
  * @author qwli7 
- * @date 2021/3/17 15:24
- * 功能：blog
+ * 2021/3/17 15:24
+ * 功能：FileConfiguration
  **/
 @Configuration
+@Conditional(FileCondition.class)
 public class FileConfiguration {
 
 

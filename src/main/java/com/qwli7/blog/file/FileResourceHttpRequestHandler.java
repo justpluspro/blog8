@@ -19,8 +19,8 @@ import java.util.List;
 
 /**
  * @author qwli7 
- * @date 2021/3/17 15:27
- * 功能：blog
+ * 2021/3/17 15:27
+ * 功能：FileResourceHttpRequestHandler
  **/
 public class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
 

@@ -9,8 +9,8 @@ import java.util.List;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:09
- * 功能：blog8
+ * 2021/2/22 13:09
+ * 功能：BlackIpService
  **/
 public interface BlackIpService {
     PageDto<BlackIp> selectPage(CommonQueryParam queryParam);

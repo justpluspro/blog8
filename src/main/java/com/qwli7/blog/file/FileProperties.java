@@ -6,16 +6,22 @@ import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author qwli7 (qwli7@iflytek.com)
- * @date 2021/3/2 8:33
- * 功能：blog
+ * 2021/3/2 8:33
+ * 功能：FileProperties
  **/
 @Configuration
 @ConfigurationProperties(prefix = "blog.file")
 @PropertySource(value = "classpath:blog.properties")
 public class FileProperties {
 
+    /**
+     * 上传路径
+     */
     private String uploadPath;
 
+    /**
+     * 缩略图路径
+     */
     private String uploadThumbPath;
 
     public String getUploadThumbPath() {

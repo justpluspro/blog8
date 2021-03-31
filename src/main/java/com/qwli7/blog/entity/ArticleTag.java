@@ -4,13 +4,19 @@ import java.io.Serializable;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:05
- * 功能：blog8
+ * 2021/2/22 13:05
+ * 功能：ArticleTag
  **/
 public class ArticleTag extends BaseEntity implements Serializable {
 
+    /**
+     * 文章 id
+     */
     private Integer articleId;
 
+    /**
+     * 标签 id
+     */
     private Integer tagId;
 
 

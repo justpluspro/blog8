@@ -1,6 +1,5 @@
 package com.qwli7.blog.mapper;
 
-import com.qwli7.blog.entity.CommentModule;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
@@ -11,31 +10,76 @@ import java.util.Optional;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:49
- * 功能：blog8
+ * 2021/2/22 13:49
+ * 功能：MomentMapper
  **/
 @Mapper
 public interface MomentMapper {
 
+    /**
+     * 插入动态
+     * @param moment moment
+     */
     void insert(Moment moment);
 
+    /**
+     * 更新动态
+     * @param moment moment
+     */
     void update(Moment moment);
 
+    /**
+     * 根据 id 查询动态
+     * @param id id
+     * @return Moment
+     */
     Optional<Moment> selectById(int id);
 
+    /**
+     * 删除动态
+     * @param id id
+     */
     void deleteById(int id);
 
+    /**
+     * 更新动态点击量
+     * @param id id
+     * @param hits hits
+     */
     void updateHits(int id, int hits);
 
-    void addHits(int id, int hits);
+    /**
+     * 添加点击量
+     * @param id id
+     * @param hits hits
+     */
+    void addHits(int id , int hits);
 
+    /**
+     * 分页查询动态
+     * @param queryParam queryParam
+     * @return List
+     */
     List<Moment> selectPage(MomentQueryParam queryParam);
 
+    /**
+     * 获取动态的数量
+     * @param queryParam queryParam
+     * @return int
+     */
     int count(MomentQueryParam queryParam);
 
+    /**
+     * 获取归档数量
+     * @param queryParam queryParam
+     * @return int
+     */
     int countArchive(MomentQueryParam queryParam);
 
+    /**
+     * 查询归档列表
+     * @param queryParam queryParam
+     * @return List
+     */
     List<MomentArchive> selectArchivePage(MomentQueryParam queryParam);
-
-    Optional<Moment> selectByModule(CommentModule commentModule);
 }
