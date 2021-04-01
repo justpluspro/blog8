@@ -10,8 +10,8 @@ import java.util.Optional;
 
 /**
  * @author qwli7
- * @date 2021/2/22 13:49
- * 功能：blog8
+ * 2021/2/22 13:49
+ * 功能：ArticleMapper
  **/
 @Mapper
 public interface ArticleMapper {

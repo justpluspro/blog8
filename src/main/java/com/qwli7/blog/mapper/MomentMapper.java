@@ -4,6 +4,7 @@ import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,14 +47,28 @@ public interface MomentMapper {
      * @param id id
      * @param hits hits
      */
-    void updateHits(int id, int hits);
+    void updateHits(@Param("id") int id, @Param("hits") int hits);
 
     /**
      * 添加点击量
      * @param id id
      * @param hits hits
      */
-    void addHits(int id , int hits);
+    void addHits(@Param("id") int id , @Param("hits") int hits);
+
+    /**
+     * 更新评论数
+     * @param id id
+     * @param comments comments
+     */
+    void updateComments(@Param("id") int id, @Param("comments") int comments);
+
+    /**
+     * 添加评论数
+     * @param id id
+     * @param comments comments
+     */
+    void addComments(@Param("id") int id, @Param("comments") int comments);
 
     /**
      * 分页查询动态

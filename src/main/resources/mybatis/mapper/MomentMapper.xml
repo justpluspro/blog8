@@ -49,6 +49,15 @@
         UPDATE blog_moment set hits = hits + #{hits} WHERE id = #{id}
     </update>
 
+    <update id="addComments">
+        UPDATE blog_moment set comments = #{comments} WHERE id = #{id}
+    </update>
+
+    <update id="updateComments">
+        UPDATE blog_moment set hits = comments + #{comments} WHERE id = #{id}
+    </update>
+
+
     <select id="count" parameterType="MomentQueryParam" resultType="int">
         select count(id) from blog_moment
         <where>
