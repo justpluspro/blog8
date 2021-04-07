@@ -13,15 +13,46 @@ import java.util.Optional;
  **/
 public interface CategoryService {
 
+    /**
+     * 保存分类
+     * @param category category
+     * @throws LogicException LogicException
+     */
     void save(Category category) throws LogicException;
 
+    /**
+     * 查询分类
+     * @param id id
+     * @return Category
+     * @throws LogicException LogicException
+     */
     Optional<Category> selectById(int id) throws LogicException;
 
-    List<Category> findAllCategories();
+    /**
+     * 获取所有的分类
+     * @return list
+     */
+    List<Category> getAll();
 
+    /**
+     * 根据分类查询分类
+     * @param name name
+     * @return Category
+     * @throws LogicException LogicException
+     */
     Optional<Category> selectByName(String name) throws LogicException;
 
+    /**
+     * 删除分类
+     * @param id id
+     * @throws LogicException LogicException
+     */
     void delete(final int id) throws LogicException;
 
+    /**
+     * 更新标签
+     * @param category category
+     * @throws LogicException LogicException
+     */
     void update(final Category category) throws LogicException;
 }

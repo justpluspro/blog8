@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -70,6 +71,12 @@ public class WebConfiguration implements WebMvcConfigurer {
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private Markdown2Html markdown2Html;
+
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
 
     @Bean
@@ -209,7 +216,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         if(StringUtils.isEmpty(markdownServerUrl)) {
             markdown2Html = new DefaultMarkdown2Html.CommonMarkdown2Html();
         } else {
-            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl);
+            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl, restTemplate());
         }
 
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();

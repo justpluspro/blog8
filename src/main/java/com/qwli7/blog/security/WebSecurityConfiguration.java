@@ -40,28 +40,28 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
     }
 
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new HandlerInterceptor() {
-            @Override
-            public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                                     Object handler) throws Exception {
-
-                if(handler instanceof HandlerMethod) {
-                    HandlerMethod handlerMethod = (HandlerMethod) handler;
-
-                    Authenticated authenticated = AnnotationUtils.getAnnotation(handlerMethod.getMethod(), Authenticated.class);
-                    if(authenticated == null) {
-                        authenticated = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Authenticated.class);
-                    }
-
-                    if(authenticated != null) {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }).addPathPatterns("/**");
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(new HandlerInterceptor() {
+//            @Override
+//            public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+//                                     Object handler) throws Exception {
+//
+//                if(handler instanceof HandlerMethod) {
+//                    HandlerMethod handlerMethod = (HandlerMethod) handler;
+//
+//                    Authenticated authenticated = AnnotationUtils.getAnnotation(handlerMethod.getMethod(), Authenticated.class);
+//                    if(authenticated == null) {
+//                        authenticated = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Authenticated.class);
+//                    }
+//
+//                    if(authenticated != null) {
+//                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+//                        return false;
+//                    }
+//                }
+//                return true;
+//            }
+//        }).addPathPatterns("/**");
+//    }
 }

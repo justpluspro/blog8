@@ -35,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Category> findAllCategories() {
+    public List<Category> getAll() {
         return categoryMapper.findAll();
     }
 

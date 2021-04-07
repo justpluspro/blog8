@@ -1,5 +1,6 @@
 package com.qwli7.blog.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,7 +16,13 @@ public interface Markdown2Html {
      * @param markdownMap markdownMap
      * @return Map
      */
-    Map<Integer, String> toHtmls(Map<Integer, String> markdownMap);
+    default Map<Integer, String> toHtmls(Map<Integer, String> markdownMap) {
+        Map<Integer, String> map = new HashMap<>();
+        for(Map.Entry<Integer, String> it: markdownMap.entrySet()) {
+            map.put(it.getKey(), toHtml(it.getValue()));
+        }
+        return map;
+    }
 
     /**
      * 单个解析接口

@@ -21,10 +21,19 @@ public class BlogProperties {
      */
     private String markdownServerUrl;
 
+    /**
+     * ip header
+     */
     private String ipHeader;
 
+    /**
+     * token header
+     */
     private String tokenHeader;
 
+    /**
+     * 默认分页大小
+     */
     private int defaultPageSize;
 
     public String getTokenHeader() {
@@ -50,7 +59,6 @@ public class BlogProperties {
     public String getMarkdownServerUrl() {
         return markdownServerUrl;
     }
-
 
     public String getIpHeader() {
         return ipHeader;
