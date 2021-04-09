@@ -196,7 +196,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * 删除评论
-     * @param comment
+     * @param comment comment
      */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
@@ -205,7 +205,7 @@ public class CommentServiceImpl implements CommentService {
         if(!commentOp.isPresent()) {
             throw new LogicException("comment.notExists", "评论不存在");
         }
-
+        // 删除评论下的子评论
         commentMapper.deleteById(commentOp.get().getId());
         dataContainer.remove(comment);
     }
