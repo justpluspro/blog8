@@ -6,6 +6,7 @@ import com.qwli7.blog.entity.ArticleSaved;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -67,4 +68,7 @@ public interface ArticleService {
      * @param id id
      */
     void hits(int id);
+
+
+    void deleteByIds(List<Integer> ids);
 }

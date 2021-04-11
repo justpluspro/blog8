@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author qwli7
- * 2021/2/22 13:11
+ * @date 2021/2/22 13:11
  * 功能：ArticleController
  **/
 @Authenticated
@@ -96,6 +97,13 @@ public class ArticleController {
     @DeleteMapping("article/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         articleService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @DeleteMapping("article/delete/batch")
+    public ResponseEntity<?> deleteInBatch(@RequestBody List<Integer> ids) {
+        articleService.deleteByIds(ids);
         return ResponseEntity.noContent().build();
     }
 }

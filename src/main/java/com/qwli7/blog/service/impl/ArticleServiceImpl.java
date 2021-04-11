@@ -6,23 +6,29 @@ import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.entity.vo.HandledArticleQueryParam;
+import com.qwli7.blog.event.ArticleBatchDeleteEvent;
 import com.qwli7.blog.event.ArticleDeleteEvent;
 import com.qwli7.blog.event.ArticlePostEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.*;
+import com.qwli7.blog.service.ArticleIndexer;
 import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.util.JsoupUtil;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * @author qwli7
  * @date 2021/2/22 13:09
- * 功能：blog8
+ * 功能：ArticleService
  **/
 @Service
 public class ArticleServiceImpl implements ArticleService, CommentModuleHandler {
@@ -45,6 +51,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     private final TagMapper tagMapper;
     private final Markdown2Html markdown2Html;
     private final BlogProperties blogProperties;
+    private ArticleIndexer articleIndexer;
     private final ApplicationEventPublisher publisher;
 
     public ArticleServiceImpl(Markdown2Html markdown2Html, ArticleMapper articleMapper,
@@ -59,6 +66,12 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         this.tagMapper = tagMapper;
         this.commentMapper = commentMapper;
         this.blogProperties = blogProperties;
+        try {
+            this.articleIndexer = new ArticleIndexer();
+        } catch (IOException ex){
+            ex.printStackTrace();
+            System.out.println("闯建索引文件失败");
+        }
         this.publisher = publisher;
     }
 
@@ -132,10 +145,23 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
 
         articleMapper.insert(article);
-        processArticleTags(article);
+        processArticleTagsAfterInsertOrUpdate(article);
 
-        publisher.publishEvent(new ArticlePostEvent(this, article));
+        if(ArticleStatus.POST == article.getStatus()) {
+            publisher.publishEvent(new ArticlePostEvent(this, article));
+        }
 
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try {
+                    articleIndexer.addIndex(article);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
         return new ArticleSaved(article.getId(), true);
     }
 
@@ -171,7 +197,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         } else if(article.getStatus().equals(ArticleStatus.DRAFT)) {
             article.setPostAt(oldArticle.getPostAt());
         }
-        processArticleTags(article);
+        processArticleTagsAfterInsertOrUpdate(article);
         articleMapper.update(article);
 
         if(article.getStatus().equals(ArticleStatus.POST)) {
@@ -186,54 +212,71 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      * @param queryParam queryParam
      * @return PageDto
      */
+    @Transactional(readOnly = true)
     @Override
     public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
-//        final Integer categoryId = queryParam.getCategoryId();
-//        Category category = null;
-//        if(categoryId != null && categoryId > 0) {
-//            final Optional<Category> categoryOp = categoryMapper.findById(categoryId);
-//            if(categoryOp.isPresent()) {
-//                category = categoryOp.get();
-//            }
-//        }
-//        if(category == null) {
-//            return new PageDto<>(queryParam, 0, new ArrayList<>());
-//        }
+        final Integer categoryId = queryParam.getCategoryId();
+        Category category;
+        HandledArticleQueryParam handledArticleQueryParam = new HandledArticleQueryParam();
+        if(categoryId != null && categoryId > 0) {
+            final Optional<Category> categoryOp = categoryMapper.findById(categoryId);
+            if(categoryOp.isPresent()) {
+                category = categoryOp.get();
+                handledArticleQueryParam.setCategory(category);
+            } else {
+                return new PageDto<>(queryParam, 0, new ArrayList<>());
+            }
+        }
 
-        int count = articleMapper.count(queryParam);
+        if(!BlogContext.isAuthenticated()) {
+            handledArticleQueryParam.setStatuses(Collections.singletonList(ArticleStatus.POST));
+        }
+
+        final String query = queryParam.getQuery();
+        if(!StringUtils.isEmpty(query)) {
+            try {
+                List<Integer> ids = articleIndexer.doSearch(handledArticleQueryParam);
+                if(!CollectionUtils.isEmpty(ids)) {
+                    handledArticleQueryParam.setAids(ids);
+                }
+            } catch (IOException | ParseException ex){
+                ex.printStackTrace();
+            }
+        }
+
+        int count = articleMapper.count(handledArticleQueryParam);
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
 
-        HandledArticleQueryParam handledArticleQueryParam = new HandledArticleQueryParam();
         handledArticleQueryParam.setPage(queryParam.getPage());
         handledArticleQueryParam.setSize(queryParam.getSize());
-        handledArticleQueryParam.setStart(0);
+        handledArticleQueryParam.setStart(queryParam.getStart());
         handledArticleQueryParam.setOffset(queryParam.getSize());
         List<Article> articles = articleMapper.selectPage(handledArticleQueryParam);
 
         processArticles(articles);
-
+        processContents(articles);
 
         return new PageDto<>(queryParam, count, articles);
     }
 
     /**
-     * 处理文章 | 主要是处理标签
-     * @param articles article
+     * 删除文章
+     * @param id id
      */
-    private void processArticles(List<Article> articles) {
-        if(CollectionUtils.isEmpty(articles)) {
-            return;
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void deleteById(int id) {
+        final Optional<Article> articleOp = articleMapper.selectById(id);
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException("article.notExists", "内容未找到");
         }
-        for(Article article: articles) {
-            Set<Tag> tags = article.getTags();
-            if(CollectionUtils.isEmpty(tags)) {
-                continue;
-            }
-            article.setTags(tags.stream().map(Tag::getId).map(tagMapper::findById).filter(Optional::isPresent)
-                    .map(Optional::get).collect(Collectors.toCollection(HashSet::new)));
-        }
+        final CommentModule commentModule = new CommentModule(articleOp.get().getId(), getModuleName());
+        commentMapper.deleteByModule(commentModule);
+        articleTagMapper.deleteByArticle(articleOp.get());
+        articleMapper.deleteById(articleOp.get().getId());
+        publisher.publishEvent(new ArticleDeleteEvent(this, articleOp.get()));
     }
 
     /**
@@ -246,6 +289,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     public Optional<Article> getArticleForEdit(int id) {
         return articleMapper.selectById(id);
     }
+
 
     /**
      * 获取文章
@@ -296,25 +340,6 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         return Optional.empty();
     }
 
-    /**
-     * 删除文章
-     * @param id id
-     */
-    @Transactional(propagation = Propagation.REQUIRED)
-    @Override
-    public void deleteById(int id) {
-        final Optional<Article> articleOp = articleMapper.selectById(id);
-        if(!articleOp.isPresent()) {
-            return;
-        }
-        final CommentModule commentModule = new CommentModule(articleOp.get().getId(), getModuleName());
-        commentMapper.deleteByModule(commentModule);
-        articleTagMapper.deleteByArticle(articleOp.get());
-        articleMapper.deleteById(articleOp.get().getId());
-        publisher.publishEvent(new ArticleDeleteEvent(this, articleOp.get()));
-        //        articleMapper.select
-    }
-
 
     @Transactional(readOnly = true)
     @Override
@@ -328,6 +353,33 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         articleMapper.addHits(id, article.getHits() + 1);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void deleteByIds(List<Integer> ids) {
+        List<Article> articles = articleMapper.selectByIds(ids);
+        if(articles.isEmpty()) {
+            return;
+        }
+        publisher.publishEvent(new ArticleBatchDeleteEvent(this, articles));
+    }
+
+    /**
+     * 处理文章 | 主要是处理标签
+     * @param articles article
+     */
+    private void processArticles(List<Article> articles) {
+        if(CollectionUtils.isEmpty(articles)) {
+            return;
+        }
+        for(Article article: articles) {
+            Set<Tag> tags = article.getTags();
+            if(CollectionUtils.isEmpty(tags)) {
+                continue;
+            }
+            article.setTags(tags.stream().map(Tag::getId).map(tagMapper::findById).filter(Optional::isPresent)
+                    .map(Optional::get).collect(Collectors.toCollection(HashSet::new)));
+        }
+    }
 
     /**
      * 处理内容
@@ -345,7 +397,9 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
     /**
      * 处理内容
-     * @param articles
+     * 1. md -》 html
+     * 2. 如果没有 featureImage，则从内容中抽取图片作为 featureImage
+     * @param articles articles
      */
     private void processContents(List<Article> articles) {
         if(CollectionUtils.isEmpty(articles)) {
@@ -370,8 +424,9 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      * 处理文章标签
      * @param article article
      */
-    private void processArticleTags(Article article) {
+    private void processArticleTagsAfterInsertOrUpdate(Article article) {
         articleTagMapper.deleteByArticle(article);
+        List<ArticleTag> articleTags = new ArrayList<>();
         for(Tag tag: article.getTags()) {
             String name = tag.getName();
             name = StringUtils.trimAllWhitespace(name);
@@ -386,8 +441,10 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
                 oldTag.setModifyAt(LocalDateTime.now());
                 tagMapper.insert(oldTag);
             }
-            articleTagMapper.insert(new ArticleTag(article.getId(), oldTag.getId()));
+//            articleTagMapper.insert(new ArticleTag(article.getId(), oldTag.getId()));
+            articleTags.add(new ArticleTag(article.getId(), oldTag.getId()));
         }
+        articleTagMapper.batchInsert(articleTags);
     }
 
     /**
@@ -451,6 +508,4 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     public String getModuleName() {
         return Article.class.getSimpleName().toLowerCase();
     }
-
-
 }

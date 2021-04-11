@@ -2,10 +2,12 @@ package com.qwli7.blog.template;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerAdapter;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * @author qwli7
@@ -16,12 +18,16 @@ import javax.servlet.http.HttpServletResponse;
 public class TemplateHandlerAdapter implements HandlerAdapter {
     @Override
     public boolean supports(Object handler) {
-        return "template".equals(handler);
+        return handler instanceof String;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        return null;
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response,
+                               Object handler) throws Exception {
+
+        final Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        return new ModelAndView(handler.toString()).addAllObjects(pathVariables);
     }
 
     @Override

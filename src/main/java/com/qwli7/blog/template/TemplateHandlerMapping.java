@@ -2,6 +2,7 @@ package com.qwli7.blog.template;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -18,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Order(-1)
 public class TemplateHandlerMapping implements HandlerMapping {
 
-    private TemplateService templateService;
+    private final TemplateService templateService;
 
     private Map<String, String> urlMap = new ConcurrentHashMap<>();
 

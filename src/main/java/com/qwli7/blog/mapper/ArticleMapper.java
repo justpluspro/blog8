@@ -41,7 +41,7 @@ public interface ArticleMapper {
      * @param queryParam queryParam
      * @return int
      */
-    int count(ArticleQueryParam queryParam);
+    int count(HandledArticleQueryParam queryParam);
 
     /**
      * 分页查询文章
@@ -89,4 +89,6 @@ public interface ArticleMapper {
      * @param id id
      */
     void deleteById(int id);
+
+    List<Article> selectByIds(List<Integer> ids);
 }
