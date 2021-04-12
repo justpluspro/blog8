@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import sun.rmi.runtime.Log;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -80,8 +81,6 @@ public class FileService implements InitializingBean {
         final String path = queryParam.getPath();
 
 
-
-
         return new FilePageResult();
     }
 
@@ -89,16 +88,16 @@ public class FileService implements InitializingBean {
      * 上传文件
      * @param dirPath dirPath
      * @param file file
-     * @return
+     * @return FileInfoDetail
      */
     public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
         readWriteLock.writeLock().lock();
         try {
             Path path;
-            if(StringUtils.isEmpty(dirPath) || StringUtils.pathEquals(dirPath, File.pathSeparator)) {
+            if(StringUtils.isEmpty(dirPath) || StringUtils.pathEquals(dirPath, FileUtil.pathSeparator)) {
                 path = rootPath;
             } else {
-                while (StringUtils.startsWithIgnoreCase(dirPath, File.pathSeparator)) {
+                while (StringUtils.startsWithIgnoreCase(dirPath, FileUtil.pathSeparator)) {
                     dirPath = dirPath.substring(1);
                 }
                 path = rootPath.resolve(dirPath);
@@ -106,52 +105,25 @@ public class FileService implements InitializingBean {
 
             logger.info("filePath:[{}]", path.toAbsolutePath());
             final Path parent = path.getParent();
-            System.out.println(rootPath.compareTo(parent));
-            try {
-//                if (rootPath.compareTo(parent) != 0) {
-                    createDirectories(parent);
-//                }
-            }catch (IOException ex){
-                throw new LogicException("", "");
+            final boolean directories = FileUtil.createDirectories(parent);
+            if(!directories) {
+                throw new LogicException("path.notDirectories", "指定路径非文件夹");
             }
-
-//            createDirectories(path);
 
             String fileName = file.getOriginalFilename();
             //去除文件中的非法字符
-            if(!StringUtils.isEmpty(fileName)) {
-
-                Path dest = path.resolve(fileName);
-                try(InputStream in = new BufferedInputStream(file.getInputStream())) {
-                    Files.copy(path, dest);
-                } catch (IOException ex) {
-                    throw new LogicException("file.already.exists", "文件已经存在");
-                }
-
-
-//                try {
-//                    if(!dest.toFile().exists()) {
-//                        Files.createFile(dest);
-//                        Files.copy(file.getInputStream(), dest);
-//                    }
-//                } catch (Exception ex) {
-//                    ex.printStackTrace();
-//                }
-
-                return getFileInfoDetail(dest);
+            if(StringUtils.isEmpty(fileName)) {
+                throw new LogicException("fileName.isEmpty", "文件名称不能为空");
             }
 
-//
+            Path dest = path.resolve(fileName);
+            try (InputStream in = new BufferedInputStream(file.getInputStream())) {
+                Files.copy(path, dest);
+            } catch (IOException ex) {
+                throw new LogicException("file.already.exists", "文件已经存在");
+            }
 
-//            String fileExtension = FileUtil.getFileExtension(fileName);
-//            if(MediaHandler.canHandle(fileExtension)) {
-//
-//
-//            }
-
-
-            return null;
-
+            return getFileInfoDetail(dest);
 
         } finally {
             readWriteLock.writeLock().unlock();
@@ -187,26 +159,25 @@ public class FileService implements InitializingBean {
     }
 
 
-
-
-
-    private void createDirectories(Path path) throws IOException {
-        if(path == null) {
-            return;
-        }
-        if(path.toFile().exists()) {
-            return;
-        }
-        if(!path.toFile().isDirectory()) {
-            return;
-        }
-        Files.createDirectories(path);
+    public Resource processFile(String requestPath) {
+        return null;
     }
 
 
+    /**
+     * /1/2/3/4/5
+     * /1/2/3
+     *
+     * => /1/2/3/   /1/2/3/4   /1/2/3/4/5
+     *
+     * 获取两个路径中的子路径
+     * @param start start
+     * @param end end
+     * @return List
+     */
+    public List<Path> getPathsBetweenTwoPath(Path start, Path end) {
 
-    public Resource processFile(String requestPath) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

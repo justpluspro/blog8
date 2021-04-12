@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @since 1.2
  * 视频信息
  */
-public class VideoInfo implements Serializable {
+public class VideoMetaInfo implements Serializable {
 
     /**
      * 视频宽度
@@ -28,7 +28,7 @@ public class VideoInfo implements Serializable {
      */
     private final String extension;
   
-    public VideoInfo(int width, int height, int duration, String extension) {
+    public VideoMetaInfo(int width, int height, int duration, String extension) {
         super();
         this.width = width;
         this.height = height;

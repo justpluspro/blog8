@@ -74,13 +74,11 @@ public class TagServiceImpl implements TagService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteTag(int id) {
-        final Optional<Tag> tagOp = tagMapper.findById(id);
-        if(!tagOp.isPresent()) {
-            return;
-        }
+        Tag tag = tagMapper.findById(id).orElseThrow(()
+                -> new ResourceNotFoundException("tag.notExists", "标签不存在"));
         tagMapper.deleteById(id);
-        articleTagMapper.deleteByTag(tagOp.get());
-        publisher.publishEvent(new TagDeleteEvent(this, tagOp.get()));
+        articleTagMapper.deleteByTag(tag);
+        publisher.publishEvent(new TagDeleteEvent(this, tag));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -94,7 +92,6 @@ public class TagServiceImpl implements TagService {
         if(old.getName().equals(tag.getName())) {
             return;
         }
-        tag.setName(tag.getName());
         tag.setModifyAt(LocalDateTime.now());
         tagMapper.update(tag);
     }

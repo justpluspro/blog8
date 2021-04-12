@@ -16,7 +16,7 @@
     </select>
 
     <select id="findById" resultType="Category">
-        select id, name, create_at from blog_category where id = #{id}
+        select id, name, create_at, modify_at from blog_category where id = #{id}
     </select>
 
     <delete id="deleteById" parameterType="int">
@@ -30,7 +30,7 @@
                 name = #{name,jdbcType=VARCHAR},
             </if>
             <if test="modifyAt != null">
-                modify_at = {modifyAt},
+                modify_at = #{modifyAt},
             </if>
         </set>
         where id = #{id}

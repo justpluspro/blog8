@@ -4,6 +4,7 @@ import com.qwli7.blog.entity.Category;
 import com.qwli7.blog.event.CategoryDeleteEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
+import com.qwli7.blog.mapper.ArticleMapper;
 import com.qwli7.blog.mapper.CategoryMapper;
 import com.qwli7.blog.service.CategoryService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,12 +26,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryMapper categoryMapper;
 
+    private final ArticleMapper articleMapper;
+
+
     private final ApplicationEventPublisher publisher;
 
-    public CategoryServiceImpl(CategoryMapper categoryMapper, ApplicationEventPublisher publisher) {
+    public CategoryServiceImpl(CategoryMapper categoryMapper, ArticleMapper articleMapper,
+                               ApplicationEventPublisher publisher) {
         super();
         this.categoryMapper = categoryMapper;
         this.publisher = publisher;
+        this.articleMapper = articleMapper;
     }
 
     @Transactional(readOnly = true)
@@ -54,12 +60,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void delete(int id) {
-        final Optional<Category> categoryOp = categoryMapper.findById(id);
-        if(!categoryOp.isPresent()) {
-            return;
+        final Category category = categoryMapper.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("category.notExists", "分类不存在"));
+
+        long count = articleMapper.countByCategory(category);
+        if(count > 0) {
+            throw new LogicException("category.existsArticles", "分类下存在文章，无法删除");
         }
         categoryMapper.deleteById(id);
-        publisher.publishEvent(new CategoryDeleteEvent(this, categoryOp.get()));
+        publisher.publishEvent(new CategoryDeleteEvent(this, category));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

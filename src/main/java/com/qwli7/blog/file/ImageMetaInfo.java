@@ -7,7 +7,7 @@ import java.io.Serializable;
  * 2021/3/2 8:30
  * 功能：图片信息
  **/
-public class ImageInfo implements Serializable {
+public class ImageMetaInfo implements Serializable {
 
     /**
      * 图片宽度
@@ -24,7 +24,7 @@ public class ImageInfo implements Serializable {
      */
     private final String extension;
 
-    public ImageInfo(int width, int height, String extension) {
+    public ImageMetaInfo(int width, int height, String extension) {
         super();
         this.width = width;
         this.height = height;

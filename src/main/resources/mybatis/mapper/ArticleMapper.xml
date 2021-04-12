@@ -200,4 +200,8 @@
             </foreach>
         </where>
     </select>
+
+    <select id="countByCategory" resultType="long">
+        select count(id) from blog_article where category_id = #{id,jdbcType=INTEGER}
+    </select>
 </mapper>

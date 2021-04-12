@@ -15,6 +15,9 @@ import java.nio.file.Path;
  **/
 public class FileUtil {
 
+
+    public static final String pathSeparator = "/";
+
     private FileUtil() {
         super();
     }

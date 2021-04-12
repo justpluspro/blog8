@@ -1,6 +1,7 @@
 package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Article;
+import com.qwli7.blog.entity.Category;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.entity.vo.HandledArticleQueryParam;
 import org.apache.ibatis.annotations.Mapper;
@@ -91,4 +92,11 @@ public interface ArticleMapper {
     void deleteById(int id);
 
     List<Article> selectByIds(List<Integer> ids);
+
+    /**
+     * 查询分类下的文章
+     * @param category category
+     * @return long
+     */
+    long countByCategory(Category category);
 }
