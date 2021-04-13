@@ -3,9 +3,8 @@ package com.qwli7.blog.web.controller;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.ConfigService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author qwli7 
@@ -30,5 +29,15 @@ public class ConfigController {
     @GetMapping("configs")
     public BlogConfig getAllConfig() {
         return configService.getConfig();
+    }
+
+    /**
+     * 修改配置信息
+     * @param blogConfig blogConfig
+     */
+    @PutMapping("config")
+    public ResponseEntity<?> updateConfig(@RequestBody BlogConfig blogConfig) {
+        configService.updateConfig(blogConfig);
+        return ResponseEntity.noContent().build();
     }
 }

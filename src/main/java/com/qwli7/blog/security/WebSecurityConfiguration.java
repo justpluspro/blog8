@@ -1,6 +1,9 @@
 package com.qwli7.blog.security;
 
+import com.qwli7.blog.BlogContext;
 import com.qwli7.blog.service.BlackIpService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,48 +23,49 @@ import java.util.EnumSet;
 
 /**
  * @author qwli7
- * 2021/2/26 13:10
+ * @date 2021/2/26 13:10
  * 功能：WebSecurityConfiguration
  **/
 @Configuration
 public class WebSecurityConfiguration implements WebMvcConfigurer {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
     @Bean
     public FilterRegistrationBean<BlackIpFilter> registrationBean(BlackIpService blackIpService) {
-
-
         FilterRegistrationBean<BlackIpFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-
         filterRegistrationBean.setFilter(new BlackIpFilter(blackIpService));
         filterRegistrationBean.setDispatcherTypes(EnumSet.allOf(DispatcherType.class));
         filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE+1);
-
         return filterRegistrationBean;
     }
 
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(new HandlerInterceptor() {
-//            @Override
-//            public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-//                                     Object handler) throws Exception {
-//
-//                if(handler instanceof HandlerMethod) {
-//                    HandlerMethod handlerMethod = (HandlerMethod) handler;
-//
-//                    Authenticated authenticated = AnnotationUtils.getAnnotation(handlerMethod.getMethod(), Authenticated.class);
-//                    if(authenticated == null) {
-//                        authenticated = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Authenticated.class);
-//                    }
-//
-//                    if(authenticated != null) {
-//                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-//                        return false;
-//                    }
-//                }
-//                return true;
-//            }
-//        }).addPathPatterns("/**");
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HandlerInterceptor() {
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+                                     Object handler) throws Exception {
+
+                final String requestUri = request.getRequestURI();
+                logger.info("method<preHandle> requestUri:[{}]", requestUri);
+
+                if(handler instanceof HandlerMethod) {
+                    HandlerMethod handlerMethod = (HandlerMethod) handler;
+
+                    Authenticated authenticated = AnnotationUtils.getAnnotation(handlerMethod.getMethod(), Authenticated.class);
+                    if(authenticated == null) {
+                        authenticated = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Authenticated.class);
+                    }
+
+                    if(authenticated != null && !BlogContext.isAuthenticated()) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }).addPathPatterns("/**");
+    }
 }

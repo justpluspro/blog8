@@ -11,7 +11,7 @@ import java.util.UUID;
 public class TokenUtil implements Serializable {
 
     private static final Long LIVE = 30 * 60 * 1000L;
-    private static UserToken userToken;
+    private static AuthToken authToken;
 
     public TokenUtil() {
         super();
@@ -19,12 +19,12 @@ public class TokenUtil implements Serializable {
 
 
     public static String createNew() {
-        userToken = new UserToken();
-        return userToken.token;
+        authToken = new AuthToken();
+        return authToken.token;
     }
 
     public static boolean valid(String str, boolean increaseTime) {
-        return userToken != null && userToken.valid(str, increaseTime);
+        return authToken != null && authToken.valid(str, increaseTime);
     }
 
     public static boolean valid(String str) {
@@ -32,16 +32,16 @@ public class TokenUtil implements Serializable {
     }
 
     public static void remove() {
-        userToken = null;
+        authToken = null;
     }
 
-    public static class UserToken implements Serializable {
+    public static class AuthToken implements Serializable {
 
         private final String token;
 
         private long expireTime;
 
-        public UserToken() {
+        public AuthToken() {
             this.token = UUID.randomUUID().toString().replace("-", "");
             this.expireTime = System.currentTimeMillis();
         }

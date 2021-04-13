@@ -33,13 +33,13 @@ public class BlogContextFilter implements Filter {
             final HttpServletRequest request = (HttpServletRequest) servletRequest;
 
             String ipHeader = blogProperties.getIpHeader();
-//            String ip;
-//            if(StringUtils.hasText(ipHeader)) {
-//                ip = ((HttpServletRequest) servletRequest).getHeader(ipHeader);
-//            } else {
-//                ip = servletRequest.getRemoteAddr();
-//            }
-//            BlogContext.setIp(ip);
+            String ip;
+            if(StringUtils.hasText(ipHeader)) {
+                ip = ((HttpServletRequest) servletRequest).getHeader(ipHeader);
+            } else {
+                ip = servletRequest.getRemoteAddr();
+            }
+            BlogContext.setIp(ip);
 
             String tokenHeader = blogProperties.getTokenHeader();
             final String token = request.getHeader(tokenHeader);
@@ -53,7 +53,6 @@ public class BlogContextFilter implements Filter {
                     BlogContext.setAuthenticated(true);
                 }
             }
-
 
             filterChain.doFilter(servletRequest, servletResponse);
         } finally {

@@ -113,6 +113,16 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
         return user;
     }
 
+    @Override
+    public void updateConfig(BlogConfig blogConfig) {
+
+    }
+
+    @Override
+    public void updateUser(User user) {
+
+    }
+
     /**
      * 加载本地配置
      */

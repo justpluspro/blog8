@@ -43,4 +43,16 @@ public interface ConfigService {
      * @return User
      */
     User getUser();
+
+    /**
+     * 修改配置信息
+     * @param blogConfig blogConfig
+     */
+    void updateConfig(BlogConfig blogConfig);
+
+    /**
+     * 修改用户信息
+     * @param user user
+     */
+    void updateUser(User user);
 }
