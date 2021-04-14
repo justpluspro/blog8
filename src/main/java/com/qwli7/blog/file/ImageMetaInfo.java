@@ -20,15 +20,25 @@ public class ImageMetaInfo implements Serializable {
     private final int height;
 
     /**
+     * 图片大小
+     */
+    private final long size;
+
+    /**
      * 图片类型
      */
     private final String extension;
 
-    public ImageMetaInfo(int width, int height, String extension) {
+    public ImageMetaInfo(int width, int height, long size, String extension) {
         super();
         this.width = width;
         this.height = height;
         this.extension = extension;
+        this.size = size;
+    }
+
+    public long getSize() {
+        return size;
     }
 
     public int getWidth() {

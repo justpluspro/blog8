@@ -24,6 +24,11 @@ public class VideoMetaInfo implements Serializable {
     private final int duration;
 
     /**
+     * 视频大小
+     */
+    private long size;
+
+    /**
      * 视频扩展名
      */
     private final String extension;
@@ -35,6 +40,14 @@ public class VideoMetaInfo implements Serializable {
         this.duration = duration;
         this.extension = extension;
    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
 
     public String getExtension() {
         return extension;

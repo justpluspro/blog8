@@ -28,13 +28,7 @@ public class FileUtil {
      * @return String
      */
     public static String getFileExtension(String fileName) {
-        if(StringUtils.isEmpty(fileName)) {
-            return "";
-        }
-        if(fileName.lastIndexOf(".") != -1) {
-            return "";
-        }
-        return fileName.substring(fileName.lastIndexOf(".")+1);
+        return StringUtils.getFilenameExtension(fileName);
     }
 
     /**
@@ -46,7 +40,7 @@ public class FileUtil {
         if(path.toFile().isDirectory()) {
             return "";
         }
-        return getFileExtension(path.getFileName().getFileName().toString());
+        return getFileExtension(path.getFileName().toString());
     }
 
     /**

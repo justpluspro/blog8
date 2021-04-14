@@ -1,5 +1,7 @@
 package com.qwli7.blog.file;
 
+import com.qwli7.blog.file.vo.VideoConvertParams;
+import com.qwli7.blog.file.vo.VideoCutParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -9,13 +11,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +36,23 @@ import java.util.regex.Pattern;
 public class MediaConverter implements Serializable {
 
     private final static Logger logger = LoggerFactory.getLogger(MediaConverter.class.getName());
+
+    private static final List<String> VIDEO_FORMAT = Arrays.asList("mp4", "rmvb", "rm", "flv");
+    private static final List<String> IMAGE_FORMAT = Arrays.asList("jpeg", "jpg", "png", "webp");
+    private static final List<String> TEXT_FORMAT = Arrays.asList("pdf", "doc", "pptx", "ppt", "txt", "md", "html", "css", "js", "xml", "json", "properties", "config");
+
+    /**
+     * 默认预设 crf 值
+     * @see VideoConvertParams
+     */
+    private final static Integer DEFAULT_CRF = 18;
+
+    /**
+     * 默认预设属性值
+     * @see VideoConvertParams
+     */
+    private final static String DEFAULT_PRESET = "veryslow";
+
     /**
      * ffmpeg 路径
      */
@@ -221,41 +237,43 @@ public class MediaConverter implements Serializable {
 
     /**
      * 视频转换
-     * @param fileInput fileInput
-     * @param fileOutput fileOutput
-     * @param withAudio 是否携带音频，true，携带
-     * @param crf crf 视频的质量，值越小视频质量越高（取值为 0-51，直接影响视频码率大小），取值可参考 CrfValueEnum.code
-     * @param preset preset 指定视频的编码速率（速率越快压缩率越低），取值参考 PresetValueEnum.presetValue
-     * @param width 视频宽度，为空则表示原视频宽度
-     * @param height 视频高度，为空则表示原视频高度
+     * @param videoConvertParams convertParam 转换参数
      */
-    public static void convertVideo(File fileInput, File fileOutput, boolean withAudio, Integer crf, String preset, Integer width, Integer height) {
-        if(fileInput == null || !fileInput.exists()) {
+    public static void convertVideo(VideoConvertParams videoConvertParams) {
+        final File inputFile = videoConvertParams.getInputFile();
+        if(inputFile == null || !inputFile.exists()) {
             throw new RuntimeException("源文件不存在");
         }
-        if(null == fileOutput) {
-            throw new RuntimeException("转换后的视频路径为空，请检查转换后的视频存放路径是否正确");
-        }
-        if(!fileOutput.exists()) {
-            try{
-                fileOutput.createNewFile();
-            } catch (IOException ex){
-                System.out.println("视频转换创建文件失败");
-            }
-        }
+//        if(null == outputFile) {
+//            throw new RuntimeException("转换后的视频路径为空，请检查转换后的视频存放路径是否正确");
+//        }
+//        if(!outputFile.exists()) {
+//            try{
+//                outputFile.createNewFile();
+//            } catch (IOException ex){
+//                System.out.println("视频转换创建文件失败");
+//            }
+//        }
 
-        String format = FileUtil.getFileExtension(fileInput.toPath());
+        String format = StringUtils.getFilenameExtension(inputFile.getName());
         if(!isIllegalFormat(format, new String[]{"avi", "mp4", "rmvb"})){
             throw new RuntimeException("无法解析视频格式");
         }
         List<String> command = new ArrayList<>();
         command.add("-i");
-        command.add(fileInput.getAbsolutePath());
+        command.add(inputFile.getAbsolutePath());
+
+        final boolean withAudio = videoConvertParams.isWithAudio();
+
         //是否保留音频
         if(!withAudio) {
             //去掉音频
             command.add("-an");
         }
+
+        final Integer width = videoConvertParams.getWidth();
+        final Integer height = videoConvertParams.getHeight();
+
         if(null != width && width > 0 && null != height && height > 0) {
             command.add("-s");
             String resolution = String.format("%sx%s", width.toString(), height.toString());
@@ -265,16 +283,32 @@ public class MediaConverter implements Serializable {
         command.add("-vcodec");
         // 指定使用 x264 编码
         command.add("libx264");
-        // 当使用 x264 的时候需要带上该餐胡
+        // 当使用 x264 的时候需要带带上参数
         command.add("-preset");
-        command.add(preset);
+        final String preset = videoConvertParams.getPreset();
+        if(videoConvertParams.matchPreset(preset)) {
+            command.add(preset);
+        } else {
+            command.add(DEFAULT_PRESET);
+        }
         // crf 值。值越小，视频质量越高
         command.add("-crf");
+
+        Integer crf = videoConvertParams.getCrf();
+        if(crf == null || 0 > crf || crf > 51) {
+            crf = DEFAULT_CRF;
+        }
         command.add(crf.toString());
 
         // 当存在已输出文件时，不提示是否覆盖
         command.add("-y");
-        command.add(fileOutput.getAbsolutePath());
+
+        // 转换文件规则
+        final Path path = inputFile.toPath();
+        final Path parent = path.getParent();
+//        Path outputPath = Paths.get(parent.toString(), "" + FileUtil.getFileExtension(path));
+
+        command.add("/Users/liqiwen/Desktop/video.mp4");
 
         executeCommand(command, getFfmpegPath());
     }
@@ -321,18 +355,14 @@ public class MediaConverter implements Serializable {
 
     /**
      * 抽帧
-     * @param videoFile 原视频
-     * @param path 转换后的文件路径
-     * @param time 开始截取视频帧的时间点，单位 s
-     * @param width 截图的视频帧的图片的宽度 单位 px
-     * @param height 截图的视频图片的高度 单位 px，需要大于 20
-     * @param timeLength 截取的视频帧的时长（从开始时间算，单位 s，需要小于原视频的最大时长）
-     * @param isContinue false - 静态图（只截取 time 时间点的那一帧图片）true，动态图，（截取时间从 time 时间开始，timeLength 这段时间内的多张图）
+     * @param cutParams cutParams
      */
-    public static void cutVideoFrame(File videoFile, String path, Time time, int width, int height, int timeLength, boolean isContinue) {
+    public static void cutVideoFrame(VideoCutParams cutParams) {
+        final File videoFile = cutParams.getInputFile();
         if(videoFile == null || !videoFile.exists()) {
             throw new RuntimeException("原视频文件不存在");
         }
+        final String path = cutParams.getPath();
         if(StringUtils.isEmpty(path)) {
             throw new RuntimeException("转换后的文件路径为空，请检查转换后的文件存放路径是否正确");
         }
@@ -341,38 +371,62 @@ public class MediaConverter implements Serializable {
         if (null == videoMetaInfo) {
             throw new RuntimeException("未解析到视频信息");
         }
-        if (time.getTime() + timeLength > videoMetaInfo.getDuration()) {
-            throw new RuntimeException("开始截取视频帧的时间点不合法：" + time.toString() + "，因为截取时间点晚于视频的最后时间点");
-        }
+        //开始时间
+        final LocalTime localTime = cutParams.getLocalTime();
+        final int timeLength = cutParams.getTimeLength();
+//        if (time.getTime() + timeLength > videoMetaInfo.getDuration()) {
+//            throw new RuntimeException("开始截取视频帧的时间点不合法：" + time.toString() + "，因为截取时间点晚于视频的最后时间点");
+//        }
 
-        if (width <= 20 || height <= 20) {
-            throw new RuntimeException("截取的视频帧图片的宽度或高度不合法，宽高值必须大于20");
+        Integer height = cutParams.getHeight();
+        Integer width = cutParams.getWidth();
+        if (width == null || width <= 20 || height == null || height <= 20) {
+            width = videoMetaInfo.getWidth();
+            height = videoMetaInfo.getHeight();
+        }
+        if(width > videoMetaInfo.getWidth()) {
+            width = videoMetaInfo.getWidth();
+        }
+        if(height > videoMetaInfo.getHeight()) {
+            height = videoMetaInfo.getHeight();
         }
 
         try {
             List<String> command = new ArrayList<>();
             command.add("-ss");
-            command.add(time.toString());
-            if(isContinue) {
+//            command.add(time.toString()); //从什么时候开始截图
+            command.add("00:00:00");
+            command.add("-i");
+            command.add(videoFile.getAbsolutePath());
+
+            if(cutParams.isContinuous()) {
                 command.add("-t");
-                command.add(timeLength+"");
+//                ffmpeg -ss 0:1:30 -t 0:0:20 -i input.avi -vcodec copy -acodec copy output.avi
+                command.add(timeLength+""); //截取视频时长，该截图需要持续多长时间
             } else {
                 command.add("-vframes");
                 command.add("1");
             }
-            command.add("-i");
-            command.add(videoFile.getAbsolutePath());
+            //去除音频编码
             command.add("-an");
-            command.add("-f");
-            command.add("image2");
-            if(isContinue) {
+
+//            if(cutParams.isContinuous()) {
+//                command.add("-f");
+//                command.add("image2");
+//            }
+            if(cutParams.isContinuous()) {
+                // -r 提取视频的频率，多长时间提取一次
                 command.add("-r");
                 command.add("3");
             }
             command.add("-s");
             command.add(width + "*" + height);
-            if(!isContinue) {
-                command.add(path + File.separator + "foo-%3d.jpeg");
+
+            //重名文件直接保存
+            command.add("-y");
+
+            if(cutParams.isContinuous()) {
+                command.add(path + File.separator + "-%3d.jpeg");
             } else {
                 command.add(path);
             }
@@ -409,7 +463,12 @@ public class MediaConverter implements Serializable {
     }
 
 
-
+    /**
+     * 调用进程执行
+     * @param commands 待执行的命令
+     * @param bash bash 或者 exe 所在的目录
+     * @return String
+     */
     public static String executeCommand(List<String> commands, String bash) {
         if(CollectionUtils.isEmpty(commands)) {
             return null;
@@ -531,16 +590,44 @@ public class MediaConverter implements Serializable {
 
         VideoMetaInfo videoMetaInfo = new VideoMetaInfo(videoWidth, videoHeight,
                 Math.toIntExact(duration), format);
-//        videoMetaInfo.
+        videoMetaInfo.setSize(videoSize);
         return videoMetaInfo;
     }
 
-
+    /**
+     * 通过 ffmpeg 获取视频信息
+     * 完整命令：ffmpeg -i fileInput
+     * 通过正则表达式获取到视频信息
+     * @param file file or url
+     * @return String
+     */
     private static String getVideoMetaInfoByFfmpeg(File file) {
         List<String> commands = new ArrayList<>();
         commands.add("-i");
         commands.add(file.getAbsolutePath());
         return executeCommand(commands, getFfmpegPath());
+    }
+
+    /**
+     * 完整命令：ffprobe -v quiet -print_format json -show_format -show_streams /Users/liqiwen/Desktop/video.mp4
+     * 通过 ffprobe 获取到视频信息
+     * @param file file
+     * @return String
+     */
+    private static String getVideoMetaInfoByFfprobe(File file) {
+        List<String> commands = new ArrayList<>();
+        commands.add("-v");
+        commands.add("quiet");
+        commands.add("-print_format");
+        // 输出格式为 json
+        commands.add("json");
+        // 显示格式
+        commands.add("-show_format");
+        //显示流信息
+        commands.add("-show_streams");
+        commands.add(file.getAbsolutePath());
+        // 返回的是 json 类型的数据，获取到数据进行解析即可
+        return executeCommand(commands, getFfprobePath());
     }
 
     /**
@@ -585,8 +672,8 @@ public class MediaConverter implements Serializable {
             int height = image.getHeight();
             long size = imageFile.length();
             String fileExtension = FileUtil.getFileExtension(imageFile.toPath());
-            return new ImageMetaInfo(width,height, fileExtension);
-        }catch (Exception ex){
+            return new ImageMetaInfo(width,height, size, fileExtension);
+        } catch (Exception ex){
             ex.printStackTrace();
         }
         return null;
@@ -613,7 +700,7 @@ public class MediaConverter implements Serializable {
             return null;
         }
         String[] xes = result.split("x");
-        return new ImageMetaInfo(Integer.parseInt(xes[0]), Integer.parseInt(xes[1]), ext);
+        return new ImageMetaInfo(Integer.parseInt(xes[0]), Integer.parseInt(xes[1]), 0, ext);
     }
 
     /**
@@ -646,6 +733,33 @@ public class MediaConverter implements Serializable {
 
         executeCommand(commands, getGraphicsMagickPath());
 
+    }
+
+    public static boolean isVideo(Path dest) {
+        if(dest == null) {
+            return false;
+        }
+        final File file = dest.toFile();
+        if(file.isDirectory() || !file.exists()) {
+            return false;
+        }
+        final Path fileName = dest.getFileName();
+        final String ext = StringUtils.getFilenameExtension(fileName.toString());
+        if(StringUtils.isEmpty(ext)) {
+            return false;
+        }
+        return VIDEO_FORMAT.contains(ext.toLowerCase());
+    }
+
+    public static boolean canHandle(Path dest) {
+        return true;
+    }
+
+    public static boolean isText(String ext) {
+        if(StringUtils.isEmpty(ext)) {
+            return false;
+        }
+        return TEXT_FORMAT.contains(ext);
     }
 
     private static class ProcessKiller extends Thread {
@@ -703,18 +817,21 @@ public class MediaConverter implements Serializable {
     }
 
     public static void main(String[] rags) {
+        File inputFile = new File("C:\\Users\\admin\\Desktop\\image_jpeg__RC-2021-04-14_7243_1618384294446.jpg");
+        File outputFile = new File("C:\\Users\\admin\\Desktop\\image_xx.jpg");
 
-        MediaConverter.setFfmpegPath("C:\\converter\\ffmpeg\\ffmpeg.exe");
-        MediaConverter.setGraphicsMagickPath("C:\\converter\\GraphicsMagick\\gm.exe");
+        //windows
+//        MediaConverter.setFfmpegPath("C:\\converter\\ffmpeg\\ffmpeg.exe");
+//        MediaConverter.setGraphicsMagickPath("C:\\converter\\GraphicsMagick\\gm.exe");
+
+
 //        boolean executable = MediaConverter.isExecutable();
 //        System.out.println(executable);
 
 //        VideoMetaInfo videoMetaInfo = MediaConverter.getVideoMetaInfo(new File("C:\\Users\\admin\\Desktop\\video-from-phone.mp4"));
 //        System.out.println(videoMetaInfo);
-        long start = System.currentTimeMillis();
-        long second = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-        System.out.println(second);
-        System.out.println(start);
+
+
 //        ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
 //        executorService.schedule(new Runnable() {
 //            @Override
@@ -739,31 +856,29 @@ public class MediaConverter implements Serializable {
 //        System.out.println(imageMetaInfo.getExtension());
 
         //图片放大缩小
-        File inputFile = new File("C:\\Users\\admin\\Desktop\\image_jpeg__RC-2021-04-14_7243_1618384294446.jpg");
-        File outputFile = new File("C:\\Users\\admin\\Desktop\\image_xx.jpg");
 //        MediaConverter.clipImage(inputFile, outputFile,"50");
-        MediaConverter.addWaterMarkForImage(inputFile, outputFile, "qwli7.com");
+//        MediaConverter.addWaterMarkForImage(inputFile, outputFile, "qwli7.com");
+
+        //视频转换
+//        VideoConvertParams videoConvertParams = new VideoConvertParams();
+//        videoConvertParams.setInputFile(new File("/Users/liqiwen/Desktop/obj_w5zDkcKQw6LDiWzDgcK2_1374635483_a9ac_58c9_db6c_f0730e472dc0176e37dbcef3e0098b76.mp4"));
+//        videoConvertParams.setWithAudio(true);
+//        videoConvertParams.setCrf(28);
+//        MediaConverter.convertVideo(videoConvertParams);
+
+        VideoCutParams cutParams = new VideoCutParams();
+        cutParams.setInputFile(new File("/Users/liqiwen/Desktop/video.mp4"));
+        cutParams.setPath(Paths.get("/Users/liqiwen/Desktop/", "video_thumb.png").toString());
+        cutParams.setContinuous(false);
+        cutParams.setHeight(450);
+        cutParams.setWidth(600);
+        MediaConverter.cutVideoFrame(cutParams);
         while (true){
             //死循环
         }
 
     }
 
-    /**
-     * 获取两个时间的之间的秒数
-     * @param start start
-     * @param end end
-     * @return long
-     */
-    public static long getSeconds(LocalDateTime start, LocalDateTime end) {
-       if(start == null || end == null || end.isBefore(start)) {
-           return -1;
-       }
-       long startMills = start.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-       long endMills = end.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-       long millsInterval = endMills - startMills;
-       return millsInterval/1000;
-    }
 
     static class Resize implements Serializable {
 

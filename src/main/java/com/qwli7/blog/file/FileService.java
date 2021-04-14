@@ -1,6 +1,7 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
+import com.qwli7.blog.file.vo.VideoCutParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,11 +17,11 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -122,6 +123,7 @@ public class FileService implements InitializingBean {
             } catch (IOException ex) {
                 throw new LogicException("file.already.exists", "文件已经存在");
             }
+            //目标文件
 
             return getFileInfoDetail(dest);
 
@@ -135,8 +137,64 @@ public class FileService implements InitializingBean {
      * @param fileCreate fileCreate
      */
     public void createFile(FileCreate fileCreate) {
+        final Lock lock = readWriteLock.writeLock();
+        lock.lock();
 
+        try {
+            final String path = fileCreate.getPath();
+            final String fileName = fileCreate.getFileName();
+            final FileType fileType = fileCreate.getFileType();
+            //组合成一个文件路径
+            final Path filePath = Paths.get(path, fileName);
+            //跟 root 合并成一个完整的路径
+            final String cleanPath = StringUtils.cleanPath(filePath.toString());
+            final Path fullPath = rootPath.resolve(Paths.get(cleanPath));
+            if(fileType == FileType.DIRECTORY) {
+                if(fullPath.toFile().exists()) {
+                    throw new LogicException("directories.exists", "文件夹已经存在");
+                }
+                FileUtil.createDirectories(fullPath);
+            } else if(fileType == FileType.FILE) {
+                if(fullPath.toFile().exists()) {
+                    throw new LogicException("file.exists", "文件已经存在");
+                }
+                final String ext = FileUtil.getFileExtension(cleanPath);
+                if(MediaConverter.isText(ext)) {
+                    // 创建的文件必须都是可编辑的
+                    throw new LogicException("file.cannot.created", "无法创建扩展名为" + ext + "的文件");
+                }
+                FileUtil.createFile(filePath);
+            } else {
+                // 不是文件也不是文件夹
+                throw new LogicException("illegal.fileType", "非法的文件类型");
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
 
+    /**
+     * 更新文件
+     * @param fileUpdated fileUpdated
+     */
+    public void updateFile(FileUpdated fileUpdated) {
+        final Lock lock = readWriteLock.writeLock();
+        lock.lock();
+        try {
+            final String path = fileUpdated.getPath();
+            final Path fullPath = getFullPath(path);
+            // 检验文件是否可编辑
+            Files.write(fullPath, fileUpdated.getContent().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            logger.error("写文件失败：[{}]", ex.getMessage(), ex);
+            throw new LogicException("write.content.failed", "写文件失败");
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private Path getFullPath(String path) {
+        return rootPath.resolve(Paths.get(path));
     }
 
     /**
@@ -155,6 +213,22 @@ public class FileService implements InitializingBean {
 
 
     private FileInfoDetail getFileInfoDetail(Path dest) {
+        if(MediaConverter.isVideo(dest) && MediaConverter.canHandle(dest)) {
+            final VideoMetaInfo videoMetaInfo = MediaConverter.getVideoMetaInfo(dest.toFile());
+            VideoCutParams cutParams = new VideoCutParams();
+            cutParams.setInputFile(dest.toFile());
+            cutParams.setContinuous(false);
+            cutParams.setWidth(600);
+            cutParams.setHeight(450);
+            MediaConverter.cutVideoFrame(cutParams);
+            FileInfoDetail fileInfoDetail = new FileInfoDetail();
+            fileInfoDetail.setHeight(videoMetaInfo.getHeight());
+            fileInfoDetail.setWidth(videoMetaInfo.getWidth());
+            fileInfoDetail.setExt(videoMetaInfo.getExtension());
+            fileInfoDetail.setPath(dest.toFile().getAbsolutePath());
+            return fileInfoDetail;
+        }
+
         return null;
     }
 
