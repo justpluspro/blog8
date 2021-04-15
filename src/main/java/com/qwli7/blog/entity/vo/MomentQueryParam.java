@@ -19,6 +19,7 @@ public class MomentQueryParam extends AbstractQueryParam implements Serializable
      */
     private Boolean orderDesc;
 
+
     public String getQuery() {
         return query;
     }

@@ -78,4 +78,14 @@ public class CommentController {
         commentService.delete(comment);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 审核评论
+     * @param id id
+     * @return ResponseEntity
+     */
+    @PutMapping("comment/{id}/check")
+    public ResponseEntity<Void> checkComment(@PathVariable("id") int id) {
+
+    }
 }

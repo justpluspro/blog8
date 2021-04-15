@@ -1,5 +1,7 @@
 package com.qwli7.blog.util;
 
+import org.springframework.util.StringUtils;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -9,8 +11,21 @@ import javax.servlet.http.HttpServletRequest;
  * @version 1.2
  */
 public class WebUtils {
+    private static final String HTTP_PREFIX = "http://";
+    private static final String HTTPS_PREFIX = "https://";
+
     private WebUtils(){
         super();
+    }
+
+
+    /**
+     * 是否是规则的请求地址
+     * @param serverUri serverUri
+     * @return boolean
+     */
+    public static boolean isRegularUrl(String serverUri) {
+        return serverUri.startsWith(HTTPS_PREFIX) || serverUri.startsWith(HTTP_PREFIX);
     }
 
 

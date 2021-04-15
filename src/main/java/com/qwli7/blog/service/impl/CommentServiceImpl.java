@@ -92,19 +92,24 @@ public class CommentServiceImpl implements CommentService {
 
         String parentPath = DEFAULT_PARENT_PATH;
         Comment parent = comment.getParent();
-        if(parent != null) {
 
+        // 父评论不为空
+        if(parent != null) {
+            // 判断父评论是否存在
             final Optional<Comment> parentOp = commentMapper.selectById(parent.getId());
             if(!parentOp.isPresent()) {
                 throw new LogicException("parent.notExists", "父评论不存在");
             }
             parent = parentOp.get();
 
+            // 判断父评论状态
             final CommentStatus status = parent.getStatus();
             if(status == null || status == CommentStatus.CHECKING) {
                 throw new LogicException("parent.checking", "父评论正在审核中");
             }
             parentPath = parent.getParentPath() + parent.getId() + parentPath;
+
+            // 判断回复的深度
             if(parentPath.length() > MAX_PARENT_PATH_DEPTH) {
                 throw new LogicException("parentPath.too.depth", "评论不允许回复了");
             }
@@ -114,23 +119,31 @@ public class CommentServiceImpl implements CommentService {
         final String ip = comment.getIp();
         boolean checking = false;
 
+        // 如果用户在已登录的情况下
         if(BlogContext.isAuthenticated()) {
+            // 不设置用户名称
             comment.setName("");
             comment.setAdmin(true);
             final User user = configService.getUser();
             comment.setEmail(user.getEmail());
             comment.setAvatar(user.getAvatar());
             comment.setStatus(CommentStatus.NORMAL);
+            comment.setChecking(false);
         } else {
+            // 用户未登录
             final String email = comment.getEmail();
             if (StringUtils.isEmpty(email)) {
+                // 如果邮箱为空，则设置默认的头像
                 final BlogConfig config = configService.getConfig();
                 comment.setAvatar(config.getDefaultAvatar());
             } else {
+                // 如果用户邮箱不为空，则根据邮箱计算头像的 md5
                 final String partAvatar = DigestUtils.md5DigestAsHex(email.getBytes(StandardCharsets.UTF_8));
                 comment.setAvatar(partAvatar);
             }
+            comment.setAdmin(false);
 
+            // 判断审核策略
             final CommentStrategy commentStrategy = configService.getCommentStrategy();
             switch (commentStrategy) {
                 case EACH: //每次评论都需要审核
@@ -139,8 +152,12 @@ public class CommentServiceImpl implements CommentService {
                 case FIRST: //第一次评论需要审核
                     Optional<Comment> commentOp = commentMapper.selectLatestCommentByIp(ip);
                     if(commentOp.isPresent()) {
+                        // 如果存在，则看最近一条的评论是什么状态
                         final Comment ipComment = commentOp.get();
                         final CommentStatus status = ipComment.getStatus();
+
+                        // 如果最近的一条评论也是审核中，则该条评论直接设置成审核中
+                        // 反之则不审核
                         checking = CommentStatus.CHECKING == status;
                     } else {
                         checking = true;

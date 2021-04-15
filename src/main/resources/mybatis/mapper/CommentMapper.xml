@@ -29,7 +29,7 @@
     </insert>
 
     <select id="selectLatestCommentByIp" resultType="com.qwli7.blog.entity.Comment">
-        select * from blog_comment where ip = #{ip,jdbcType=VARCHAR}
+        select * from blog_comment where ip = #{ip,jdbcType=VARCHAR} order by id desc limit 1
     </select>
 
     <delete id="deleteById">

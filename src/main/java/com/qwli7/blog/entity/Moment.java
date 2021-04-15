@@ -3,6 +3,7 @@ package com.qwli7.blog.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -46,11 +47,13 @@ public class Moment extends BaseEntity implements Serializable {
     /**
      * 是否私人
      */
+    @NotNull(message = "私人属性不能为空")
     private Boolean isPrivate;
 
     /**
      * 允许评论
      */
+    @NotNull(message = "允许评论属性不能为空")
     private Boolean allowComment;
 
     /**

@@ -28,7 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final ArticleMapper articleMapper;
 
-
     private final ApplicationEventPublisher publisher;
 
     public CategoryServiceImpl(CategoryMapper categoryMapper, ArticleMapper articleMapper,

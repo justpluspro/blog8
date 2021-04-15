@@ -1,6 +1,7 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.security.Authenticated;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 @Authenticated
 @RestController
+@Conditional(FileCondition.class)
 @RequestMapping("api")
 public class FileController {
 

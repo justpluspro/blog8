@@ -13,11 +13,30 @@ import java.util.List;
  * 功能：BlackIpService
  **/
 public interface BlackIpService {
+
+    /**
+     * 分页查询黑名单
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     PageDto<BlackIp> selectPage(CommonQueryParam queryParam);
 
+    /**
+     * 是否是黑名单
+     * @param ip ip
+     * @return ip
+     */
     boolean isBlackIp(String ip);
 
+    /**
+     * 保存黑名单
+     * @param blackIp blackIp
+     */
     void save(BlackIp blackIp);
 
+    /**
+     * 删除黑名单
+     * @param id id
+     */
     void delete(int id);
 }

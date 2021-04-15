@@ -253,6 +253,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
             throw new ResourceNotFoundException("comment.notExists", "动态不存在");
         }
         final Moment moment = momentOp.get();
+
+        if(moment.getPrivate() && !BlogContext.isAuthenticated()) {
+            throw new LogicException("comment.private", "不允许操作私人动态");
+        }
+
         if(!moment.getAllowComment()) {
             throw new LogicException("moment.notAllow", "动态不允许评论");
         }

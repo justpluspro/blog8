@@ -123,20 +123,6 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
 
-    /**
-     * 解决跨域请求问题
-     * @param registry registry
-     */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowCredentials(true)
-                .allowedHeaders("*")
-                .allowedMethods("*")
-                .allowedOrigins("*")
-                .maxAge(5000);
-    }
-
     @Bean("commentNotifyContainer")
     public DataContainer<Comment> dataContainer() {
         return new MemoryDataContainer<>();
