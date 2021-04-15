@@ -7,10 +7,13 @@ import com.qwli7.blog.entity.SavedComment;
 import com.qwli7.blog.entity.dto.CommentDto;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommentQueryParam;
+import com.qwli7.blog.entity.vo.UpdateComment;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * @author qwli7
@@ -84,8 +87,23 @@ public class CommentController {
      * @param id id
      * @return ResponseEntity
      */
+    @Authenticated
     @PutMapping("comment/{id}/check")
-    public ResponseEntity<Void> checkComment(@PathVariable("id") int id) {
+    public ResponseEntity<SavedComment> checkComment(@PathVariable("id") int id) {
+        return ResponseEntity.ok(commentService.check(id));
+    }
 
+    /**
+     * 修改评论, 仅管理员对自己的评论有效
+     * @param id id
+     * @param updateComment updateComment
+     * @return ResponseEntity
+     */
+    @Authenticated
+    @PutMapping("comment/{id}/update")
+    public ResponseEntity<Void> update(@PathVariable("id") Integer id, @RequestBody @Valid UpdateComment updateComment) {
+        updateComment.setId(id);
+        commentService.update(updateComment);
+        return ResponseEntity.noContent().build();
     }
 }

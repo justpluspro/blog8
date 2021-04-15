@@ -3,14 +3,38 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qwli7.blog.mapper.CommentMapper">
 
+    <resultMap id="BaseResultMap" type="Comment">
+        <id property="id" column="id" />
+        <result property="content" column="content" />
+        <result property="name" column="nickname" />
+        <result property="email" column="email" />
+        <result property="conversationPath" column="path" />
+        <result property="ip" column="ip" />
+        <result property="admin" column="admin" />
+        <result property="createAt" column="create_at" />
+        <result property="avatar" column="avatar" />
+        <result property="status" column="status" typeHandler="EnumOrdinalTypeHandler" />
+        <association property="module" javaType="com.qwli7.blog.entity.CommentModule">
+            <result property="name" column="module_name" />
+            <result property="id" column="module_id" />
+        </association>
+    </resultMap>
+
+    <sql id="fullSql">
+        select id, parent_id, path, nickname, email,
+               ip, admin, content, module_id,
+               create_at, modify_at, website, avatar,
+               module_name, checking from blog_comment
+    </sql>
+
     <delete id="deleteByModule" parameterType="CommentModule">
         delete from blog_comment where module_id = #{id,jdbcType=INTEGER}
         and module_name = #{name,jdbcType=VARCHAR}
     </delete>
 
-    <select id="selectById" parameterType="integer" resultType="com.qwli7.blog.entity.Comment">
-
-        SELECT * FROM blog_comment WHERE id = #{id,jdbcType=INTEGER}
+    <select id="selectById" parameterType="integer" resultMap="BaseResultMap">
+        <include refid="fullSql" />
+        WHERE id = #{id,jdbcType=INTEGER}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" parameterType="Comment" keyProperty="id" keyColumn="id">
@@ -24,15 +48,34 @@
                 #{parent.id,jdbcType=INTEGER},
             </if>
         #{parentPath,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{ip,jdbcType=VARCHAR},
         #{admin,jdbcType=BOOLEAN}, #{content,jdbcType=VARCHAR}, #{module.id,jdbcType=INTEGER},
         #{createAt}, #{modifyAt}, #{avatar,jdbcType=VARCHAR}, #{module.name,jdbcType=VARCHAR})
     </insert>
 
     <select id="selectLatestCommentByIp" resultType="com.qwli7.blog.entity.Comment">
-        select * from blog_comment where ip = #{ip,jdbcType=VARCHAR} order by id desc limit 1
+        <include refid="fullSql" />
+        where ip = #{ip, jdbcType=VARCHAR} order by id desc limit 1
     </select>
 
     <delete id="deleteById">
         delete from blog_comment where id = #{id,jdbcType=INTEGER}
     </delete>
+
+    <update id="update" parameterType="Comment">
+        update blog_comment
+            <set>
+                <if test="content != null and content != ''">
+                    content = #{content,jdbcType=VARCHAR},
+                </if>
+                <if test="status != null">
+                    status = #{status, typeHandler=EnumOrdinalTypeHandler},
+                </if>
+                <if test="checking != null">
+                    checking = #{checking,jdbcType=BOOLEAN},
+                </if>
+                modify_at = #{modifyAt},
+            </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>

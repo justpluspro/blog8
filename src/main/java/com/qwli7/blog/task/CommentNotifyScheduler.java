@@ -5,6 +5,8 @@ import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.queue.DataContainer;
 import com.qwli7.blog.service.ConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CommentNotifyScheduler {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private final DataContainer<Comment> dataContainer;
     private final EmailProcessor emailProcessor;
@@ -30,8 +34,13 @@ public class CommentNotifyScheduler {
     }
 
 
+    /**
+     * 每五分钟拉取一次评论列表
+     * 进行批量处理
+     */
     @Scheduled(cron = "0/10 * * * * ?")
     public void commentNotify() {
+        logger.info("method<commentNotify> start executing...");
         if(dataContainer.isEmpty()){
             return;
         }
@@ -44,6 +53,5 @@ public class CommentNotifyScheduler {
 
             }
         }
-
     }
 }

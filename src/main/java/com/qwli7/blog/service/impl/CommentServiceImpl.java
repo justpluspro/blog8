@@ -6,6 +6,8 @@ import com.qwli7.blog.entity.*;
 import com.qwli7.blog.entity.dto.CommentDto;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommentQueryParam;
+import com.qwli7.blog.entity.vo.UpdateComment;
+import com.qwli7.blog.event.CheckCommentEvent;
 import com.qwli7.blog.event.CommentPostEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.mapper.CommentMapper;
@@ -107,14 +109,14 @@ public class CommentServiceImpl implements CommentService {
             if(status == null || status == CommentStatus.CHECKING) {
                 throw new LogicException("parent.checking", "父评论正在审核中");
             }
-            parentPath = parent.getParentPath() + parent.getId() + parentPath;
+            parentPath = parent.getConversationPath() + parent.getId() + parentPath;
 
             // 判断回复的深度
             if(parentPath.length() > MAX_PARENT_PATH_DEPTH) {
                 throw new LogicException("parentPath.too.depth", "评论不允许回复了");
             }
         }
-        comment.setParentPath(parentPath);
+        comment.setConversationPath(parentPath);
 
         final String ip = comment.getIp();
         boolean checking = false;
@@ -225,5 +227,57 @@ public class CommentServiceImpl implements CommentService {
         // 删除评论下的子评论
         commentMapper.deleteById(commentOp.get().getId());
         dataContainer.remove(comment);
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void update(UpdateComment updateComment) {
+        final Comment comment = commentMapper.selectById(updateComment.getId()).orElseThrow(() ->
+                new LogicException("comment.notExists", "评论不存在"));
+        final Boolean admin = comment.getAdmin();
+        if(!admin) {
+            throw new LogicException("illegal.operation", "管理员仅仅只能修改自己的评论");
+        }
+        // 内容相同
+        if(comment.getContent().equals(updateComment.getContent())) {
+            return;
+        }
+
+        Comment update = new Comment();
+        comment.setId(updateComment.getId());
+        comment.setContent(updateComment.getContent());
+        comment.setModifyAt(LocalDateTime.now());
+
+        commentMapper.update(update);
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public SavedComment check(int id) {
+        final Comment comment = commentMapper.selectById(id).orElseThrow(()
+                -> new LogicException("comment.notExists", "评论不存在"));
+        final CommentStatus status = comment.getStatus();
+        final Boolean checking = comment.getChecking();
+        if(status != CommentStatus.CHECKING || !checking) {
+            throw new LogicException("invalid.operation", "无效的审核操作");
+        }
+        final Comment updateComment = new Comment();
+        updateComment.setId(comment.getId());
+        updateComment.setChecking(false);
+        updateComment.setStatus(CommentStatus.NORMAL);
+        updateComment.setModifyAt(LocalDateTime.now());
+        commentMapper.update(updateComment);
+
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                publisher.publishEvent(new CheckCommentEvent(this, comment));
+            }
+        });
+
+        return new SavedComment(comment.getId(), true);
     }
 }

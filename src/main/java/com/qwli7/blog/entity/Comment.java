@@ -39,7 +39,7 @@ public class Comment extends BaseEntity implements Serializable {
     /**
      * 显示会话深度，最多不能超过 255
      */
-    private String parentPath;
+    private String conversationPath;
 
     /**
      * 评论状态
@@ -95,12 +95,12 @@ public class Comment extends BaseEntity implements Serializable {
         this.admin = admin;
     }
 
-    public String getParentPath() {
-        return parentPath;
+    public String getConversationPath() {
+        return conversationPath;
     }
 
-    public void setParentPath(String parentPath) {
-        this.parentPath = parentPath;
+    public void setConversationPath(String conversationPath) {
+        this.conversationPath = conversationPath;
     }
 
     public String getName() {

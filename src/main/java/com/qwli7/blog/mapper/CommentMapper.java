@@ -45,4 +45,10 @@ public interface CommentMapper {
      * @param id id
      */
     void deleteById(Integer id);
+
+    /**
+     * 修改评论
+     * @param comment comment
+     */
+    void update(Comment comment);
 }
