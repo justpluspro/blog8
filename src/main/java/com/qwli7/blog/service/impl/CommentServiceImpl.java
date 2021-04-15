@@ -176,15 +176,16 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentMapper.insert(comment);
-        publisher.publishEvent(new CommentPostEvent(this, comment));
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                dataContainer.push(comment);
-//                final Comment _parent = comment.getParent();
-                //email notify
-
+                final Boolean admin = comment.getAdmin();
+                //如果此条评论是管理员评论，则不推送邮件
+                if(!admin) {
+                    // 非管理员评论，向管理员推送评论 || 回复邮件
+                    publisher.publishEvent(new CommentPostEvent(this, comment));
+                }
             }
         });
         return new SavedComment(comment.getId(), checking);
