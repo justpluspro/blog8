@@ -4,11 +4,13 @@ import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.CommentStatus;
 import com.qwli7.blog.mapper.CommentMapper;
 import com.qwli7.blog.queue.DataContainer;
-import com.sun.xml.internal.stream.events.CommentEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 
 /**
@@ -23,11 +25,15 @@ public class BlogEventHandler {
 
     private final CommentMapper commentMapper;
 
+    private final SpringTemplateEngine templateEngine;
+
     private final DataContainer<Comment> dataContainer;
 
-    private BlogEventHandler(DataContainer<Comment> dataContainer, CommentMapper commentMapper) {
+    private BlogEventHandler(DataContainer<Comment> dataContainer, CommentMapper commentMapper,
+                             SpringTemplateEngine templateEngine) {
         this.commentMapper = commentMapper;
         this.dataContainer = dataContainer;
+        this.templateEngine = templateEngine;
     }
 
     @EventListener(CommentPostEvent.class)
@@ -43,6 +49,9 @@ public class BlogEventHandler {
             if(parent != null) {
                 if(parent.getAdmin()) {
                     // 向管理员推送回复邮件
+                    IContext context = new Context();
+
+                    templateEngine.process("", context);
                 } else {
                     // 向被回复者推送被回复邮件
                 }
