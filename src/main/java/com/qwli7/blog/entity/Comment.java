@@ -1,6 +1,7 @@
 package com.qwli7.blog.entity;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * @author qwli7
  * @date 2021/2/22 13:05
- * 功能：blog8
+ * 功能：评论实体
  **/
 public class Comment extends BaseEntity implements Serializable {
 
@@ -25,6 +26,9 @@ public class Comment extends BaseEntity implements Serializable {
     @NotBlank(message = "内容不能为空")
     @Length(max = 1024, message = "评论长度不能超过{max}")
     private String content;
+
+    @URL(message = "无效的网络地址")
+    private String website;
 
     /**
      * 评论 ip
@@ -173,5 +177,13 @@ public class Comment extends BaseEntity implements Serializable {
 
     public void setModule(CommentModule module) {
         this.module = module;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

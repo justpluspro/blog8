@@ -3,7 +3,6 @@ package com.qwli7.blog.mapper;
 import com.qwli7.blog.entity.Tag;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.MappedJdbcTypes;
 import org.springframework.util.StringUtils;
 
 import java.sql.CallableStatement;

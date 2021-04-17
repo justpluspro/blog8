@@ -1,6 +1,5 @@
 package com.qwli7.blog.web.controller;
 
-import com.qwli7.blog.BlogContext;
 import com.qwli7.blog.entity.PasswordModel;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.security.Authenticated;

@@ -5,19 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileUrlResource;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StreamUtils;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.templateresource.SpringResourceTemplateResource;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.file.Files;
 import java.util.Map;
 
 /**

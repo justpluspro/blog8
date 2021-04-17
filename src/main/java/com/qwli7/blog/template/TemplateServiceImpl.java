@@ -3,12 +3,6 @@ package com.qwli7.blog.template;
 import com.qwli7.blog.entity.Template;
 import com.qwli7.blog.mapper.TemplateMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.HandlerAdapter;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {

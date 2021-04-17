@@ -1,7 +1,5 @@
 package com.qwli7.blog.util;
 
-import org.springframework.util.StringUtils;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**

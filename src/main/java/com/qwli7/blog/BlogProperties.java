@@ -36,6 +36,19 @@ public class BlogProperties {
      */
     private int defaultPageSize;
 
+    /**
+     * 每篇文章关联的最大标签数量
+     */
+    private int maxArticleTagCount;
+
+    public int getMaxArticleTagCount() {
+        return maxArticleTagCount;
+    }
+
+    public void setMaxArticleTagCount(int maxArticleTagCount) {
+        this.maxArticleTagCount = maxArticleTagCount;
+    }
+
     public String getTokenHeader() {
         return tokenHeader;
     }

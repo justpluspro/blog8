@@ -1,8 +1,6 @@
 package com.qwli7.blog.template.helper;
 
 import com.qwli7.blog.entity.dto.PageDto;
-import com.qwli7.blog.entity.vo.AbstractQueryParam;
-import com.qwli7.blog.entity.vo.MomentQueryParam;
 
 import java.util.ArrayList;
 import java.util.List;

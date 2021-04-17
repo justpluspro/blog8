@@ -5,7 +5,6 @@ import com.qwli7.blog.entity.vo.LoginModel;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.security.TokenUtil;
 import com.qwli7.blog.service.ConfigService;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author qwli7

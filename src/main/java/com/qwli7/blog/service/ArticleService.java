@@ -69,6 +69,10 @@ public interface ArticleService {
      */
     void hits(int id);
 
-
+    /**
+     * 批量删除文章
+     * @param ids ids
+     */
     void deleteByIds(List<Integer> ids);
+
 }

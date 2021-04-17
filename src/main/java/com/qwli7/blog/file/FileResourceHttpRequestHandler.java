@@ -4,18 +4,12 @@ import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
-import org.springframework.web.servlet.resource.ResourceResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author qwli7 

@@ -2,7 +2,6 @@ package com.qwli7.blog.event;
 
 import com.qwli7.blog.entity.Article;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.web.servlet.FrameworkServlet;
 
 import java.util.List;
 

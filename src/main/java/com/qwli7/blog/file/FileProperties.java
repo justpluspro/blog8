@@ -1,14 +1,16 @@
 package com.qwli7.blog.file;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 /**
- * @author qwli7 (qwli7@iflytek.com)
+ * @author qwli7
  * 2021/3/2 8:33
  * 功能：FileProperties
  **/
+@Conditional(FileCondition.class)
 @Configuration
 @ConfigurationProperties(prefix = "blog.file")
 @PropertySource(value = "classpath:blog.properties")

@@ -2,7 +2,6 @@ package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.Category;
-import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.entity.vo.HandledArticleQueryParam;
 import org.apache.ibatis.annotations.Mapper;
 

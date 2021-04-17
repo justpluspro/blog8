@@ -1,6 +1,5 @@
 package com.qwli7.blog.exception.reader;
 
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

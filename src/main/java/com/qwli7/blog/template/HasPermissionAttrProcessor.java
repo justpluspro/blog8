@@ -1,11 +1,9 @@
 package com.qwli7.blog.template;
 
 import org.thymeleaf.context.ITemplateContext;
-import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractElementTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
-import org.thymeleaf.standard.processor.AbstractStandardConditionalVisibilityTagProcessor;
 import org.thymeleaf.templatemode.TemplateMode;
 
 public class HasPermissionAttrProcessor extends AbstractElementTagProcessor {

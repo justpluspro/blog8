@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 最近动态数据提供者
+ * @author liqiwen
+ * @since 2.5
+ */
 @Component
 public class LatestMomentsDataProvider extends AbstractDataProvider<List<Moment>> {
 

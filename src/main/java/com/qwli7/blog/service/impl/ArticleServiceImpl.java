@@ -12,11 +12,13 @@ import com.qwli7.blog.event.ArticlePostEvent;
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.mapper.*;
+import com.qwli7.blog.queue.runnable.ArticlePostRunnable;
 import com.qwli7.blog.service.ArticleIndexer;
 import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.CommentModuleHandler;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.util.JsoupUtil;
+import com.qwli7.blog.util.TimeUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -51,12 +53,14 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     private final TagMapper tagMapper;
     private final Markdown2Html markdown2Html;
     private final BlogProperties blogProperties;
+    private final ScheduledExecutorService scheduledExecutorService;
     private ArticleIndexer articleIndexer;
     private final ApplicationEventPublisher publisher;
 
     public ArticleServiceImpl(Markdown2Html markdown2Html, ArticleMapper articleMapper,
                               CategoryMapper categoryMapper, ArticleTagMapper articleTagMapper,
                               TagMapper tagMapper, CommentMapper commentMapper,
+                              ScheduledExecutorService scheduledExecutorService,
                               BlogProperties blogProperties,
                               ApplicationEventPublisher publisher) {
         this.markdown2Html = markdown2Html;
@@ -66,6 +70,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         this.tagMapper = tagMapper;
         this.commentMapper = commentMapper;
         this.blogProperties = blogProperties;
+        this.scheduledExecutorService = scheduledExecutorService;
         try {
             this.articleIndexer = new ArticleIndexer();
         } catch (IOException ex){
@@ -88,7 +93,8 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         article.setCreateAt(LocalDateTime.now());
 
         Set<Tag> tags = article.getTags();
-        if(tags != null && tags.size() > 5) {
+        int maxArticleTagSize = blogProperties.getMaxArticleTagCount();
+        if(tags != null && tags.size() > maxArticleTagSize) {
             throw new LogicException("tags.exceed.limit", "标签最多不能超过5个");
         }
 
@@ -129,9 +135,12 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
                     article.setModifyAt(LocalDateTime.now());
                     article.setStatus(ArticleStatus.POST);
                 } else {
-                    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
-//                    exe
-//                    cutorService.scheduleWithFixedDelay()
+                    final long seconds = TimeUtils.getSeconds(postAt, LocalDateTime.now());
+                    if(seconds <= 0) {
+                        throw new LogicException("scheduled.error", "预计发布文章错误");
+                    }
+                    ArticlePostRunnable articlePostRunnable = new ArticlePostRunnable(article);
+                    scheduledExecutorService.schedule(articlePostRunnable, seconds, TimeUnit.SECONDS);
                 }
                 break;
             default:

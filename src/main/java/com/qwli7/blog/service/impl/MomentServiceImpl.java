@@ -130,12 +130,15 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Override
     public Optional<Moment> getMoment(int id) {
         final Optional<Moment> momentOp= momentMapper.selectById(id);
-        if(momentOp.isPresent()) {
-            Moment moment = momentOp.get();
-            processMoment(moment);
-            return Optional.of(moment);
+        if(!momentOp.isPresent()) {
+            throw new ResourceNotFoundException("moment.notExists", "动态不存在");
         }
-        return momentOp;
+        final Moment moment = momentOp.get();
+        if(moment.getPrivate() && !BlogContext.isAuthenticated()) {
+            throw new LogicException("access.reject", "访问拒绝");
+        }
+        processMoment(moment);
+        return Optional.of(moment);
     }
 
     /**

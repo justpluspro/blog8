@@ -1,11 +1,8 @@
 package com.qwli7.blog.template;
 
-import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
-import org.thymeleaf.processor.AbstractProcessor;
 import org.thymeleaf.processor.IProcessor;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

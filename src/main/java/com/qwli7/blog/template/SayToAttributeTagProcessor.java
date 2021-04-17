@@ -12,7 +12,6 @@ import org.thymeleaf.spring5.context.SpringContextUtils;
 import org.thymeleaf.spring5.util.SpringVersionUtils;
 import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.standard.expression.IStandardExpressionParser;
-import org.thymeleaf.standard.expression.StandardExpressionParser;
 import org.thymeleaf.standard.expression.StandardExpressions;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.unbescape.html.HtmlEscape;

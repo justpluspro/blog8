@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @version 1.2
  */
 @Component
-public class CommentNotifyScheduler {
+public class CommentNotifyTask {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -26,8 +26,8 @@ public class CommentNotifyScheduler {
     private final ConfigService configService;
 
 
-    public CommentNotifyScheduler(DataContainer<Comment> dataContainer, EmailProcessor emailProcessor,
-                                  ConfigService configService) {
+    public CommentNotifyTask(DataContainer<Comment> dataContainer, EmailProcessor emailProcessor,
+                             ConfigService configService) {
         this.dataContainer = dataContainer;
         this.emailProcessor = emailProcessor;
         this.configService = configService;

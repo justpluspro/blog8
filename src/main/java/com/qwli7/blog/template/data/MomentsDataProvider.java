@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author qwli7 
  * @date 2021/3/4 9:43
- * 功能：blog
+ * 功能：动态列表动态提供者
  **/
 @Component
 public class MomentsDataProvider extends AbstractDataProvider<PageDto<Moment>> {

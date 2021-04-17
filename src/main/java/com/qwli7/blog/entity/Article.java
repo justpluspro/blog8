@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class Article extends BaseEntity implements Serializable {
      * 别名
      * 这里用正则表达式校验
      */
+    @Pattern(regexp = "^[A-Za-z]+$", message = "别名仅仅只能由英文字母组成")
     private String alias;
 
     /**

@@ -4,7 +4,6 @@ import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Tag;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.CommonQueryParam;
-import com.qwli7.blog.entity.vo.TagQueryParam;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.TagService;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * @author qwli7

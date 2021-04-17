@@ -8,7 +8,6 @@ import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.ArticleService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

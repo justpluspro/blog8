@@ -3,6 +3,7 @@ package com.qwli7.blog.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 public class BlackIp extends BaseEntity implements Serializable {
 
     @NotBlank(message = "ip 地址不能为空")
+    @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$", message = "无效的 ip 地址")
     private String ip;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
