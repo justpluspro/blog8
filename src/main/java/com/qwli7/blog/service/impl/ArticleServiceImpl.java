@@ -499,7 +499,9 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     @Override
     public void validateBeforeQuery(CommentModule module) {
         Assert.notNull(module, "module cannot be null");
-
+        if(!getModuleName().equals(module.getName())) {
+            throw new LogicException("illegal.operators", "无效的操作");
+        }
 
         final Optional<Article> articleOp = articleMapper.selectById(module.getId());
         if(!articleOp.isPresent()) {

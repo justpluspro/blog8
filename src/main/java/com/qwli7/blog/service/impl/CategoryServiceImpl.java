@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * @author qwli7
  * @date 2021/2/22 13:09
- * 功能：blog8
+ * 功能：分类业务实现类
  **/
 @Service
 public class CategoryServiceImpl implements CategoryService {

@@ -273,6 +273,15 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Override
     public void validateBeforeQuery(CommentModule module) {
 //        momentMapper.selectById()
+        final Integer id = module.getId();
+        final String name = module.getName();
+        if(!getModuleName().equals(name)) {
+            throw new LogicException("invalid.module", "无效的模块");
+        }
+        final Moment moment = momentMapper.selectById(id).orElseThrow(() -> new LogicException("moment.notExists", "动态不存在"));
 
+        if(moment.getPrivate() && !BlogContext.isAuthenticated()) {
+            throw new LogicException("illegal.operator", "无效的操作");
+        }
     }
 }

@@ -41,15 +41,17 @@ public class BlogContextFilter implements Filter {
             }
             BlogContext.setIp(ip);
 
+            // 前后端分离选择 token
             String tokenHeader = blogProperties.getTokenHeader();
             final String token = request.getHeader(tokenHeader);
             if(!StringUtils.isEmpty(token) && TokenUtil.valid(token)) {
                 BlogContext.setAuthenticated(true);
             }
 
+            // 非前后端分离选择 session，兼容
             if(!BlogContext.isAuthenticated()) {
                 final HttpSession session = request.getSession();
-                if(session != null && Boolean.TRUE.equals(session.getAttribute("auth_user"))) {
+                if(session != null && Boolean.TRUE.equals(session.getAttribute(Constant.AUTH_USER))) {
                     BlogContext.setAuthenticated(true);
                 }
             }

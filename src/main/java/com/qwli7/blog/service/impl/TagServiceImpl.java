@@ -21,15 +21,24 @@ import java.util.Optional;
 /**
  * @author qwli7
  * @date 2021/2/22 13:09
- * 功能：blog8
+ * 功能：标签业务实现类
  **/
 @Service
 public class TagServiceImpl implements TagService {
 
+    /**
+     * 标签 Mapper
+     */
     private final TagMapper tagMapper;
 
+    /**
+     * 文章标签 Mapper
+     */
     private final ArticleTagMapper articleTagMapper;
 
+    /**
+     * 事件发布
+     */
     private final ApplicationEventPublisher publisher;
 
     public TagServiceImpl(TagMapper tagMapper, ArticleTagMapper articleTagMapper, ApplicationEventPublisher publisher) {
@@ -38,7 +47,10 @@ public class TagServiceImpl implements TagService {
         this.publisher = publisher;
     }
 
-
+    /**
+     * 新增标签
+     * @param tag tag
+     */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = LogicException.class)
     @Override
     public void save(Tag tag) {
@@ -51,6 +63,11 @@ public class TagServiceImpl implements TagService {
         tagMapper.insert(tag);
     }
 
+    /**
+     * 分页查询标签
+     * @param queryParam queryParam
+     * @return PageDto
+     */
     @Transactional(readOnly = true)
     @Override
     public PageDto<Tag> selectPage(CommonQueryParam queryParam) {
@@ -61,12 +78,21 @@ public class TagServiceImpl implements TagService {
         return new PageDto<>(queryParam, count, tagMapper.selectPage(queryParam));
     }
 
+    /**
+     * 根据 id 查询标签
+     * @param id id
+     * @return Tag
+     */
     @Transactional(readOnly = true)
     @Override
     public Optional<Tag> selectById(int id) {
         return tagMapper.selectById(id);
     }
 
+    /**
+     * 删除标签
+     * @param id id
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteTag(int id) {
@@ -77,6 +103,10 @@ public class TagServiceImpl implements TagService {
         publisher.publishEvent(new TagDeleteEvent(this, tag));
     }
 
+    /**
+     * 更新标签
+     * @param tag tag
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void updateTag(Tag tag) {
