@@ -18,10 +18,10 @@ public class Category extends BaseEntity implements Serializable {
     @Length(max = 10, message = "分类名称的长度不能超过 {max}")
     private String name;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime createAt;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime modifyAt;
 
     public LocalDateTime getCreateAt() {

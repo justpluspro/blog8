@@ -1,6 +1,7 @@
 package com.qwli7.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

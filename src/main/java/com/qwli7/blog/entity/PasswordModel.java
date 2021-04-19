@@ -1,5 +1,8 @@
 package com.qwli7.blog.entity;
 
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -8,11 +11,25 @@ import java.io.Serializable;
  * @since 1.2
  */
 public class PasswordModel implements Serializable {
-
+    /**
+     * 旧密码
+     */
+    @NotBlank(message = "确认密码不能为空")
+    @Length(max = 16, min = 6, message = "确认密码长度必须在 {min} 和 {max} 之间")
     private String oldPassword;
 
+    /**
+     * 新密码
+     */
+    @NotBlank(message = "确认密码不能为空")
+    @Length(max = 16, min = 6, message = "确认密码长度必须在 {min} 和 {max} 之间")
     private String password;
 
+    /**
+     * 确认密码
+     */
+    @NotBlank(message = "确认密码不能为空")
+    @Length(max = 16, min = 6, message = "确认密码长度必须在 {min} 和 {max} 之间")
     private String confirmPassword;
 
     public String getOldPassword() {
