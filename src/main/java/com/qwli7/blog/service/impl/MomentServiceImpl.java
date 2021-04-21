@@ -191,10 +191,14 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(readOnly = true)
     @Override
     public Optional<MomentNav> selectMomentNav(int id) {
-        momentMapper.selectById(id).orElseThrow(() ->
+        Moment current = momentMapper.selectById(id).orElseThrow(() ->
                 new ResourceNotFoundException("moment.notExists", "动态不存在"));
-
-        return Optional.empty();
+        MomentNav momentNav = new MomentNav();
+        final Optional<Moment> preMomentOp = momentMapper.selectPreMoment(current);
+        final Optional<Moment> nextMomentOp = momentMapper.selectNextMoment(current);
+        nextMomentOp.ifPresent(momentNav::setNextMoment);
+        preMomentOp.ifPresent(momentNav::setPrevMoment);
+        return Optional.of(momentNav);
     }
 
     /**

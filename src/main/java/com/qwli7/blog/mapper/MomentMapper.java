@@ -97,4 +97,18 @@ public interface MomentMapper {
      * @return List
      */
     List<MomentArchive> selectArchivePage(MomentQueryParam queryParam);
+
+    /**
+     * 获取上一篇动态
+     * @param moment moment
+     * @return Optional
+     */
+    Optional<Moment> selectPreMoment(Moment moment);
+
+    /**
+     * 获取下一篇动态
+     * @param moment moment
+     * @return Optional
+     */
+    Optional<Moment> selectNextMoment(Moment moment);
 }

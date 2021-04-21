@@ -9,9 +9,19 @@ import java.io.Serializable;
  */
 public class MomentNav implements Serializable {
 
+    /**
+     * 上一篇动态
+     */
     private Moment prevMoment;
 
+    /**
+     * 下一篇动态
+     */
     private Moment nextMoment;
+
+    public MomentNav() {
+        super();
+    }
 
     public MomentNav(Moment prevMoment, Moment nextMoment) {
         super();
