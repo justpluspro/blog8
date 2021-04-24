@@ -74,5 +74,4 @@ public interface ArticleService {
      * @param ids ids
      */
     void deleteByIds(List<Integer> ids);
-
 }

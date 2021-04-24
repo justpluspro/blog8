@@ -20,6 +20,8 @@ import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.util.JsoupUtil;
 import com.qwli7.blog.util.TimeUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,6 +47,8 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class ArticleServiceImpl implements ArticleService, CommentModuleHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private final ArticleMapper articleMapper;
     private final CategoryMapper categoryMapper;
@@ -74,8 +78,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         try {
             this.articleIndexer = new ArticleIndexer();
         } catch (IOException ex){
-            ex.printStackTrace();
-            System.out.println("闯建索引文件失败");
+            logger.error("创建文章索引类失败:[{}]", ex.getMessage(), ex);
         }
         this.publisher = publisher;
     }
@@ -264,8 +267,8 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         handledArticleQueryParam.setOffset(queryParam.getSize());
         List<Article> articles = articleMapper.selectPage(handledArticleQueryParam);
 
-        processArticles(articles);
-        processContents(articles);
+        processArticlesTags(articles);
+        processContentsAndFeatureImages(articles);
 
         return new PageDto<>(queryParam, count, articles);
     }
@@ -328,13 +331,13 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
 
         // 未登录情况下
         if(!BlogContext.isAuthenticated()) {
-            // 非发布状态  || 私人动态不允许访问
+            // 非发布状态  || 私人文章不允许访问
             if (!ArticleStatus.POST.equals(status) || article.getPrivate() == null || article.getPrivate()) {
                 throw new LogicException("invalid.articleStatus", "无效的状态");
             }
         }
-        processArticles(Collections.singletonList(article));
-        processContent(article);
+        processArticlesTags(Collections.singletonList(article));
+        processContentAndFeatureImage(article);
         return Optional.of(article);
     }
 
@@ -376,7 +379,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      * 处理文章 | 主要是处理标签
      * @param articles article
      */
-    private void processArticles(List<Article> articles) {
+    private void processArticlesTags(List<Article> articles) {
         if(CollectionUtils.isEmpty(articles)) {
             return;
         }
@@ -394,7 +397,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      * 处理内容
      * @param article article
      */
-    private void processContent(Article article) {
+    private void processContentAndFeatureImage(Article article) {
         final String content = article.getContent();
         final String featureImage = article.getFeatureImage();
         if(StringUtils.isEmpty(featureImage)) {
@@ -410,7 +413,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      * 2. 如果没有 featureImage，则从内容中抽取图片作为 featureImage
      * @param articles articles
      */
-    private void processContents(List<Article> articles) {
+    private void processContentsAndFeatureImages(List<Article> articles) {
         if(CollectionUtils.isEmpty(articles)) {
             return;
         }
