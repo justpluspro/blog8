@@ -1,6 +1,7 @@
 package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.BlogProperties;
+import com.qwli7.blog.entity.dto.ResultDto;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.util.WebUtils;
 import org.commonmark.Extension;
@@ -40,7 +41,7 @@ public class DefaultMarkdown2Html implements Markdown2Html {
             this.delegate = new CommonMarkdown2Html();
         } else {
             if(WebUtils.isRegularUrl(markdownServerUrl)) {
-                throw new RuntimeException("The node service is configured, but the service url is not regular, please check");
+                throw new RuntimeException("NodeServer 已经配置, 但是 ServerUrl 非法, 请检查!");
             }
             this.delegate = new MarkdownConverter(markdownServerUrl, restTemplate);
         }
@@ -104,54 +105,15 @@ public class DefaultMarkdown2Html implements Markdown2Html {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> httpEntity = new HttpEntity<>(markdown, headers);
-            final ResponseEntity<NodeResult> responseEntity = restTemplate.postForEntity(
-                    serverUrl, httpEntity, NodeResult.class);
+            final ResponseEntity<ResultDto> responseEntity = restTemplate.postForEntity(
+                    serverUrl, httpEntity, ResultDto.class);
             if(responseEntity.getStatusCode().is2xxSuccessful()) {
-                final NodeResult nodeResult = responseEntity.getBody();
-                if(nodeResult != null && nodeResult.isSuccess()) {
-                    return nodeResult.getData();
+                final ResultDto resultDto = responseEntity.getBody();
+                if(resultDto != null && resultDto.isSuccess()) {
+                    return ((String) resultDto.getData());
                 }
             }
             return "";
-        }
-    }
-
-    static class NodeResult  {
-
-        public static final Integer SUCCESS = 200;
-
-        private Integer code;
-
-        private String data;
-
-        private String msg;
-
-        public Integer getCode() {
-            return code;
-        }
-
-        public void setCode(Integer code) {
-            this.code = code;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public void setMsg(String msg) {
-            this.msg = msg;
-        }
-
-        public boolean isSuccess() {
-            return getCode() != null && getCode().equals(SUCCESS);
         }
     }
 }

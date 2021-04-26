@@ -21,6 +21,26 @@ public class Template extends BaseEntity implements Serializable {
     private String content;
 
     /**
+     * 匹配路径
+     */
+    private String pattern;
+
+    /**
+     * 启用
+     */
+    private String enable;
+
+    /**
+     * 是否开启评论
+     */
+    private Boolean allowComment;
+
+    /**
+     * 描述
+     */
+    private String description;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createAt;
@@ -29,6 +49,38 @@ public class Template extends BaseEntity implements Serializable {
      * 修改时间
      */
     private LocalDateTime modifyAt;
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
+
+    public String getEnable() {
+        return enable;
+    }
+
+    public void setEnable(String enable) {
+        this.enable = enable;
+    }
+
+    public Boolean getAllowComment() {
+        return allowComment;
+    }
+
+    public void setAllowComment(Boolean allowComment) {
+        this.allowComment = allowComment;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public LocalDateTime getModifyAt() {
         return modifyAt;

@@ -15,6 +15,7 @@ import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.service.impl.DefaultMarkdown2Html;
 import com.qwli7.blog.template.MyAutoDialect;
 import com.qwli7.blog.template.SayToAttributeTagProcessor;
+import com.qwli7.blog.template.TemplateHandlerAdapter;
 import com.qwli7.blog.template.data.DataElementTagProcessor;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
 import org.hibernate.validator.HibernateValidator;
@@ -68,6 +69,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private Markdown2Html markdown2Html;
 
+
+    @Bean
+    public TemplateHandlerAdapter templateHandlerAdapter() {
+        return new TemplateHandlerAdapter();
+    }
 
     @Bean
     public RestTemplate restTemplate() {
