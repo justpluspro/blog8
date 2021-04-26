@@ -8,14 +8,15 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 模板业务类
@@ -43,9 +44,11 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     @Override
     public HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
         final String method = request.getMethod();
+        // skip non method get
         if(!HttpMethod.GET.name().equals(method)) {
             return null;
         }
+//        DispatcherServlet
         final String lookupPath = urlPathHelper.getLookupPathForRequest(request);
 
 
@@ -54,7 +57,11 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
 
     private HandlerExecutionChain getHandlerExecutionChain(HttpServletRequest request, String lookupPath) {
 
-        return new HandlerExecutionChain(lookupPath);
+        if(urlPatterns.contains(lookupPath)) {
+
+            return new HandlerExecutionChain(lookupPath);
+        }
+        return null;
     }
 
 
@@ -84,6 +91,11 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     }
 
     @Override
+    public Optional<Template> findByName(String templateName) {
+        return templateMapper.findByName(templateName);
+    }
+
+    @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;
     }
@@ -94,9 +106,10 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
         queryParam.setEnable(true);
         final List<Template> templates = templateMapper.listAll(queryParam);
         if(templates == null || templates.size() == 0) {
+            // register local templates
 
-
-
+            urlPatterns.add("/");
+            urlPatterns.add("/moments");
 
         }  else {
             templates.forEach(e -> {

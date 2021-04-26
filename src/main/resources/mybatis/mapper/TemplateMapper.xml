@@ -55,8 +55,8 @@
     </insert>
 
     <select id="listAll" parameterType="TemplateQueryParam" resultMap="BaseResultMap">
-        select id, content, name, pattern, createtime,
-               modifytime, enable, allowcomment, description
+        select id, content, name, pattern, create_at,
+               modify_at, enable, allow_comment, description
         from blog_template
         <where>
             <if test="enable != null">

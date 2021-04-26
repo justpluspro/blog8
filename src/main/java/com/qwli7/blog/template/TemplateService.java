@@ -4,6 +4,7 @@ import com.qwli7.blog.entity.Template;
 import com.qwli7.blog.entity.vo.TemplateQueryParam;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 模板 Service
@@ -37,4 +38,11 @@ public interface TemplateService {
      * @param template template
      */
     void registerAllTemplate(Template template);
+
+    /**
+     * 根据名称获取一个模板
+     * @param templateName templateName
+     * @return Template
+     */
+    Optional<Template> findByName(String templateName);
 }

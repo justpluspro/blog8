@@ -13,9 +13,7 @@ import com.qwli7.blog.queue.DataContainer;
 import com.qwli7.blog.queue.MemoryDataContainer;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.service.impl.DefaultMarkdown2Html;
-import com.qwli7.blog.template.MyAutoDialect;
-import com.qwli7.blog.template.SayToAttributeTagProcessor;
-import com.qwli7.blog.template.TemplateHandlerAdapter;
+import com.qwli7.blog.template.*;
 import com.qwli7.blog.template.data.DataElementTagProcessor;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
 import org.hibernate.validator.HibernateValidator;
@@ -41,20 +39,16 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import javax.annotation.Resource;
 import javax.servlet.DispatcherType;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Web 相关配置
@@ -69,20 +63,16 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private Markdown2Html markdown2Html;
 
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Resource
+    private TemplateService templateService;
+
 
     @Bean
     public TemplateHandlerAdapter templateHandlerAdapter() {
         return new TemplateHandlerAdapter();
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    @Bean
-    public ScheduledExecutorService scheduledExecutorService() {
-        return new ScheduledThreadPoolExecutor(1);
     }
 
     @Bean
@@ -134,42 +124,6 @@ public class WebConfiguration implements WebMvcConfigurer {
         return new MemoryDataContainer<>();
     }
 
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(ObjectMapper.class)
-    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
-        ObjectMapper objectMapper = builder.createXmlMapper(false).build();
-        // 通过该方法对mapper对象进行设置，所有序列化的对象都将按改规则进行系列化
-        // Include.Include.ALWAYS 默认
-        // Include.NON_DEFAULT 属性为默认值不序列化
-        // Include.NON_EMPTY 属性为 空（""） 或者为 NULL 都不序列化，则返回的json是没有这个字段的。这样对移动端会更省流量
-        // Include.NON_NULL 属性为NULL 不序列化
-//        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        // 允许出现特殊字符和转义符
-//        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-        // 允许出现单引号
-//        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        // 字段保留，将null值转为""
-//        objectMapper.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
-//
-//            @Override
-//            public void serialize(Object o, JsonGenerator jsonGenerator,
-//                                  SerializerProvider serializerProvider) throws IOException {
-//                jsonGenerator.writeString("");
-//
-//            }
-//        });
-
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm")));
-        objectMapper.registerModule(javaTimeModule);
-        return objectMapper;
-    }
-
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/console/**").addResourceLocations("classpath:/static/");
@@ -177,28 +131,23 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
 
-//    @Bean
-//    public PageHelperDialect pageHelperDialect() {
-//        return new PageHelperDialect();
-//    }
-
-
     /* **************************************************************** */
     /*  THYMELEAF-SPECIFIC ARTIFACTS                                    */
     /*  TemplateResolver <- TemplateEngine <- ViewResolver              */
     /* **************************************************************** */
-    @Bean
-    public ITemplateResolver templateResolver(ApplicationContext applicationContext) {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setPrefix("classpath:/templates/");
-        templateResolver.setSuffix(".html");
-        //Template cache is true by default. Set to false if you want
-        //templates to be automatically updated when modified
-        templateResolver.setCacheable(true);
-        return templateResolver;
-    }
+//    @Bean
+//    public ITemplateResolver templateResolver(ApplicationContext applicationContext) {
+//        TemplateResolver templateResolver = new TemplateResolver(templateService);
+////        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+////        templateResolver.setApplicationContext(applicationContext);
+////        templateResolver.setTemplateMode(TemplateMode.HTML);
+////        templateResolver.setPrefix("classpath:/templates/");
+////        templateResolver.setSuffix(".html");
+////        Template cache is true by default. Set to false if you want
+//        //templates to be automatically updated when modified
+////        templateResolver.setCacheable(true);
+//        return templateResolver;
+//    }
 
 
     @Bean
@@ -208,12 +157,12 @@ public class WebConfiguration implements WebMvcConfigurer {
         if(StringUtils.isEmpty(markdownServerUrl)) {
             markdown2Html = new DefaultMarkdown2Html.CommonMarkdown2Html();
         } else {
-            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl, restTemplate());
+            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl, restTemplate);
         }
 
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setEnableSpringELCompiler(true); //是否启用 SpringEL 表达式编译
-        templateEngine.setTemplateResolver(templateResolver(applicationContext));
+        templateEngine.addTemplateResolver(new TemplateResolver(templateService));
         templateEngine.addDialect(myAutoDialect());
 //        templateEngine.addDialect(pageHelperDialect());
 //        templateEngine.add
@@ -253,10 +202,12 @@ public class WebConfiguration implements WebMvcConfigurer {
         return processors;
     }
 
-    @Bean
+    @Bean(name = "blogThymeleafResolver")
     public ThymeleafViewResolver viewResolver(ApplicationContext applicationContext, BlogProperties blogProperties) {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine(applicationContext, blogProperties));
+        viewResolver.setCharacterEncoding(Charset.defaultCharset().name());
+        viewResolver.setOrder(Ordered.LOWEST_PRECEDENCE-5);
         return viewResolver;
     }
 

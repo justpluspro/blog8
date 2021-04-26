@@ -26,5 +26,6 @@
         <mapper resource="mybatis/mapper/CategoryMapper.xml" />
         <mapper resource="mybatis/mapper/TagMapper.xml" />
         <mapper resource="mybatis/mapper/BlackIpMapper.xml" />
+        <mapper resource="mybatis/mapper/TemplateMapper.xml" />
     </mappers>
 </configuration>

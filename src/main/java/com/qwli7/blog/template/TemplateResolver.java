@@ -6,54 +6,55 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.thymeleaf.IEngineConfiguration;
+import org.thymeleaf.cache.AlwaysValidCacheEntryValidity;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.templateresource.SpringResourceTemplateResource;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+import org.thymeleaf.templateresolver.TemplateResolution;
 import org.thymeleaf.templateresource.ITemplateResource;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author qwli7
  * @date 2021/2/25 12:34
- * 功能：blog
+ * 功能：TemplateResolver 模板解析器
  **/
-public class TemplateResolver extends SpringResourceTemplateResolver {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+public class TemplateResolver implements ITemplateResolver {
 
     private final TemplateService templateService;
-    private final ApplicationContext applicationContext;
 
-    public TemplateResolver(TemplateService templateService, ApplicationContext applicationContext){
+    public TemplateResolver(TemplateService templateService) {
         this.templateService = templateService;
-        this.applicationContext = applicationContext;
+    }
+
+
+    @Override
+    public String getName() {
+        return "blog template resolver";
     }
 
     @Override
-    protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration, String ownerTemplate,
-                                                        String templateName, String resourceName,
-                                                        String characterEncoding, Map<String, Object> templateResolutionAttributes) {
-        logger.info("computeTemplateResource:[{}]", configuration);
-        logger.info("ownerTemplate:[{}]", ownerTemplate);
-        logger.info("template:[{}]", templateName);
-        logger.info("resourceName:[{}]", resourceName);
-        logger.info("characterEncoding:[{}]", characterEncoding);
-//        logger.info("templateResolutionAttributes:[{}]", templateResolutionAttributes.size());
-        logger.info("templateResolutionAttributes:[{}]", templateResolutionAttributes);
-
-        //从数据库中查询模板
-        Template template = templateService.findTemplate(templateName);
-        if(template == null) {
-            return super.computeTemplateResource(configuration, ownerTemplate, templateName, resourceName, characterEncoding, templateResolutionAttributes);
-            //            return new SpringResourceTemplateResource(applicationContext, templateName, characterEncoding);
-        }
-        ClassPathResource resource = new ClassPathResource("defaultTemplate");
-        return new SpringResourceTemplateResource(resource, characterEncoding);
+    public Integer getOrder() {
+        return Integer.MAX_VALUE;
     }
 
+    @Override
+    public TemplateResolution resolveTemplate(IEngineConfiguration iEngineConfiguration,
+                                              String ownerTemplate, String template,
+                                              Map<String, Object> map) {
+        final Optional<Template> templateOp = templateService.findByName(template);
+        Template template1 = new Template();
+        template1.setContent("<html><head></head><body><h1>模板</h1></body></html>");
+        template1.setName("index");
+
+        return new TemplateResolution(new TemplateResource(template1), TemplateMode.HTML, AlwaysValidCacheEntryValidity.INSTANCE);
+    }
 
     public static final class TemplateResource implements ITemplateResource {
 
@@ -66,7 +67,7 @@ public class TemplateResolver extends SpringResourceTemplateResolver {
 
         @Override
         public String getDescription() {
-            return null;
+            return template.getDescription();
         }
 
         @Override
