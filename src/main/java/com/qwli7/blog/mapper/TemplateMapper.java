@@ -53,4 +53,10 @@ public interface TemplateMapper {
      * @return List
      */
     List<Template> listAll(TemplateQueryParam queryParam);
+
+    /**
+     * 批量插入模板列表
+     * @param templates defaultTemplates
+     */
+    void batchInsert(List<Template> templates);
 }

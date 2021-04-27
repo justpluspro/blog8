@@ -45,4 +45,10 @@ public interface TemplateService {
      * @return Template
      */
     Optional<Template> findByName(String templateName);
+
+    /**
+     * 获取内存中已经全部注册的 urlPatterns
+     * @return List
+     */
+    List<String> getAllUrlPatterns();
 }

@@ -67,4 +67,20 @@
             </if>
         </where>
     </select>
+
+    <insert id="batchInsert" parameterType="Template">
+        insert into blog_template (name, content, pattern,
+        create_at, modify_at, enable,
+        allow_comment, description)
+            values
+            <foreach collection="list" separator="," item="item">
+                (#{item.name, jdbcType=VARCHAR},
+                #{item.content, jdbcType=VARCHAR},
+                #{item.pattern, jdbcType=VARCHAR},
+                #{item.createAt}, #{item.modifyAt},
+                #{item.enable, jdbcType=BOOLEAN},
+                #{item.allowComment, jdbcType=BOOLEAN},
+                #{item.description, jdbcType=VARCHAR} )
+            </foreach>
+    </insert>
 </mapper>

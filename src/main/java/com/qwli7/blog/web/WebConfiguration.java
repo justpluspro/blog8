@@ -1,10 +1,5 @@
 package com.qwli7.blog.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.qwli7.blog.BlogContextFilter;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Comment;
@@ -19,16 +14,14 @@ import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
 import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.dialect.IProcessorDialect;
@@ -135,23 +128,31 @@ public class WebConfiguration implements WebMvcConfigurer {
     /*  THYMELEAF-SPECIFIC ARTIFACTS                                    */
     /*  TemplateResolver <- TemplateEngine <- ViewResolver              */
     /* **************************************************************** */
-//    @Bean
-//    public ITemplateResolver templateResolver(ApplicationContext applicationContext) {
-//        TemplateResolver templateResolver = new TemplateResolver(templateService);
-////        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-////        templateResolver.setApplicationContext(applicationContext);
-////        templateResolver.setTemplateMode(TemplateMode.HTML);
-////        templateResolver.setPrefix("classpath:/templates/");
-////        templateResolver.setSuffix(".html");
-////        Template cache is true by default. Set to false if you want
-//        //templates to be automatically updated when modified
-////        templateResolver.setCacheable(true);
-//        return templateResolver;
-//    }
+    @Bean
+    public ITemplateResolver templateResolver(ApplicationContext applicationContext) {
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setApplicationContext(applicationContext);
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        templateResolver.setPrefix("classpath:/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setOrder(Ordered.HIGHEST_PRECEDENCE+2);
+//        Template cache is true by default. Set to false if you want
+//        templates to be automatically updated when modified
+        templateResolver.setCacheable(true);
+        return templateResolver;
+    }
+
+    @Bean
+    public ITemplateResolver memoryTemplateResolver(TemplateService templateService) {
+        MemoryTemplateResolver memoryTemplateResolver = new MemoryTemplateResolver(templateService);
+        memoryTemplateResolver.setOrder(Ordered.HIGHEST_PRECEDENCE+1);
+        return memoryTemplateResolver;
+    }
 
 
     @Bean
-    public SpringTemplateEngine templateEngine(ApplicationContext applicationContext, BlogProperties blogProperties) {
+    public SpringTemplateEngine templateEngine(ApplicationContext applicationContext,
+                                               BlogProperties blogProperties, TemplateService templateService) {
 
         final String markdownServerUrl = blogProperties.getMarkdownServerUrl();
         if(StringUtils.isEmpty(markdownServerUrl)) {
@@ -161,8 +162,12 @@ public class WebConfiguration implements WebMvcConfigurer {
         }
 
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        templateEngine.setEnableSpringELCompiler(true); //是否启用 SpringEL 表达式编译
-        templateEngine.addTemplateResolver(new TemplateResolver(templateService));
+        //是否启用 SpringEL 表达式编译
+        templateEngine.setEnableSpringELCompiler(true);
+        Set<ITemplateResolver> templateResolvers = new HashSet<>();
+        templateResolvers.add(templateResolver(applicationContext));
+        templateResolvers.add(memoryTemplateResolver(templateService));
+        templateEngine.setTemplateResolvers(templateResolvers);
         templateEngine.addDialect(myAutoDialect());
 //        templateEngine.addDialect(pageHelperDialect());
 //        templateEngine.add
@@ -202,12 +207,12 @@ public class WebConfiguration implements WebMvcConfigurer {
         return processors;
     }
 
-    @Bean(name = "blogThymeleafResolver")
-    public ThymeleafViewResolver viewResolver(ApplicationContext applicationContext, BlogProperties blogProperties) {
+    @Bean
+    public ViewResolver viewResolver(ApplicationContext applicationContext, BlogProperties blogProperties, TemplateService templateService) {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-        viewResolver.setTemplateEngine(templateEngine(applicationContext, blogProperties));
+        viewResolver.setTemplateEngine(templateEngine(applicationContext, blogProperties, templateService));
         viewResolver.setCharacterEncoding(Charset.defaultCharset().name());
-        viewResolver.setOrder(Ordered.LOWEST_PRECEDENCE-5);
+//        viewResolver.setOrder(Ordered.LOWEST_PRECEDENCE-5);
         return viewResolver;
     }
 

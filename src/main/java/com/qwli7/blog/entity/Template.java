@@ -1,5 +1,6 @@
 package com.qwli7.blog.entity;
 
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -28,7 +29,7 @@ public class Template extends BaseEntity implements Serializable {
     /**
      * 启用
      */
-    private String enable;
+    private Boolean enable;
 
     /**
      * 是否开启评论
@@ -58,11 +59,11 @@ public class Template extends BaseEntity implements Serializable {
         this.pattern = pattern;
     }
 
-    public String getEnable() {
+    public Boolean getEnable() {
         return enable;
     }
 
-    public void setEnable(String enable) {
+    public void setEnable(Boolean enable) {
         this.enable = enable;
     }
 
