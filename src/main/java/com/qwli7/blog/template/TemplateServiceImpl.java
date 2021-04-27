@@ -21,10 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +67,16 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     private HandlerExecutionChain getHandlerExecutionChain(HttpServletRequest request, String lookupPath) {
         for(String pattern : urlPatterns) {
             if(antPathMatcher.match(pattern, lookupPath)) {
-                return new HandlerExecutionChain(lookupPath);
+                // /  /article/ewqew  /moments  /moment/2021
+                TemplateQueryParam queryParam = new TemplateQueryParam();
+                queryParam.setEnable(true);
+                final List<Template> allTemplates = getAllTemplates(queryParam);
+                if(!CollectionUtils.isEmpty(allTemplates)) {
+                    final Optional<Template> templateOp = allTemplates.stream().filter(e -> e.getPattern().equals(pattern)).findAny();
+                    if(templateOp.isPresent()) {
+                        return new HandlerExecutionChain(templateOp.get().getName());
+                    }
+                }
             }
         }
         return null;
