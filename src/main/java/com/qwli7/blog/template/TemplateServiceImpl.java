@@ -2,6 +2,7 @@ package com.qwli7.blog.template;
 
 import com.qwli7.blog.entity.Template;
 import com.qwli7.blog.entity.vo.TemplateQueryParam;
+import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.mapper.TemplateMapper;
 import com.qwli7.blog.util.StreamUtils;
 import org.slf4j.Logger;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.*;
@@ -22,6 +22,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +41,7 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
      */
     private final TemplateMapper templateMapper;
 
-    private List<String> urlPatterns = new ArrayList<>();
+    private List<String> urlPatterns = new CopyOnWriteArrayList<>();
 
     private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
@@ -85,10 +86,7 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
 
     @Override
     public Template findTemplate(String templateName) {
-        Template template = new Template();
-        template.setContent("");
-        template.setName("index");
-        return template;
+        return templateMapper.findByName(templateName).orElseThrow(() -> new LogicException("template.notExists", "模板不存在"));
     }
 
     @Override
@@ -99,7 +97,21 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     @Override
     public void registerTemplate(Template template) {
         final String pattern = template.getPattern();
-//        templateMapper.findByPattern(pattern);
+        if(!antPathMatcher.isPattern(pattern)) {
+            throw new LogicException("invalid.pattern", "无效的 pattern");
+        }
+        Optional<Template> templateOp = templateMapper.findByName(template.getName());
+        if(templateOp.isPresent()) {
+            throw new LogicException("template.exists", "模板已经存在了");
+        }
+        templateOp = templateMapper.findByPattern(pattern);
+        if(templateOp.isPresent()) {
+            throw new LogicException("template.pattern.exists", "模板pattern已经存在了");
+        }
+        template.setCreateAt(LocalDateTime.now());
+        template.setModifyAt(LocalDateTime.now());
+        templateMapper.insert(template);
+        urlPatterns.add(pattern);
     }
 
     @Override
@@ -110,6 +122,13 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     @Override
     public void registerAllTemplate(Template template) {
 
+    }
+
+    @Override
+    public void deleteTemplate(int id) {
+        Template template = templateMapper.findById(id).orElseThrow(() -> new LogicException("template.notExists", "模板不存在"));
+        templateMapper.delete(id);
+        urlPatterns.remove(template.getPattern());
     }
 
     @Override

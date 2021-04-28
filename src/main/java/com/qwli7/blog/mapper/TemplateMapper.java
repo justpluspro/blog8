@@ -59,4 +59,11 @@ public interface TemplateMapper {
      * @param templates defaultTemplates
      */
     void batchInsert(List<Template> templates);
+
+    /**
+     * 根据 pattern 查找模板
+     * @param pattern pattern
+     * @return Template
+     */
+    Optional<Template> findByPattern(String pattern);
 }

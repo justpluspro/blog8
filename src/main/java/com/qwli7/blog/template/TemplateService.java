@@ -51,4 +51,10 @@ public interface TemplateService {
      * @return List
      */
     List<String> getAllUrlPatterns();
+
+    /**
+     * 删除模板
+     * @param id id
+     */
+    void deleteTemplate(int id);
 }

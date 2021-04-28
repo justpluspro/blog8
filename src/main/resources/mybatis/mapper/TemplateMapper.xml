@@ -83,4 +83,9 @@
                 #{item.description, jdbcType=VARCHAR} )
             </foreach>
     </insert>
+
+    <select id="findByPattern" parameterType="string" resultMap="BaseResultMap">
+        select id, name, content, pattern, create_at, modify_at, enable, allow_comment, description from
+                blog_template where pattern = pattern
+    </select>
 </mapper>
