@@ -1,4 +1,4 @@
-package com.qwli7.blog.entity;
+package com.qwli7.blog.entity.vo;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author liqiwen
  * @since 1.2
  */
-public class PasswordModel implements Serializable {
+public class UpdatedPassword implements Serializable {
     /**
      * 旧密码
      */

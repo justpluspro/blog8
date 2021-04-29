@@ -1,0 +1,100 @@
+package com.qwli7.blog.file.converter;
+
+import com.qwli7.blog.file.vo.ControlArgs;
+import com.qwli7.blog.file.vo.WatermarkTextControlArgs;
+import org.springframework.util.StringUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * 资源添加水印 converter
+ * @author liqiwen
+ * @since 2.0
+ */
+public class WatermarkConverter extends AbstractMediaConverter {
+
+    public WatermarkConverter(String ffmpegPath, String graphicsMagickPath) {
+        super(ffmpegPath, graphicsMagickPath);
+    }
+
+    @Override
+    public void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs) {
+        final String action = controlArgs.getAction();
+        if(Arrays.asList("video2watermark", "image2watermark").contains(action)) {
+            WatermarkTextControlArgs watermarkTextControlArgs = null;
+            if(controlArgs instanceof WatermarkTextControlArgs) {
+                watermarkTextControlArgs = (WatermarkTextControlArgs) controlArgs;
+            }
+            if(watermarkTextControlArgs == null) {
+                logger.info("method<doConvert> 无效的水印参数");
+                return;
+            }
+            final String text = watermarkTextControlArgs.getText();
+            String processBashPath = "";
+            List<String> commands;
+            if ("video2watermark".equals(action)) {
+                commands = buildAddVideo2WatermarkCommand(sourceFile, targetFile, text);
+                processBashPath = getFfmpegPath();
+                doProcess(commands, processBashPath);
+            } else {
+                commands = buildAddImage2WatermarkCommand(sourceFile, targetFile, text);
+                processBashPath = getGraphicsMagickPath();
+            }
+            doProcess(commands, processBashPath);
+
+        }
+
+    }
+
+    /**
+     * 给图片添加水印，生成添加水印命令
+     * @param sourceFile sourceFile
+     * @param targetFile targetFile
+     * @param text text
+     * @return List<String>
+     */
+    private List<String> buildAddImage2WatermarkCommand(File sourceFile, File targetFile, String text) {
+        return null;
+    }
+
+
+    /**
+     * 给视频添加文字水印
+     * 完整命令  ffmpeg -y -i video.mp4 -vf drawtext=fontfile=arial.ttf:text=bilibili:x=w-tw-10:y=10:fontsize=60:fontcolor=gray output.mp4
+     *
+     * @param videoFile  输入文件
+     * @param outputFile 输出文件
+     * @param text 水印文字
+     */
+    public List<String> buildAddVideo2WatermarkCommand(File videoFile, File outputFile, String text) {
+        if(videoFile == null || !videoFile.exists()) {
+            throw new RuntimeException("原视频文件不存在");
+        }
+
+        List<String> command = new ArrayList<>();
+        command.add("-i");
+        command.add(videoFile.getAbsolutePath());
+        command.add(FORCE_SAVE);
+        command.add("-vf");
+
+        StringBuilder paramsBuilder = new StringBuilder("drawtext=");
+        paramsBuilder.append("fontfile='C\\:\\\\Windows\\\\Fonts\\\\STHUPO.TTF'").append(":text=").append(text)
+                .append(":x=w-tw-16")
+                .append(":y=16")
+                .append(":fontsize=60")
+                .append(":fontcolor=gray");
+        command.add(paramsBuilder.toString());
+//        command.add("drawtext=fontfile=arial.ttf");
+//        command.add(":text=");
+//        command.add(text);
+//        command.add(":x=w-tw-16");
+//        command.add(":y=16");
+//        command.add(":fontsie=60");
+//        command.add("fontcolor=gray");
+        command.add(outputFile.getAbsolutePath());
+        return command;
+    }
+}

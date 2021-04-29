@@ -317,45 +317,6 @@ public class MediaConverter implements Serializable {
 
 
     /**
-     * 给视频添加文字水印
-     * 完整命令  ffmpeg -y -i video.mp4 -vf drawtext=fontfile=arial.ttf:text=bilibili:x=w-tw-10:y=10:fontsize=60:fontcolor=gray output.mp4
-     *
-     * @param videoFile  输入文件
-     * @param outputFile 输出文件
-     * @param text 水印文字
-     */
-    public static void addWaterMarkForVideo(File videoFile, File outputFile, String text) {
-        if(videoFile == null || !videoFile.exists()) {
-            throw new RuntimeException("原视频文件不存在");
-        }
-
-        List<String> command = new ArrayList<>();
-        command.add("-i");
-        command.add(videoFile.getAbsolutePath());
-        command.add("-y");
-        command.add("-vf");
-
-        StringBuilder paramsBuilder = new StringBuilder("drawtext=");
-        paramsBuilder.append("fontfile='C\\:\\\\Windows\\\\Fonts\\\\STHUPO.TTF'").append(":text=").append(text)
-                .append(":x=w-tw-16")
-                .append(":y=16")
-                .append(":fontsize=60")
-                .append(":fontcolor=gray");
-        command.add(paramsBuilder.toString());
-//        command.add("drawtext=fontfile=arial.ttf");
-//        command.add(":text=");
-//        command.add(text);
-//        command.add(":x=w-tw-16");
-//        command.add(":y=16");
-//        command.add(":fontsie=60");
-//        command.add("fontcolor=gray");
-        command.add(outputFile.getAbsolutePath());
-        String executeResult = executeCommand(command, getFfmpegPath());
-        System.out.println("添加水印:" + executeResult);
-    }
-
-
-    /**
      * 抽帧
      * @param cutParams cutParams
      */

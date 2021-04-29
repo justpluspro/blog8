@@ -1,6 +1,6 @@
 package com.qwli7.blog.web.controller;
 
-import com.qwli7.blog.entity.PasswordModel;
+import com.qwli7.blog.entity.vo.UpdatedPassword;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.security.Authenticated;
 import com.qwli7.blog.service.ConfigService;
@@ -52,7 +52,7 @@ public class UserController {
      * @return ResponseEntity
      */
     @PutMapping("user/password")
-    public ResponseEntity<?> updatePassword(@RequestBody PasswordModel passwordModel) {
+    public ResponseEntity<?> updatePassword(@RequestBody UpdatedPassword passwordModel) {
         configService.updatePassword(passwordModel.getPassword(), passwordModel.getOldPassword());
         return ResponseEntity.ok().build();
     }
