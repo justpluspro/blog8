@@ -2,6 +2,7 @@ package com.qwli7.blog.file.converter;
 
 import com.qwli7.blog.file.MediaConverter;
 import com.qwli7.blog.file.vo.ControlArgs;
+import com.qwli7.blog.file.vo.VideoConvertParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -20,13 +21,32 @@ import java.util.List;
 public abstract class AbstractMediaConverter {
     /**
      * 版本信息
+     * -version
      */
     public static final String VERSION = "-version";
 
     /**
+     * -i
+     */
+    public static final String I = "-i";
+
+    /**
      * 强制覆盖保存
+     * -y
      */
     public static final String FORCE_SAVE = "-y";
+
+    /**
+     * 预设 crf 值
+     * crf
+     */
+    public static final Integer DEFAULT_CRF = 18;
+
+    /**
+     * 默认预设属性值（转换速度，越快质量越差）
+     * @see VideoConvertParams
+     */
+    private final static String DEFAULT_PRESET = "veryslow";
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -95,8 +115,8 @@ public abstract class AbstractMediaConverter {
     }
 
     /**
-     *
-     * @return
+     * 获取 ffprobe 可执行 path
+     * @return String
      */
     public String getFfprobePath() {
         return ffprobePath;

@@ -666,37 +666,7 @@ public class MediaConverter implements Serializable {
         return new ImageMetaInfo(Integer.parseInt(xes[0]), Integer.parseInt(xes[1]), 0, ext);
     }
 
-    /**
-     * 为图片添加水印
-     * gm  convert image_2000x3000.jpg -fill white -pointsize 128 -font "C:/Windows/Fonts/STCAIYUN.TTF" -gravity northeast -draw "text 40,120 'bilibili'" dest-c.jpg
-     */
-    private static void addWaterMarkForImage(File inputFile, File outputFile, String text) {
-        if(inputFile == null || !inputFile.exists()) {
-            logger.info("源文件不存在");
-            return;
-        }
-        if(StringUtils.isEmpty(text)) {
-            logger.info("水印不存在");
-            return;
-        }
 
-        List<String> commands = new ArrayList<>();
-        commands.add("convert");
-        commands.add(inputFile.getAbsolutePath());
-        commands.add("-fill white");
-        commands.add("-pointsize 128");
-        commands.add("-font C:/Windows/Fonts/STCAIYUN.TTF");
-        commands.add("-gravity northeast");
-        commands.add("-draw");
-        commands.add("text 40,120");
-        commands.add("'");
-        commands.add(text.toLowerCase());
-        commands.add("'");
-        commands.add(outputFile.getAbsolutePath());
-
-        executeCommand(commands, getGraphicsMagickPath());
-
-    }
 
     public static boolean isVideo(Path dest) {
         if(dest == null) {

@@ -33,6 +33,10 @@ public class WatermarkConverter extends AbstractMediaConverter {
                 return;
             }
             final String text = watermarkTextControlArgs.getText();
+            if(StringUtils.isEmpty(text)) {
+                logger.info("method<doConvert> 无要添加水印的文本");
+                return;
+            }
             String processBashPath = "";
             List<String> commands;
             if ("video2watermark".equals(action)) {
@@ -44,39 +48,46 @@ public class WatermarkConverter extends AbstractMediaConverter {
                 processBashPath = getGraphicsMagickPath();
             }
             doProcess(commands, processBashPath);
-
         }
-
     }
 
     /**
      * 给图片添加水印，生成添加水印命令
+     * gm  convert image_2000x3000.jpg -fill white -pointsize 128 -font "C:/Windows/Fonts/STCAIYUN.TTF" -gravity northeast -draw "text 40,120 'bilibili'" dest-c.jpg
      * @param sourceFile sourceFile
      * @param targetFile targetFile
      * @param text text
      * @return List<String>
      */
     private List<String> buildAddImage2WatermarkCommand(File sourceFile, File targetFile, String text) {
-        return null;
+        List<String> commands = new ArrayList<>();
+        commands.add("convert");
+        commands.add(sourceFile.getAbsolutePath());
+        commands.add("-fill white");
+        commands.add("-pointsize 128");
+        commands.add("-font C:/Windows/Fonts/STCAIYUN.TTF");
+        commands.add("-gravity northeast");
+        commands.add("-draw");
+        commands.add("text 40,120");
+        commands.add("'");
+        commands.add(text.toLowerCase());
+        commands.add("'");
+        commands.add(targetFile.getAbsolutePath());
+        return commands;
     }
 
 
     /**
      * 给视频添加文字水印
-     * 完整命令  ffmpeg -y -i video.mp4 -vf drawtext=fontfile=arial.ttf:text=bilibili:x=w-tw-10:y=10:fontsize=60:fontcolor=gray output.mp4
-     *
-     * @param videoFile  输入文件
+     * ffmpeg -y -i video.mp4 -vf drawtext=fontfile=arial.ttf:text=bilibili:x=w-tw-10:y=10:fontsize=60:fontcolor=gray output.mp4
+     * @param sourceFile  输入文件
      * @param outputFile 输出文件
      * @param text 水印文字
      */
-    public List<String> buildAddVideo2WatermarkCommand(File videoFile, File outputFile, String text) {
-        if(videoFile == null || !videoFile.exists()) {
-            throw new RuntimeException("原视频文件不存在");
-        }
-
+    public List<String> buildAddVideo2WatermarkCommand(File sourceFile, File outputFile, String text) {
         List<String> command = new ArrayList<>();
-        command.add("-i");
-        command.add(videoFile.getAbsolutePath());
+        command.add(I);
+        command.add(sourceFile.getAbsolutePath());
         command.add(FORCE_SAVE);
         command.add("-vf");
 
@@ -87,13 +98,6 @@ public class WatermarkConverter extends AbstractMediaConverter {
                 .append(":fontsize=60")
                 .append(":fontcolor=gray");
         command.add(paramsBuilder.toString());
-//        command.add("drawtext=fontfile=arial.ttf");
-//        command.add(":text=");
-//        command.add(text);
-//        command.add(":x=w-tw-16");
-//        command.add(":y=16");
-//        command.add(":fontsie=60");
-//        command.add("fontcolor=gray");
         command.add(outputFile.getAbsolutePath());
         return command;
     }
