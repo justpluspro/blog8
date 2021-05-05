@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public abstract class AbstractMediaConverter {
             return;
         }
         final String action = controlArgs.getAction();
-        if(StringUtils.isEmpty(action)) {
+        if(StringUtils.isEmpty(action) && Arrays.asList("video2video", "video2image", "video2gif").contains(action)) {
             logger.error("method<convert> 无指定的转换动作");
             return;
         }

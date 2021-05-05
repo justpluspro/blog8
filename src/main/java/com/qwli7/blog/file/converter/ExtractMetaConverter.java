@@ -51,7 +51,6 @@ public class ExtractMetaConverter extends AbstractMediaConverter {
     @Override
     public void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs) {
 
-
     }
 
 
