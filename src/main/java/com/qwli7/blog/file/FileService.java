@@ -125,7 +125,8 @@ public class FileService implements InitializingBean {
             }
             //目标文件
 
-            return getFileInfoDetail(dest);
+//            return getFileInfoDetail(dest);
+            return null;
 
         } finally {
             readWriteLock.writeLock().unlock();
@@ -212,25 +213,25 @@ public class FileService implements InitializingBean {
     }
 
 
-    private FileInfoDetail getFileInfoDetail(Path dest) {
-        if(MediaConverter.isVideo(dest) && MediaConverter.canHandle(dest)) {
-            final VideoMetaInfo videoMetaInfo = MediaConverter.getVideoMetaInfo(dest.toFile());
-            VideoCutParams cutParams = new VideoCutParams();
-            cutParams.setInputFile(dest.toFile());
-            cutParams.setContinuous(false);
-            cutParams.setWidth(600);
-            cutParams.setHeight(450);
-            MediaConverter.cutVideoFrame(cutParams);
-            FileInfoDetail fileInfoDetail = new FileInfoDetail();
-            fileInfoDetail.setHeight(videoMetaInfo.getHeight());
-            fileInfoDetail.setWidth(videoMetaInfo.getWidth());
-            fileInfoDetail.setExt(videoMetaInfo.getExtension());
-            fileInfoDetail.setPath(dest.toFile().getAbsolutePath());
-            return fileInfoDetail;
-        }
-
-        return null;
-    }
+//    private FileInfoDetail getFileInfoDetail(Path dest) {
+//        if(MediaConverter.isVideo(dest) && MediaConverter.canHandle(dest)) {
+//            final VideoMetaInfo videoMetaInfo = MediaConverter.getVideoMetaInfo(dest.toFile());
+//            VideoCutParams cutParams = new VideoCutParams();
+//            cutParams.setInputFile(dest.toFile());
+//            cutParams.setContinuous(false);
+//            cutParams.setWidth(600);
+//            cutParams.setHeight(450);
+//            MediaConverter.cutVideoFrame(cutParams);
+//            FileInfoDetail fileInfoDetail = new FileInfoDetail();
+//            fileInfoDetail.setHeight(videoMetaInfo.getHeight());
+//            fileInfoDetail.setWidth(videoMetaInfo.getWidth());
+//            fileInfoDetail.setExt(videoMetaInfo.getExtension());
+//            fileInfoDetail.setPath(dest.toFile().getAbsolutePath());
+//            return fileInfoDetail;
+//        }
+//
+//        return null;
+//    }
 
 
     public Resource processFile(String requestPath) {

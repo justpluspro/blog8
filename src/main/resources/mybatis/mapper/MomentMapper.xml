@@ -132,4 +132,11 @@
         order by bm.create_at desc
         limit #{start}, #{offset}
     </select>
+
+    <select id="selectPreMoment" resultType="com.qwli7.blog.entity.Moment">
+
+    </select>
+    <select id="selectNextMoment" resultType="com.qwli7.blog.entity.Moment">
+
+    </select>
 </mapper>

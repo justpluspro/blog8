@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 当且仅当存在 blog.core.cors-enabled 且值为 true 时才开启全局跨域配置
  */
 @Configuration
-@ConditionalOnProperty(name = "cors-enabled", prefix = "blog.core", havingValue = "true")
+@ConditionalOnProperty(prefix = "blog.core", name = "cors-enabled", havingValue = "true")
 public class CorsConfiguration implements WebMvcConfigurer {
 
 

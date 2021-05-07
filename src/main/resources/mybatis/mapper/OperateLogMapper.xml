@@ -1,63 +1,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.qwli7.blog.mapper.TagMapper">
+<mapper namespace="com.qwli7.blog.mapper.OperateLogMapper">
 
-    <select id="findById" parameterType="int" resultType="Tag">
-        select id, name, create_at, modify_at from blog_tag where id = #{id}
-    </select>
 
-    <select id="findByName" resultType="Tag">
-        select id, name, create_at, modify_at from blog_tag where name = #{name,jdbcType=VARCHAR}
-    </select>
-
-    <select id="findAll" resultType="Tag">
-        select id, name, create_at, modify_at from blog_tag
-    </select>
-
-    <delete id="deleteById" parameterType="int">
-        delete from blog_tag where id = #{id}
-    </delete>
-
-    <update id="update" parameterType="Tag">
-        update blog_tag
-            <set>
-                <if test="name != null and name != ''">
-                    name = #{name,jdbcType=VARCHAR},
-                </if>
-                <if test="modifyAt != null">
-                    modify_at = #{modifyAt},
-                </if>
-            </set>
-        where id = #{id}
-    </update>
-
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into blog_tag(name, create_at, modify_at) values (#{name,jdbcType=VARCHAR}, now(), now())
-    </insert>
-
-    <select id="count" resultType="int" parameterType="CommonQueryParam">
-        select count(1) from blog_tag
-        <where>
-            <if test="query != null and query != ''">
-                name like concat('%', #{query}, '%')
-            </if>
-        </where>
-    </select>
-    <select id="selectPage"  parameterType="CommonQueryParam" resultType="Tag">
-        select id, name, create_at, modify_at
-        from blog_tag
-        <where>
-            <if test="query != null and query != ''">
-                name like concat('%', #{query}, '%')
-            </if>
-        </where>
-        order by create_at desc
-        limit #{start}, #{offset}
-    </select>
-
-    <select id="selectById" resultType="Tag">
-        select id, name, create_at, modify_at
-        from blog_tag where id = #{id}
-    </select>
 </mapper>

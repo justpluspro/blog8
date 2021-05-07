@@ -17,24 +17,44 @@ public class TokenUtil implements Serializable {
         super();
     }
 
-
+    /**
+     * 创建一个新的 token
+     * @return String
+     */
     public static String createNew() {
         authToken = new AuthToken();
         return authToken.token;
     }
 
+    /**
+     * 校验 token 是否有效
+     * @param str str
+     * @param increaseTime increaseTime
+     * @return true | false
+     */
     public static boolean valid(String str, boolean increaseTime) {
         return authToken != null && authToken.valid(str, increaseTime);
     }
 
+    /**
+     * 校验 token
+     * @param str str
+     * @return true | false
+     */
     public static boolean valid(String str) {
         return valid(str, true);
     }
 
+    /**
+     * 移除 token
+     */
     public static void remove() {
         authToken = null;
     }
 
+    /**
+     * Token
+     */
     public static class AuthToken implements Serializable {
 
         private final String token;

@@ -4,9 +4,16 @@ package com.qwli7.blog.file;
 import com.qwli7.blog.exception.LogicException;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author qwli7
@@ -86,11 +93,109 @@ public class FileUtil {
     /**
      * 删除文件
      * @param path path
-     * @return
+     * @return true | false
      */
     public static boolean deleteFile(Path path) {
-
+        if(path == null) {
+            return false;
+        }
         return false;
+    }
+
+    /**
+     * 获取目录的大小
+     * @param dir dir
+     * @return long
+     */
+    public static long getDirectorySizeLegacy(File dir) {
+        long length = 0;
+        final File[] files = dir.listFiles();
+        if(files != null) {
+            for(File file: files) {
+                if(file.isFile()) {
+                    length += file.length();
+                } else {
+                    length += getDirectorySizeLegacy(file);
+                }
+            }
+        }
+        return length;
+    }
+
+    /**
+     * 获取目录的大小，使用 java8
+     * @param path path
+     * @return long
+     */
+    public static long getDirectorySizeJava8(Path path) {
+        long size = 0;
+        try(Stream<Path> walk = Files.walk(path)) {
+            size = walk.filter(Files::isRegularFile)
+                    .mapToLong(p -> {
+                        try {
+                            return Files.size(p);
+                        } catch (IOException e){
+
+                            return 0L;
+                        }
+                    }).sum();
+        } catch (IOException e) {
+
+        }
+        return size;
+    }
+
+    /**
+     * 获取目录的大小，使用 java7
+     * @param path path
+     * @return long
+     */
+    public static long getDirectorySizeJava7(Path path) {
+        AtomicLong size = new AtomicLong(0);
+        try {
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    size.addAndGet(attrs.size());
+
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e){
+
+        }
+        return size.get();
+    }
+
+    public static List<String> findByExt(Path path, String ext) {
+        List<String> result = new ArrayList<>();
+        try(Stream<Path> walk = Files.walk(path)) {
+            result = walk.filter(p -> !Files.isDirectory(p))
+                    .map(p -> p.toString().toLowerCase())
+                    .filter(f -> f.endsWith(ext))
+                    .collect(Collectors.toList());
+        }catch (IOException ex){
+
+        }
+        return result;
+    }
+
+
+    public static void writeFile(String path, String content) {
+        writeFile(Paths.get(path), content);
+    }
+
+    public static void writeFile(Path path, String content) {
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

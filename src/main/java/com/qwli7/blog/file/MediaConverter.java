@@ -70,13 +70,6 @@ public class MediaConverter implements Serializable {
      */
     private static String graphicsMagickPath = "/Users/liqiwen/develop/graphics-magick/gm";
 
-
-    static {
-        DURATION_PATTERN = Pattern.compile(DURATION_REGEX);
-        VIDEO_STREAM_PATTERN = Pattern.compile(VIDEO_STREAM_REGEX);
-        MUSIC_STREAM_PATTERN = Pattern.compile(MUSIC_STREAM_REGEX);
-    }
-
     /**
      * 获取 gm 执行路径
      * @return graphicsMagickPath
@@ -305,7 +298,8 @@ public class MediaConverter implements Serializable {
         if(StringUtils.isEmpty(path)) {
             throw new RuntimeException("转换后的文件路径为空，请检查转换后的文件存放路径是否正确");
         }
-        VideoMetaInfo videoMetaInfo = getVideoMetaInfo(videoFile);
+//        VideoMetaInfo videoMetaInfo = getVideoMetaInfo(videoFile);
+        VideoMetaInfo videoMetaInfo = null;
 
         if (null == videoMetaInfo) {
             throw new RuntimeException("未解析到视频信息");

@@ -27,5 +27,6 @@
         <mapper resource="mybatis/mapper/TagMapper.xml" />
         <mapper resource="mybatis/mapper/BlackIpMapper.xml" />
         <mapper resource="mybatis/mapper/TemplateMapper.xml" />
+        <mapper resource="mybatis/mapper/OperateLogMapper.xml" />
     </mappers>
 </configuration>
