@@ -29,6 +29,19 @@ public class AbstractQueryParam implements Serializable {
      */
     private int offset;
 
+    /**
+     * 是否忽略分页
+     */
+    private boolean ignorePaging = false;
+
+
+    public boolean isIgnorePaging() {
+        return ignorePaging;
+    }
+
+    public void setIgnorePaging(boolean ignorePaging) {
+        this.ignorePaging = ignorePaging;
+    }
 
     public boolean hasNoSize() {
         return this.size < 10;
