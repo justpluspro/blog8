@@ -38,20 +38,20 @@ public class CommentNotifyTask {
      * 每五分钟拉取一次评论列表
      * 进行批量处理
      */
-    @Scheduled(cron = "0/10 * * * * ?")
-    public void commentNotify() {
-        logger.info("method<commentNotify> start executing...");
-        if(dataContainer.isEmpty()){
-            return;
-        }
-
-        final Comment comment = dataContainer.pop();
-        if(comment != null) {
-            final Comment parent = comment.getParent();
-            final User user = configService.getUser();
-            if(comment.getAdmin()) {
-
-            }
-        }
-    }
+//    @Scheduled(cron = "0/10 * * * * ?")
+//    public void commentNotify() {
+//        logger.info("method<commentNotify> start executing...");
+//        if(dataContainer.isEmpty()){
+//            return;
+//        }
+//
+//        final Comment comment = dataContainer.pop();
+//        if(comment != null) {
+//            final Comment parent = comment.getParent();
+//            final User user = configService.getUser();
+//            if(comment.getAdmin()) {
+//
+//            }
+//        }
+//    }
 }

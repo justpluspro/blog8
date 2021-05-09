@@ -19,6 +19,10 @@ import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
  * @author liqiwen
  * @since 2.0
  */
-@Service
+//@Service
 public class TemplateServiceImpl implements TemplateService, HandlerMapping, InitializingBean, Ordered {
 
     private static final String DEFAULT_TEMPLATE_PATH = "defaultTemplate";
@@ -146,10 +150,12 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
         TemplateQueryParam queryParam = new TemplateQueryParam();
         queryParam.setEnable(true);
         final List<Template> templates = templateMapper.listAll(queryParam);
-        if(templates == null || templates.size() == 0) {
+        if(CollectionUtils.isEmpty(templates)) {
             // register local templates
 
             ClassPathResource classPathResource = new ClassPathResource(Paths.get(DEFAULT_TEMPLATE_PATH).toString());
+            final InputStream is = classPathResource.getInputStream();
+
             final File file = classPathResource.getFile();
             if(!file.exists() && !file.isDirectory()) {
                 throw new RuntimeException("不存在默认的模板");

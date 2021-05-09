@@ -46,9 +46,6 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                                      Object handler) throws Exception {
 
-                final String requestUri = request.getRequestURI();
-                logger.info("method<preHandle> requestUri:[{}]", requestUri);
-
                 if(handler instanceof HandlerMethod) {
                     HandlerMethod handlerMethod = (HandlerMethod) handler;
 

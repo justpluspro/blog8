@@ -1,7 +1,5 @@
 package com.qwli7.blog.entity;
 
-import org.apache.ibatis.lang.UsesJava7;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

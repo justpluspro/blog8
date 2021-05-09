@@ -21,8 +21,8 @@ import java.util.Collections;
  * 2021/3/17 15:24
  * 功能：FileConfiguration
  **/
-@Configuration
-@Conditional(FileCondition.class)
+//@Configuration
+//@Conditional(FileCondition.class)
 public class FileConfiguration {
 
 

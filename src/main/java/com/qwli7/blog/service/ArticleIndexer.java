@@ -77,9 +77,7 @@ public class ArticleIndexer {
      */
     private static final String POST_AT = "post_at";
 
-
-//    private final Path directoryPath = Paths.get(System.getProperty("user.home")).resolve("/blog/index");
-    private final Path directoryPath = Paths.get("/Users/liqiwen/Code/blog8/index");
+    private final Path directoryPath = Paths.get(System.getProperty("user.home")).resolve("blog/index");
 
     private final IndexWriter indexWriter;
 

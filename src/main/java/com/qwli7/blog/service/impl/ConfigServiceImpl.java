@@ -1,8 +1,10 @@
 package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.CommentStrategy;
+import com.qwli7.blog.Constant;
 import com.qwli7.blog.entity.BlogConfig;
 import com.qwli7.blog.entity.User;
+import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.exception.LoginFailException;
 import com.qwli7.blog.file.FileUtil;
 import com.qwli7.blog.service.ConfigService;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -41,10 +44,9 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
     private static final String USER_EMAIL = "user.email";
     private static final String USER_NICKNAME = "user.nickname";
     private static final String USER_AVATAR = "user.avatar";
-
     private static final String COMMENT_STRATEGY = "comment.strategy";
 
-    private static Properties PROPERTIES;
+    private static Properties properties;
 
     private User user;
 
@@ -53,24 +55,23 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
 
     @Override
     public BlogConfig getConfig() {
-        loadLocalConfig();
-        BlogConfig config = new BlogConfig(this.blogConfig);
-        config.setPassword(null);
-        return config;
+        loadConfig();
+        blogConfig.setPassword(null);
+        return blogConfig;
     }
 
 
     @Override
     public CommentStrategy getCommentStrategy() {
-        loadLocalConfig();
-        return CommentStrategy.EACH;
+        loadConfig();
+        return blogConfig.getCommentStrategy();
     }
 
     @Transactional(readOnly = true, rollbackFor = LoginFailException.class)
     @Override
     public boolean authenticate(String name, String password) {
         logger.info("method[authenticate] name:[{}], password:[{}]", name, password);
-        loadLocalConfig();
+        loadConfig();
         final String loginName = this.blogConfig.getLoginName();
         final String configPassword = this.blogConfig.getPassword();
         if(StringUtils.isEmpty(loginName) ||
@@ -93,19 +94,58 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
      */
     @Override
     public void updatePassword(String password, String oldPassword) {
-
+        loadConfig();
+        blogConfig.setPassword(DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8)));
+        save(blogConfig);
     }
 
     /**
      * 保存配置文件
      */
     public synchronized void save(BlogConfig blogConfig) {
+        try {
+            loadConfig();
+            final String avatar = blogConfig.getAvatar();
+            if (!StringUtils.isEmpty(avatar) && !avatar.equals(properties.getProperty(USER_AVATAR))) {
+                properties.setProperty(USER_AVATAR, avatar);
+            }
+            final String email = blogConfig.getEmail();
+            if (!StringUtils.isEmpty(email) && !email.equals(properties.getProperty(USER_EMAIL))) {
+                properties.setProperty(USER_EMAIL, email);
+            }
+            final String loginName = blogConfig.getLoginName();
+            if (!StringUtils.isEmpty(loginName) && !loginName.equals(properties.getProperty(LOGIN_NAME))) {
+                properties.setProperty(LOGIN_NAME, loginName);
+            }
+            if(!StringUtils.isEmpty(blogConfig.getPassword())) {
+                final String password = DigestUtils.md5DigestAsHex(blogConfig.getPassword().getBytes(StandardCharsets.UTF_8));
+                final String oldPassword = properties.getProperty(LOGIN_PWD);
+                if (!StringUtils.isEmpty(password) && !password.equals(oldPassword)) {
+                    properties.setProperty(LOGIN_PWD, password);
+                }
+            }
+            final CommentStrategy commentStrategy = blogConfig.getCommentStrategy();
+            if(commentStrategy != null) {
+                final String commentStrategyName = commentStrategy.name();
+                if (!StringUtils.isEmpty(commentStrategyName) && !commentStrategyName.equals(properties.getProperty(COMMENT_STRATEGY))) {
+                    properties.setProperty(COMMENT_STRATEGY, commentStrategyName);
+                }
+            }
 
+            final String nickname = blogConfig.getNickname();
+            if (!StringUtils.isEmpty(nickname) && !nickname.equals(properties.getProperty(USER_NICKNAME))) {
+                properties.setProperty(USER_NICKNAME, nickname);
+            }
+            FileOutputStream fos = new FileOutputStream(CONFIG_PATH.toString());
+            properties.store(fos, "update config");
+        } catch (IOException ex) {
+            throw new LogicException("config.error", "保存配置错误");
+        }
     }
 
     @Override
     public User getUser() {
-        loadLocalConfig();
+        loadConfig();
         user = new User();
         user.setUsername(this.blogConfig.getLoginName());
         user.setEmail(this.blogConfig.getEmail());
@@ -115,22 +155,33 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
 
     @Override
     public void updateConfig(BlogConfig blogConfig) {
-
+        loadConfig();
+        save(blogConfig);
     }
 
     @Override
     public void updateUser(User user) {
-
+        loadConfig();
+        final String username = user.getUsername();
+        final String avatar = user.getAvatar();
+        final String email = user.getEmail();
+        String password = user.getPassword();
+        password = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
+        blogConfig.setNickname(username);
+        blogConfig.setAvatar(avatar);
+        blogConfig.setPassword(password);
+        blogConfig.setEmail(email);
+        save(blogConfig);
     }
 
     /**
      * 加载本地配置
      */
-    private void loadLocalConfig() {
-        if(user == null) {
+    private void loadConfig() {
+        if(blogConfig == null) {
             synchronized (this) {
-                if(user == null) {
-                    loadConfigFromLocalFile();
+                if(blogConfig == null) {
+                    load();
                 }
             }
         }
@@ -139,19 +190,19 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
     /**
      * 从本地文件系统中加载配置
      */
-    private void loadConfigFromLocalFile() {
+    private void load() {
         // 登录名称
-        String loginName = PROPERTIES.getProperty(LOGIN_NAME);
+        String loginName = properties.getProperty(LOGIN_NAME);
         // 登录密码
-        String loginPwd = PROPERTIES.getProperty(LOGIN_PWD);
+        String loginPwd = properties.getProperty(LOGIN_PWD);
         // 用户邮箱
-        String userEmail = PROPERTIES.getProperty(USER_EMAIL);
+        String userEmail = properties.getProperty(USER_EMAIL);
         // 用户昵称
-        String nickname = PROPERTIES.getProperty(USER_NICKNAME);
+        String nickname = properties.getProperty(USER_NICKNAME);
         // 用户头像
-        String avatar = PROPERTIES.getProperty(USER_AVATAR);
+        String avatar = properties.getProperty(USER_AVATAR);
         // 评论策略
-        String commentStrategy = PROPERTIES.getProperty(COMMENT_STRATEGY, CommentStrategy.NEVER.name());
+        String commentStrategy = properties.getProperty(COMMENT_STRATEGY, CommentStrategy.NEVER.name());
 
         blogConfig = new BlogConfig();
         // 设置登录名称
@@ -174,12 +225,31 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
         try {
             if(!Files.exists(CONFIG_PATH)) {
                 FileUtil.createFile(CONFIG_PATH);
+                initConfig();
             }
-            PROPERTIES = PropertiesLoaderUtils.loadProperties(new EncodedResource(new FileSystemResource(CONFIG_PATH),
+            properties = PropertiesLoaderUtils.loadProperties(new EncodedResource(new FileSystemResource(CONFIG_PATH),
                     StandardCharsets.UTF_8));
         } catch (IOException ex) {
             logger.error("读取配置文件失败:[{}]", ex.getMessage(), ex);
             throw new RuntimeException("配置文件初始化失败");
         }
+    }
+
+    /**
+     * 初始化配置文件
+     * @throws IOException IOException
+     */
+    private void initConfig() throws IOException {
+        properties = new Properties();
+        properties.setProperty(LOGIN_NAME, Constant.DEFAULT_LOGIN_NAME);
+        properties.setProperty(LOGIN_PWD, DigestUtils.md5DigestAsHex(Constant.DEFAULT_LOGIN_PWD.getBytes(StandardCharsets.UTF_8)));
+        properties.setProperty(USER_EMAIL, "");
+        properties.setProperty(USER_AVATAR, "");
+        properties.setProperty(USER_NICKNAME, Constant.DEFAULT_USER_NICKNAME);
+        properties.setProperty(COMMENT_STRATEGY, CommentStrategy.NEVER.name());
+
+        FileOutputStream fos = new FileOutputStream(CONFIG_PATH.toString());
+        properties.store(fos, "initial properties");
+        fos.close();
     }
 }

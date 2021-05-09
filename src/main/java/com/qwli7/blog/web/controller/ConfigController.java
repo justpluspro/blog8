@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
  * 2021/2/26 14:26
  * 功能：ConfigController
  **/
-@Authenticated
+
 @RestController
 @RequestMapping("api")
 public class ConfigController {

@@ -60,14 +60,14 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Resource
     private RestTemplate restTemplate;
 
-    @Resource
-    private TemplateService templateService;
+//    @Resource
+//    private TemplateService templateService;
 
 
-    @Bean
-    public TemplateHandlerAdapter templateHandlerAdapter() {
-        return new TemplateHandlerAdapter();
-    }
+//    @Bean
+//    public TemplateHandlerAdapter templateHandlerAdapter() {
+//        return new TemplateHandlerAdapter();
+//    }
 
     @Bean
     public FilterRegistrationBean<BlogContextFilter> contextFilter(BlogProperties blogProperties) {
@@ -81,10 +81,10 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
 
-    @Bean
-    public BlogExceptionResolver exceptionResolver() {
-        return new BlogExceptionResolver();
-    }
+//    @Bean
+//    public BlogExceptionResolver exceptionResolver() {
+//        return new BlogExceptionResolver();
+//    }
 
 //
 //    @Override
@@ -129,80 +129,80 @@ public class WebConfiguration implements WebMvcConfigurer {
     /*  THYMELEAF-SPECIFIC ARTIFACTS                                    */
     /*  TemplateResolver <- TemplateEngine <- ViewResolver              */
     /* **************************************************************** */
-    @Bean
-    public ITemplateResolver templateResolver(ApplicationContext applicationContext) {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setPrefix("classpath:/templates/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setOrder(Ordered.HIGHEST_PRECEDENCE+2);
-//        Template cache is true by default. Set to false if you want
-//        templates to be automatically updated when modified
-        templateResolver.setCacheable(true);
-        return templateResolver;
-    }
+//    @Bean
+//    public ITemplateResolver templateResolver(ApplicationContext applicationContext) {
+//        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+//        templateResolver.setApplicationContext(applicationContext);
+//        templateResolver.setTemplateMode(TemplateMode.HTML);
+//        templateResolver.setPrefix("classpath:/templates/");
+//        templateResolver.setSuffix(".html");
+//        templateResolver.setOrder(Ordered.HIGHEST_PRECEDENCE+2);
+////        Template cache is true by default. Set to false if you want
+////        templates to be automatically updated when modified
+//        templateResolver.setCacheable(true);
+//        return templateResolver;
+//    }
 
     // 测试正常的模板能否访问
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("login");
-    }
+//    @Override
+//    public void addViewControllers(ViewControllerRegistry registry) {
+//        registry.addViewController("/login").setViewName("login");
+//    }
 
-    @Bean
-    public ITemplateResolver memoryTemplateResolver(TemplateService templateService) {
-        MemoryTemplateResolver memoryTemplateResolver = new MemoryTemplateResolver(templateService);
-        memoryTemplateResolver.setOrder(Ordered.HIGHEST_PRECEDENCE+1);
-        return memoryTemplateResolver;
-    }
+//    @Bean
+//    public ITemplateResolver memoryTemplateResolver(TemplateService templateService) {
+//        MemoryTemplateResolver memoryTemplateResolver = new MemoryTemplateResolver(templateService);
+//        memoryTemplateResolver.setOrder(Ordered.HIGHEST_PRECEDENCE+1);
+//        return memoryTemplateResolver;
+//    }
 
 
-    @Bean
-    public SpringTemplateEngine templateEngine(ApplicationContext applicationContext,
-                                               BlogProperties blogProperties, TemplateService templateService) {
-
-        final String markdownServerUrl = blogProperties.getMarkdownServerUrl();
-        if(StringUtils.isEmpty(markdownServerUrl)) {
-            markdown2Html = new DefaultMarkdown2Html.CommonMarkdown2Html();
-        } else {
-            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl, restTemplate);
-        }
-
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        //是否启用 SpringEL 表达式编译
-        templateEngine.setEnableSpringELCompiler(true);
-        Set<ITemplateResolver> templateResolvers = new HashSet<>();
-        templateResolvers.add(templateResolver(applicationContext));
-        templateResolvers.add(memoryTemplateResolver(templateService));
-        templateEngine.setTemplateResolvers(templateResolvers);
-        templateEngine.addDialect(myAutoDialect());
-//        templateEngine.addDialect(pageHelperDialect());
-//        templateEngine.add
-//        templateEngine.setDialect();// 该方法将会导致默认的方言不可用 StandardDialect, 也就是 th:*
-
-        templateEngine.setAdditionalDialects(new HashSet<>(Arrays.asList(new IProcessorDialect() {
-            @Override
-            public String getPrefix() {
-                return "data";
-            }
-
-            @Override
-            public int getDialectProcessorPrecedence() {
-                return 1000;
-            }
-
-            @Override
-            public Set<IProcessor> getProcessors(String prefix) {
-                return createProcessor(prefix, applicationContext);
-            }
-
-            @Override
-            public String getName() {
-                return "template dialect";
-            }
-        }, new ExtStandardExpressionDialect(markdown2Html))));
-        return templateEngine;
-    }
+//    @Bean
+//    public SpringTemplateEngine templateEngine(ApplicationContext applicationContext,
+//                                               BlogProperties blogProperties, TemplateService templateService) {
+//
+//        final String markdownServerUrl = blogProperties.getMarkdownServerUrl();
+//        if(StringUtils.isEmpty(markdownServerUrl)) {
+//            markdown2Html = new DefaultMarkdown2Html.CommonMarkdown2Html();
+//        } else {
+//            markdown2Html = new DefaultMarkdown2Html.MarkdownConverter(markdownServerUrl, restTemplate);
+//        }
+//
+//        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+//        //是否启用 SpringEL 表达式编译
+//        templateEngine.setEnableSpringELCompiler(true);
+//        Set<ITemplateResolver> templateResolvers = new HashSet<>();
+//        templateResolvers.add(templateResolver(applicationContext));
+//        templateResolvers.add(memoryTemplateResolver(templateService));
+//        templateEngine.setTemplateResolvers(templateResolvers);
+//        templateEngine.addDialect(myAutoDialect());
+////        templateEngine.addDialect(pageHelperDialect());
+////        templateEngine.add
+////        templateEngine.setDialect();// 该方法将会导致默认的方言不可用 StandardDialect, 也就是 th:*
+//
+//        templateEngine.setAdditionalDialects(new HashSet<>(Arrays.asList(new IProcessorDialect() {
+//            @Override
+//            public String getPrefix() {
+//                return "data";
+//            }
+//
+//            @Override
+//            public int getDialectProcessorPrecedence() {
+//                return 1000;
+//            }
+//
+//            @Override
+//            public Set<IProcessor> getProcessors(String prefix) {
+//                return createProcessor(prefix, applicationContext);
+//            }
+//
+//            @Override
+//            public String getName() {
+//                return "template dialect";
+//            }
+//        }, new ExtStandardExpressionDialect(markdown2Html))));
+//        return templateEngine;
+//    }
 
 
     private Set<IProcessor> createProcessor(String prefix, ApplicationContext applicationContext) {
@@ -214,17 +214,17 @@ public class WebConfiguration implements WebMvcConfigurer {
         return processors;
     }
 
-    @Bean
-    public ViewResolver viewResolver(ApplicationContext applicationContext, BlogProperties blogProperties, TemplateService templateService) {
-        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-        viewResolver.setTemplateEngine(templateEngine(applicationContext, blogProperties, templateService));
-        viewResolver.setCharacterEncoding(Charset.defaultCharset().name());
-//        viewResolver.setOrder(Ordered.LOWEST_PRECEDENCE-5);
-        return viewResolver;
-    }
+//    @Bean
+//    public ViewResolver viewResolver(ApplicationContext applicationContext, BlogProperties blogProperties, TemplateService templateService) {
+//        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+//        viewResolver.setTemplateEngine(templateEngine(applicationContext, blogProperties, templateService));
+//        viewResolver.setCharacterEncoding(Charset.defaultCharset().name());
+////        viewResolver.setOrder(Ordered.LOWEST_PRECEDENCE-5);
+//        return viewResolver;
+//    }
 
-    @Bean
-    public MyAutoDialect myAutoDialect() {
-        return new MyAutoDialect();
-    }
+//    @Bean
+//    public MyAutoDialect myAutoDialect() {
+//        return new MyAutoDialect();
+//    }
 }

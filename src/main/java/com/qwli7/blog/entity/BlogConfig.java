@@ -15,15 +15,6 @@ public class BlogConfig implements Serializable {
         super();
     }
 
-    public BlogConfig(BlogConfig blogConfig) {
-        super();
-        this.password = blogConfig.getPassword();
-        this.loginName = blogConfig.getLoginName();
-        this.email = blogConfig.getEmail();
-        this.nickname = blogConfig.getNickname();
-        this.avatar = blogConfig.getAvatar();
-    }
-
     /**
      * 头像
      */
@@ -48,6 +39,12 @@ public class BlogConfig implements Serializable {
      * 邮箱
      */
     private String email;
+
+    /**
+     * 密码
+     */
+    private String password;
+
 
     /**
      * 评论审核策略
@@ -101,8 +98,6 @@ public class BlogConfig implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    private String password;
 
     public String getPassword() {
         return password;

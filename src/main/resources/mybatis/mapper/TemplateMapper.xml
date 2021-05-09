@@ -86,6 +86,6 @@
 
     <select id="findByPattern" parameterType="string" resultMap="BaseResultMap">
         select id, name, content, pattern, create_at, modify_at, enable, allow_comment, description from
-                blog_template where pattern = pattern
+                blog_template where pattern = #{pattern,jdbcType=VARCHAR}
     </select>
 </mapper>
