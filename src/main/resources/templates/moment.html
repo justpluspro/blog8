@@ -59,8 +59,8 @@
     </header>
     <div class="content">
         <div class="container-xl">
-            <div class="row">
-                <div class="col-md-12 col-xl-8 markdown">
+            <div class="row justify-content-center">
+                <div class="col-12 mb-5">
                    <div th:utext="${moment.content}"></div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
     let momentId = '[[${moment.id}]]'
     $(document).ready(function() {
         $.ajax({
-            url: rootPath + '/api/moment/' + momentId + '/hits',
+            url: rootPath + 'api/moment/' + momentId + '/hits',
             method: 'PATCH',
             contentType: 'application/json'
         })

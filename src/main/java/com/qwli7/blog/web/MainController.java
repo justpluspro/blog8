@@ -6,6 +6,7 @@ import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
+import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.MomentService;
@@ -61,8 +62,12 @@ public class MainController {
     }
 
     @GetMapping("moments")
-    public String moments() {
-
+    public String moments(MomentQueryParam queryParam, Model model) {
+        if(queryParam.hasNoSize()) {
+            queryParam.setSize(blogProperties.getDefaultPageSize());
+        }
+//        final PageDto<MomentArchive> archivePageDto = momentService.selectArchivePage(queryParam);
+//        model.addAttribute("archivePageDto", archivePageDto);
         return "moments";
     }
 
