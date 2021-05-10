@@ -238,6 +238,31 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.updateHits(id, moment.getHits()+1);
     }
 
+    @Override
+    public MomentArchive selectLatestMoments() {
+        MomentQueryParam queryParam = new MomentQueryParam();
+        MomentArchive momentArchive =  momentMapper.selectLatestMoments(queryParam);
+        if(momentArchive == null) {
+            return null;
+        }
+        final List<Moment> moments = momentArchive.getMoments();
+        if(!CollectionUtils.isEmpty(moments)) {
+            processMoments(moments);
+        }
+        return momentArchive;
+    }
+
+    @Override
+    public Moment selectById(int id) {
+        final Optional<Moment> momentOp = momentMapper.selectById(id);
+        if(!momentOp.isPresent()) {
+            throw new ResourceNotFoundException("moment.notFound", "动态不存在");
+        }
+        final Moment moment = momentOp.get();
+        processMoment(moment);
+        return moment;
+    }
+
     /**
      * 获取模块名称
      * @return String

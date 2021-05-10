@@ -111,4 +111,11 @@ public interface MomentMapper {
      * @return Optional
      */
     Optional<Moment> selectNextMoment(Moment moment);
+
+    /**
+     * 获取最近的动态
+     * @param queryParam queryParam
+     * @return MomentArchive
+     */
+    MomentArchive selectLatestMoments(MomentQueryParam queryParam);
 }

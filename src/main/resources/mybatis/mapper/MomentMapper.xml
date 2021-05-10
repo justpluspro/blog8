@@ -139,4 +139,16 @@
     <select id="selectNextMoment" resultType="com.qwli7.blog.entity.Moment">
 
     </select>
+
+    <select id="selectLatestMoments" resultMap="ArchiveMomentResult">
+        select archive.archiveDate, bm.id, bm.content, bm.hits,
+               bm.comments, bm.allow_comment, bm.create_at,
+               bm.modify_at, bm.is_private from (
+                            select date_format(create_at, '%Y-%m-%d') as archiveDate
+                            from blog_moment
+        group by archiveDate order by archiveDate desc
+                                            ) archive
+                                            left join blog_moment bm on archive.archiveDate = DATE_FORMAT(bm.create_at, '%Y-%m-%d')
+        order by bm.create_at desc limit 1
+    </select>
 </mapper>

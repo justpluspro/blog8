@@ -6,6 +6,15 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
+    <style>
+        .page-item.active .page-link {
+            z-index: 3;
+            font-weight: 700;
+            color: #000;
+            border-color: transparent;
+            background: transparent;
+        }
+    </style>
 </head>
 <body class="antialiased">
 <div class="page">
@@ -63,66 +72,37 @@
             <div class="row">
                 <div class="col-md-6 col-xl-8">
                     <div class="row row-cards">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="row row-0">
-                                    <div class="col-3">
-                                        <img src="https://preview.tabler.io/static/photos/2854fd67ddbd6217.jpg" class="w-100 h-100 object-cover" alt="Card side image">
-                                    </div>
-                                    <div class="col">
-                                        <div class="card-body">
-                                            <h3 class="card-title">Card with left side image</h3>
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam deleniti fugit incidunt, iste, itaque minima
-                                                neque pariatur perferendis sed suscipit velit vitae voluptatem.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="row row-0">
-                                    <div class="col-3 order-md-last">
-                                        <img src="https://preview.tabler.io/static/photos/2854fd67ddbd6217.jpg" class="w-100 h-100 object-cover" alt="Card side image">
-                                    </div>
-                                    <div class="col">
-                                        <div class="card-body">
-                                            <h3 class="card-title">Card with right side image</h3>
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam deleniti fugit incidunt, iste, itaque minima
-                                                neque pariatur perferendis sed suscipit velit vitae voluptatem.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-12" th:each="article: ${articlePage.data}">
                             <div class="card">
                                 <div class="row row-0">
+                                    <div class="col-3" th:if="!${#strings.isEmpty(article.featureImage)}">
+                                        <img th:src="${article.featureImage}" class="w-100 h-100 rounded-start object-cover" alt="Card side image">
+                                    </div>
                                     <div class="col">
                                         <div class="card-body">
-                                            <div class="card-title">
+                                            <h2 style="word-break: break-all">
                                                 <a th:href="@{/article/} + ${article.id}" th:text="${article.title}"></a>
-                                            </div>
-                                            <div>
+                                            </h2>
+                                            <div class="text-muted mb-1">
                                                 <span class="badge bg-primary" th:text="${article.category.name}">java</span>
                                             </div>
-                                            <div>
-                                                <span class="badge bg-light">nodejs</span>
-                                                <span class="badge bg-light">grpc</span>
+                                            <div class="text-muted mb-1" th:if="!${#lists.isEmpty(article.tags)}">
+                                                <span th:each="tag: ${article.tags}" class="badge bg-transparent text-muted" style="margin-right: 0.25rem" th:text="${tag.name}">nodejs</span>
                                             </div>
-                                            <div>i18n 删除不需要的属性面板 属性面板输入点击事件 设置属性面板输入框的值</div>
-                                            <div>
-                                                <a href="#" class="text-muted">
+                                            <div style="word-break: break-all" th:if="!${#strings.isEmpty(article.summary)}" >
+                                                <p th:utext="${article.summary}"></p>
+                                            </div>
+                                            <div class="text-muted">
+                                                <small>
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                                    <span th:text="${article.hits}"></span>
-                                                </a>
-                                                <a href="#" class="ms-3 text-muted">
+                                                    <span th:text="${article.hits}" class="mr-3"></span>
+
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
                                                     <span th:text="${article.comments}"></span>
-                                                </a>
+                                                </small>
                                             </div>
-                                            <div th:text="${article.postAt}">
-                                                2021-3-1 16:31:59
+                                            <div class="d-flex pt-3 mt-auto">
+                                                <small class="text-muted" th:text="${article.postAt}">2021-3-1 16:31:59</small>
                                             </div>
                                         </div>
                                     </div>
@@ -130,7 +110,7 @@
                             </div>
                         </div>
                     </div>
-                    <ul class="pagination justify-content-center mt-2">
+                    <ul class="pagination justify-content-center pt-5">
                         <li class="page-item"><a class="page-link" href="#">1</a></li>
                         <li class="page-item active"><a class="page-link" href="#">2</a></li>
                         <li class="page-item"><a class="page-link" href="#">3</a></li>
@@ -138,28 +118,27 @@
                         <li class="page-item"><a class="page-link" href="#">5</a></li>
                     </ul>
                 </div>
-                <div class="col-md-6 col-xl-4">
-                    <h3>2021-3-1</h3>
-                    <div class="card">
-                        <a href="#" class="d-block">
-                            <img src="https://preview.tabler.io/static/photos/1b73704b282a8ec6.jpg" class="card-img-top">
+                <div class="col-md-6 col-xl-4" th:if="${latestMoments != null}">
+                    <h3 th:text="${latestMoments.archiveDate}">2021-3-1</h3>
+                    <div class="card" th:each="moment: ${latestMoments.moments}" style="cursor: pointer" th:data-momentid="${moment.id}">
+                        <a th:if="!${#strings.isEmpty(moment.featureImage)}" href="#" class="d-block">
+                            <img alt="moment featureImage" th:src="${moment.featureImage}" src="https://preview.tabler.io/static/photos/1b73704b282a8ec6.jpg" class="card-img-top">
                         </a>
                         <div class="card-body">
-                            <div>第一个 grpc 程序</div>
-                            <div class="d-flex align-items-center">
-                                <div>
-                                    <div>10:23</div>
-<!--                                        <div class="text-muted">3 days ago</div>-->
+                            <div class="markdown" th:utext="${moment.content}"></div>
+                            <div class="d-flex align-items-center pt-5">
+                                <div class="text-muted">
+                                    <small th:text="${moment.createAt}">10:23</small>
                                 </div>
                                 <div class="ms-auto">
-                                    <a href="#" class="text-muted">
+                                    <span class="text-muted">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                        467
-                                    </a>
-                                    <a href="#" class="ms-3 text-muted">
+                                        <small th:text="${moment.hits}"></small>
+                                    </span>
+                                    <span class="ms-3 text-muted">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
-                                        67
-                                    </a>
+                                        <small th:text="${moment.comments}"></small>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -173,6 +152,14 @@
 <script src="/static/js/jquery.min.js"></script>
 <!-- Tabler Core -->
 <script src="/static/tabler/js/tabler.min.js"></script>
+<script>
+    let rootPath = '[[@{/}]]';
+    for(elem of document.querySelectorAll('[data-momentid]')) {
+        elem.addEventListener('click', function() {
+            window.location.href = rootPath + 'moment/'+this.dataset.momentid;
+        })
+    }
+</script>
 
 </body>
 </html>

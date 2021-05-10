@@ -6,6 +6,7 @@ import com.qwli7.blog.entity.MomentNav;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -80,5 +81,18 @@ public interface MomentService {
      * @param id id
      */
     void hits(int id);
+
+    /**
+     * 获取最近的动态
+     * @return MomentArchive
+     */
+    MomentArchive selectLatestMoments();
+
+    /**
+     * 根据 id 查找动态
+     * @param id id
+     * @return Moment
+     */
+    Moment selectById(int id);
 }
 

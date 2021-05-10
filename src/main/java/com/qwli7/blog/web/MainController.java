@@ -2,6 +2,8 @@ package com.qwli7.blog.web;
 
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Article;
+import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.exception.ResourceNotFoundException;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -39,6 +42,10 @@ public class MainController {
         }
         final PageDto<Article> articlePage = articleService.selectPage(queryParam);
         model.addAttribute("articlePage", articlePage);
+
+        MomentArchive momentArchive = momentService.selectLatestMoments();
+        model.addAttribute("latestMoments", momentArchive);
+
         return "index";
     }
 
@@ -60,8 +67,9 @@ public class MainController {
     }
 
     @GetMapping("moment/{id}")
-    public String moment(@PathVariable("id") int id) {
+    public String moment(@PathVariable("id") int id, Model model) {
+        model.addAttribute("moment", momentService.selectById(id));
 
-        return "id";
+        return "moment";
     }
 }
