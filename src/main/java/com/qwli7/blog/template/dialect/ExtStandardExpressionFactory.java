@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * @author qwli7
  * @date 2021/3/3 13:56
- * 功能：blog
+ * 功能：ExtStandardExpressionFactory
  **/
 public class ExtStandardExpressionFactory implements IExpressionObjectFactory {
     private static final String PAGE_EVALUATION_VARIABLE_NAME = "page";

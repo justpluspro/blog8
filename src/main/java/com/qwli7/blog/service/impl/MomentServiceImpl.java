@@ -269,7 +269,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Override
     public String getModuleName() {
-        return Moment.class.getName();
+        return Moment.class.getSimpleName().toLowerCase();
     }
 
     /**

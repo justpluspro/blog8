@@ -47,7 +47,7 @@
             <if test="parent != null">
                 #{parent.id,jdbcType=INTEGER},
             </if>
-        #{parentPath,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{conversationPath,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
         #{ip,jdbcType=VARCHAR},
         #{admin,jdbcType=BOOLEAN}, #{content,jdbcType=VARCHAR}, #{module.id,jdbcType=INTEGER},
         #{createAt}, #{modifyAt}, #{avatar,jdbcType=VARCHAR}, #{module.name,jdbcType=VARCHAR})

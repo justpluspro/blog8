@@ -8,7 +8,7 @@ import org.thymeleaf.expression.IExpressionObjectFactory;
 /**
  * @author qwli7
  * @date 2021/3/3 13:55
- * 功能：blog
+ * 功能：ExtStandardExpressionDialect
  **/
 public class ExtStandardExpressionDialect extends AbstractDialect implements IExpressionObjectDialect {
 

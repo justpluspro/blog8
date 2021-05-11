@@ -5,6 +5,19 @@
     <title>动态</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/github-markdown.css">
+    <style>
+        body {
+            font-size: 1rem;
+        }
+        .page-item.active .page-link {
+            z-index: 3;
+            font-weight: 700;
+            color: #000;
+            border-color: transparent;
+            background: transparent;
+        }
+    </style>
 </head>
 <body class="antialiased">
 <div class="page">
@@ -61,7 +74,72 @@
         <div class="container-xl">
             <div class="row justify-content-center">
                 <div class="col-12 mb-5">
-                   <div th:utext="${moment.content}"></div>
+                   <div class="markdown-body" th:utext="${moment.content}"></div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 mb-5">
+                    <ul class="nav nav-tabs mb-3" data-bs-toggle="tabs">
+                        <li class="nav-item">
+                            <a href="#tabs-home-ex2" class="nav-link active" data-bs-toggle="tab">评论</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#tabs-profile-ex2" class="nav-link" data-bs-toggle="tab">
+                                评论框</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active show" id="tabs-profile-ex2">
+                            <div class="mb-3">
+                                <label class="form-label">昵称<span class="font-weight-bold text-black-50">*</span></label>
+                                <input type="text" id="username" class="form-control" name="example-text-input" placeholder="Input placeholder">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">内容</label>
+                                <textarea id="content" class="form-control" name="example-textarea" placeholder="Textarea placeholder"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">邮箱</label>
+                                <input type="text" class="form-control" id="email"
+                                       name="example-password-input" placeholder="Input placeholder">
+                            </div>
+                            <div class="mb-3 justify-content-end">
+                                <button type="button" id="postCommentBtn" class="btn btn-primary">提交</button>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tabs-home-ex2">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <span class="avatar avatar-sm avatar-rounded" style="background-image: url(/static/avatars/guest.jpg)"></span>
+                                </div>
+                                <div class="col">
+                                    <div class="text-truncate">
+                                        <strong>Dunn Slane</strong>
+                                    </div>
+                                    <div>
+                                        很不错的文章，感谢
+                                    </div>
+                                    <div>
+                                        <a href="">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 18v-6a3 3 0 0 0 -3 -3h-10l4 -4m0 8l-4 -4" /></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-auto align-self-center">
+                                    <small class="text-muted">2021-05-11 23:36:06</small>
+                                </div>
+                            </div>
+
+                            <ul class="pagination justify-content-center pt-5">
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            </ul>
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -71,6 +149,7 @@
 <script type="text/javascript" src="/static/js/jquery.min.js"></script>
 <!-- Tabler Core -->
 <script type="text/javascript" src="/static/tabler/js/tabler.min.js"></script>
+<script type="text/javascript" src="/static/js/sweetalert2.min.js"></script>
 <script>
     let rootPath = '[[@{/}]]';
     let momentId = '[[${moment.id}]]'
@@ -81,6 +160,79 @@
             contentType: 'application/json'
         })
     })
+
+    function loadCommentPage() {
+
+        let page = 1;
+        let size = 10;
+
+        $.ajax({
+            url: rootPath + 'api/moment/' + id + '/comments?page=' + page + '&size=' + size,
+            dataType: 'json',
+            contentType: 'application/json;charset=utf8',
+            method: 'GET',
+            success: function(res) {
+                let html = '';
+                let data = res.data;
+                for(let i = 0; i < data.length; i++) {
+                    html += '<div class="row">';
+                    html +=    '<div class="col-auto">';
+                    html +=        '<span class="avatar avatar-sm avatar-rounded" style="background-image: url(/static/avatars/guest.jpg)"></span>';
+                    html +=    '</div>';
+                    html +=    '<div class="col">';
+                    html +=       '<div class="text-truncate">';
+                    html +=            '<strong>Dunn Slane</strong>';
+                    html +=       '</div>';
+                    html +=    '<div>';
+                    html +=           data[i].content
+                    html +=    '</div>';
+                    html +=    '<div>';
+                    html +=         '<a href="">';
+                    html +=                '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"> ' +
+                                            '<path stroke="none" d="M0 0h24v24H0z" fill="none"/> ' +
+                                            '<path d="M18 18v-6a3 3 0 0 0 -3 -3h-10l4 -4m0 8l-4 -4"/></svg>';
+                    html +=         '</a>';
+                    html +=    '</div>';
+                    html += '</div>';
+                    html +=    '<div class="col-auto align-self-center">';
+                    html +=       '<small class="text-muted">2021-05-11 23:36:06</small>';
+                    html +=   '</div>';
+                    html +=  '</div>';
+                }
+            }
+        })
+    }
+
+    document.getElementById('postCommentBtn').addEventListener('click', function() {
+        let name = document.getElementById('username').value;
+        let content = document.getElementById('content').value;
+        let email = document.getElementById('email').value;
+        let module = {
+            id: momentId
+        }
+        let data = {
+            name: name,
+            content: content,
+            email: email
+        }
+        let uri = rootPath + 'api/moment/' + momentId + '/comment';
+        $.ajax({
+            url: uri,
+            contentType: 'application/json;charset=utf8',
+            data: JSON.stringify(data),
+            method: 'POST',
+            dataType: 'json',
+            success: function(res) {
+                console.log(res);
+                Swal.fire({
+                    type: 'success',
+                    title: '发布成功',
+                    timer: 1500
+                })
+            }
+        })
+    })
+
 </script>
 
 </body>

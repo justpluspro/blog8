@@ -30,18 +30,6 @@ public class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
         this.setCacheControl(cacheControl);
     }
 
-
-    @Override
-    protected Resource getResource(HttpServletRequest request) throws IOException {
-        return super.getResource(request);
-    }
-
-    @Override
-    protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
-        return super.getMediaType(request, resource);
-    }
-
-
     @Override
     public void afterPropertiesSet() throws Exception {
         // handle LOG WARN Locations list is empty.

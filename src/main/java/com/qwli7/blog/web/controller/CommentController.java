@@ -40,12 +40,13 @@ public class CommentController {
      * @param id id
      * @return SavedComment
      */
-    @Authenticated
-    @GetMapping("{module}/{id}/comment")
+//    @Authenticated
+    @PostMapping("{module}/{id}/comment")
     public SavedComment save(@RequestBody Comment comment, @PathVariable("module") String module,
                              @PathVariable("id") int id) {
         final CommentModule commentModule = new CommentModule(id, module);
         comment.setModule(commentModule);
+        comment.setIp("127.0.2.1");
         return commentService.saveComment(comment);
     }
 
