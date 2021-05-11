@@ -24,11 +24,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -209,9 +211,21 @@ public class CommentServiceImpl implements CommentService {
             throw new LogicException("module.notExists", "模块[" + commentModule.getName() + "]不存在");
         }
         commentModuleHandlerOp.get().validateBeforeQuery(commentModule);
+        if(BlogContext.isAuthenticated()) {
 
+        }
 
-        return null;
+        long count = commentMapper.count(commentQueryParam);
+        if(count == 0) {
+            return new PageDto<>(commentQueryParam, 0, new ArrayList<>());
+        }
+        List<Comment> comments = commentMapper.selectPage(commentQueryParam);
+        if(CollectionUtils.isEmpty(comments)) {
+            return new PageDto<>(commentQueryParam, 0, new ArrayList<>());
+        }
+        final List<CommentDto> commentDtos = comments.stream().map(CommentDto::new).collect(Collectors.toList());
+
+        return new PageDto<>(commentQueryParam, ((int) count), commentDtos);
     }
 
     /**

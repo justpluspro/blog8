@@ -89,7 +89,7 @@
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane active show" id="tabs-profile-ex2">
+                        <div class="tab-pane" id="tabs-profile-ex2">
                             <div class="mb-3">
                                 <label class="form-label">昵称<span class="font-weight-bold text-black-50">*</span></label>
                                 <input type="text" id="username" class="form-control" name="example-text-input" placeholder="Input placeholder">
@@ -107,7 +107,7 @@
                                 <button type="button" id="postCommentBtn" class="btn btn-primary">提交</button>
                             </div>
                         </div>
-                        <div class="tab-pane" id="tabs-home-ex2">
+                        <div class="tab-pane active show" id="tabs-home-ex2">
                             <div class="row">
                                 <div class="col-auto">
                                     <span class="avatar avatar-sm avatar-rounded" style="background-image: url(/static/avatars/guest.jpg)"></span>
@@ -158,7 +158,8 @@
             url: rootPath + 'api/moment/' + momentId + '/hits',
             method: 'PATCH',
             contentType: 'application/json'
-        })
+        });
+        loadCommentPage();
     })
 
     function loadCommentPage() {
@@ -167,7 +168,7 @@
         let size = 10;
 
         $.ajax({
-            url: rootPath + 'api/moment/' + id + '/comments?page=' + page + '&size=' + size,
+            url: rootPath + 'api/moment/' + momentId + '/comments?page=' + page + '&size=' + size,
             dataType: 'json',
             contentType: 'application/json;charset=utf8',
             method: 'GET',
@@ -181,7 +182,7 @@
                     html +=    '</div>';
                     html +=    '<div class="col">';
                     html +=       '<div class="text-truncate">';
-                    html +=            '<strong>Dunn Slane</strong>';
+                    html +=            '<strong>' + data[i].name +'</strong>';
                     html +=       '</div>';
                     html +=    '<div>';
                     html +=           data[i].content
@@ -199,6 +200,7 @@
                     html +=   '</div>';
                     html +=  '</div>';
                 }
+                document.getElementById('tabs-home-ex2').innerHTML = html;
             }
         })
     }

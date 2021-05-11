@@ -18,6 +18,11 @@
             <result property="name" column="module_name" />
             <result property="id" column="module_id" />
         </association>
+        <association property="parent" javaType="com.qwli7.blog.entity.Comment">
+            <id property="id" column="parent_id" />
+            <result property="name" column="parent_name" />
+            <result property="content" column="parent_content" />
+        </association>
     </resultMap>
 
     <sql id="fullSql">
@@ -78,4 +83,39 @@
             </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
+
+    <select id="count" resultType="long" parameterType="CommentQueryParam">
+        select count(id) from blog_comment
+        <where>
+            <if test="commentModule != null">
+                and module_id = #{commentModule.id,jdbcType=INTEGER}
+                and module_name = #{commentModule.name,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectPage" parameterType="CommentQueryParam" resultMap="BaseResultMap">
+        select
+            bc1.id,
+            bc1.parent_id,
+            bc1.path,
+        bc1.nickname,
+        bc1.email, bc1.ip, bc1.admin,
+        bc1.content, bc1.module_id, bc1.create_at,
+        bc1.modify_at, bc1.website, bc1.avatar, bc1.module_name,
+        bc1.checking, bc2.id as parent_id, bc2.content as parent_conent, bc2.nickname as parent_name
+
+        from blog_comment bc1 left join blog_comment bc2 on bc1.parent_id = bc2.id
+        <where>
+            <if test="commentModule != null">
+                and bc1.module_id = #{commentModule.id,jdbcType=INTEGER}
+                and bc1.module_name = #{commentModule.name,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by bc1.create_at desc
+        <if test="!ignorePaging">
+            limit #{start}, #{offset}
+        </if>
+    </select>
 </mapper>

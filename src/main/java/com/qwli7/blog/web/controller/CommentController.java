@@ -40,7 +40,6 @@ public class CommentController {
      * @param id id
      * @return SavedComment
      */
-//    @Authenticated
     @PostMapping("{module}/{id}/comment")
     public SavedComment save(@RequestBody Comment comment, @PathVariable("module") String module,
                              @PathVariable("id") int id) {

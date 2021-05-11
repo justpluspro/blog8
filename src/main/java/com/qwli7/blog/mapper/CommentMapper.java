@@ -2,8 +2,10 @@ package com.qwli7.blog.mapper;
 
 import com.qwli7.blog.entity.Comment;
 import com.qwli7.blog.entity.CommentModule;
+import com.qwli7.blog.entity.vo.CommentQueryParam;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,4 +53,18 @@ public interface CommentMapper {
      * @param comment comment
      */
     void update(Comment comment);
+
+    /**
+     * 获取评论数量
+     * @param commentQueryParam commentQueryParam
+     * @return count
+     */
+    long count(CommentQueryParam commentQueryParam);
+
+    /**
+     * 分页获取评论
+     * @param commentQueryParam commentQueryParam
+     * @return List
+     */
+    List<Comment> selectPage(CommentQueryParam commentQueryParam);
 }
