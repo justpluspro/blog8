@@ -79,7 +79,7 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-12 mb-5">
-                    <ul class="nav nav-tabs mb-3" data-bs-toggle="tabs">
+                    <ul class="nav nav-tabs mb-3" id="commentTab" role="tablist">
                         <li class="nav-item">
                             <a href="#tabs-home-ex2" class="nav-link active" data-bs-toggle="tab">评论</a>
                         </li>
@@ -92,7 +92,7 @@
                         <div class="tab-pane" id="tabs-profile-ex2">
                             <div class="mb-3">
                                 <label class="form-label">昵称<span class="font-weight-bold text-black-50">*</span></label>
-                                <input type="text" id="username" class="form-control" name="example-text-input" placeholder="Input placeholder">
+                                <input type="text" id="username" class="form-control" name="username" placeholder="用户名">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">内容</label>
@@ -160,6 +160,10 @@
             contentType: 'application/json'
         });
         loadCommentPage();
+        $("#commentTab").on('click', function(event) {
+            event.preventDefault();
+            $(this).tab('show');
+        })
     })
 
     function loadCommentPage() {
@@ -188,7 +192,7 @@
                     html +=           data[i].content
                     html +=    '</div>';
                     html +=    '<div>';
-                    html +=         '<a href="">';
+                    html +=         '<a href="javascript:void(0);" data-reply="'+data[i].id+'">';
                     html +=                '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"> ' +
                                             '<path stroke="none" d="M0 0h24v24H0z" fill="none"/> ' +
                                             '<path d="M18 18v-6a3 3 0 0 0 -3 -3h-10l4 -4m0 8l-4 -4"/></svg>';
@@ -201,6 +205,15 @@
                     html +=  '</div>';
                 }
                 document.getElementById('tabs-home-ex2').innerHTML = html;
+
+                for(elem of document.querySelectorAll('a[data-reply]')) {
+                    elem.addEventListener('click', function() {
+                        let parentId = this.dataset.reply;
+                        console.log('显示' + parentId)
+                        $('#tabs-profile-ex2 a[href="#tabs-profile-ex2"]').tab('show');
+
+                    })
+                }
             }
         })
     }
@@ -234,6 +247,8 @@
             }
         })
     })
+
+
 
 </script>
 
