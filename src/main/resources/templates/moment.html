@@ -79,17 +79,19 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-12 mb-5">
-                    <ul class="nav nav-tabs mb-3" id="commentTab" role="tablist">
-                        <li class="nav-item">
-                            <a href="#tabs-home-ex2" class="nav-link active" data-bs-toggle="tab">评论</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#tabs-profile-ex2" class="nav-link" data-bs-toggle="tab">
-                                评论框</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane" id="tabs-profile-ex2">
+                    <div id="containerTabs">
+
+                    </div>
+<!--                    <ul class="nav nav-tabs mb-3" id="commentTab" role="tablist">-->
+<!--                        <li class="nav-item" role="tab">-->
+<!--                            <a href="javascript:void(0);" data-cid="home" class="nav-link active" data-bs-toggle="tab">评论</a>-->
+<!--                        </li>-->
+<!--                        <li class="nav-item" role="tab">-->
+<!--                            <a href="javascript:void(0);" data-cid="profile" class="nav-link" data-bs-toggle="tab">评论框</a>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+                    <div class="tab-content" >
+                        <div class="tab-pane" role="tabpanel" id="home">
                             <div class="mb-3">
                                 <label class="form-label">昵称<span class="font-weight-bold text-black-50">*</span></label>
                                 <input type="text" id="username" class="form-control" name="username" placeholder="用户名">
@@ -107,7 +109,7 @@
                                 <button type="button" id="postCommentBtn" class="btn btn-primary">提交</button>
                             </div>
                         </div>
-                        <div class="tab-pane active show" id="tabs-home-ex2">
+                        <div class="tab-pane active show" role="tabpanel" id="profile">
                             <div class="row">
                                 <div class="col-auto">
                                     <span class="avatar avatar-sm avatar-rounded" style="background-image: url(/static/avatars/guest.jpg)"></span>
@@ -121,7 +123,7 @@
                                     </div>
                                     <div>
                                         <a href="">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 18v-6a3 3 0 0 0 -3 -3h-10l4 -4m0 8l-4 -4" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 18v-6a3 3 0 0 0 -3 -3h-10l4 -4m0 8l-4 -4" /></svg>
                                         </a>
                                     </div>
                                 </div>
@@ -137,7 +139,6 @@
                                 <li class="page-item"><a class="page-link" href="#">4</a></li>
                                 <li class="page-item"><a class="page-link" href="#">5</a></li>
                             </ul>
-
                         </div>
                     </div>
                 </div>
@@ -150,10 +151,20 @@
 <!-- Tabler Core -->
 <script type="text/javascript" src="/static/tabler/js/tabler.min.js"></script>
 <script type="text/javascript" src="/static/js/sweetalert2.min.js"></script>
+<script type="text/javascript" src="/static/js/comment.js"></script>
 <script>
     let rootPath = '[[@{/}]]';
-    let momentId = '[[${moment.id}]]'
+    let momentId = '[[${moment.id}]]';
     $(document).ready(function() {
+        new Comment('moment', momentId, {
+            container: 'containerTabs',
+            auth: false
+        })
+        // new Comment('containerTabs', {
+        //     page: 1,
+        //     size: 10,
+        //     id: momentId
+        // });
         $.ajax({
             url: rootPath + 'api/moment/' + momentId + '/hits',
             method: 'PATCH',
@@ -161,61 +172,17 @@
         });
         loadCommentPage();
         $("#commentTab").on('click', function(event) {
+            console.log('点击了:' + JSON.stringify(event));
+            // console.log($(this).value);
             event.preventDefault();
             $(this).tab('show');
+            $('#commentTab a[href="#profile"]').tab('show');
         })
     })
 
     function loadCommentPage() {
 
-        let page = 1;
-        let size = 10;
 
-        $.ajax({
-            url: rootPath + 'api/moment/' + momentId + '/comments?page=' + page + '&size=' + size,
-            dataType: 'json',
-            contentType: 'application/json;charset=utf8',
-            method: 'GET',
-            success: function(res) {
-                let html = '';
-                let data = res.data;
-                for(let i = 0; i < data.length; i++) {
-                    html += '<div class="row">';
-                    html +=    '<div class="col-auto">';
-                    html +=        '<span class="avatar avatar-sm avatar-rounded" style="background-image: url(/static/avatars/guest.jpg)"></span>';
-                    html +=    '</div>';
-                    html +=    '<div class="col">';
-                    html +=       '<div class="text-truncate">';
-                    html +=            '<strong>' + data[i].name +'</strong>';
-                    html +=       '</div>';
-                    html +=    '<div>';
-                    html +=           data[i].content
-                    html +=    '</div>';
-                    html +=    '<div>';
-                    html +=         '<a href="javascript:void(0);" data-reply="'+data[i].id+'">';
-                    html +=                '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"> ' +
-                                            '<path stroke="none" d="M0 0h24v24H0z" fill="none"/> ' +
-                                            '<path d="M18 18v-6a3 3 0 0 0 -3 -3h-10l4 -4m0 8l-4 -4"/></svg>';
-                    html +=         '</a>';
-                    html +=    '</div>';
-                    html += '</div>';
-                    html +=    '<div class="col-auto align-self-center">';
-                    html +=       '<small class="text-muted">2021-05-11 23:36:06</small>';
-                    html +=   '</div>';
-                    html +=  '</div>';
-                }
-                document.getElementById('tabs-home-ex2').innerHTML = html;
-
-                for(elem of document.querySelectorAll('a[data-reply]')) {
-                    elem.addEventListener('click', function() {
-                        let parentId = this.dataset.reply;
-                        console.log('显示' + parentId)
-                        $('#tabs-profile-ex2 a[href="#tabs-profile-ex2"]').tab('show');
-
-                    })
-                }
-            }
-        })
     }
 
     document.getElementById('postCommentBtn').addEventListener('click', function() {
