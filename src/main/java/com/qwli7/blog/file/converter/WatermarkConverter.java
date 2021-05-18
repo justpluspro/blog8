@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -49,6 +50,11 @@ public class WatermarkConverter extends AbstractMediaConverter {
             }
             doProcess(commands, processBashPath);
         }
+    }
+
+    @Override
+    public LinkedList<String> buildCommands() {
+        return null;
     }
 
     /**

@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +52,11 @@ public class ExtractMetaConverter extends AbstractMediaConverter {
     @Override
     public void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs) {
 
+    }
+
+    @Override
+    public LinkedList<String> buildCommands() {
+        return null;
     }
 
 

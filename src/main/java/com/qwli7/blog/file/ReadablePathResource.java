@@ -2,6 +2,7 @@ package com.qwli7.blog.file;
 
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -11,8 +12,12 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
-public class ReadablePathResource implements Resource {
+public class ReadablePathResource implements FilePathResource {
+
+    private static final String WEBP = "webp";
+
 
     private final Path path;
 
@@ -68,5 +73,27 @@ public class ReadablePathResource implements Resource {
     @Override
     public InputStream getInputStream() throws IOException {
         return Files.newInputStream(path);
+    }
+
+    @Override
+    public MediaType getMediaType() {
+        final Path fileName = path.getFileName();
+        final String extension = StringUtils.getFilenameExtension(fileName.toString());
+        if(Arrays.asList("jpg", "jpeg").contains(extension)) {
+            return MediaType.IMAGE_JPEG;
+        }
+        if("png".equals(extension)) {
+            return MediaType.IMAGE_PNG;
+        }
+        if("webp".equals(extension)) {
+            return MediaType.valueOf("image/webp");
+        }
+        if("mp4".equals(extension)) {
+            return MediaType.valueOf("video/mp4");
+        }
+        if("gif".equals(extension)) {
+            return MediaType.IMAGE_GIF;
+        }
+        return MediaType.ALL;
     }
 }

@@ -48,7 +48,7 @@ public class FileController {
      * @param fileCreate fileCreate
      * @return ResponseEntity
      */
-    @PostMapping(value = "file/created")
+    @PostMapping(value = "file/create")
     public ResponseEntity<?> createFile(FileCreate fileCreate) {
         fileService.createFile(fileCreate);
         return ResponseEntity.noContent().build();

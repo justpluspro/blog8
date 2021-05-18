@@ -3,6 +3,7 @@ package com.qwli7.blog.file.converter;
 import com.qwli7.blog.file.vo.ControlArgs;
 
 import java.io.File;
+import java.util.LinkedList;
 
 /**
  * 图片转图片
@@ -18,5 +19,10 @@ public class Image2ImageConverter extends AbstractMediaConverter {
     @Override
     public void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs) {
 
+    }
+
+    @Override
+    public LinkedList<String> buildCommands() {
+        return null;
     }
 }

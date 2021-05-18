@@ -3,6 +3,7 @@ package com.qwli7.blog.file;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.resource.ResourceResolver;
 import org.springframework.web.servlet.resource.ResourceResolverChain;
 
@@ -32,7 +33,11 @@ public class FileResourceResolver implements ResourceResolver {
         if(request == null) {
             return null;
         }
-        return fileService.processFile(requestPath);
+        final String method = request.getMethod();
+        if(!HttpMethod.GET.name().equals(method) && !HttpMethod.OPTIONS.name().equals(method)) {
+            return null;
+        }
+        return fileService.processFile(requestPath).map(ReadablePathResource::new).orElse(null);
     }
 
     @Override

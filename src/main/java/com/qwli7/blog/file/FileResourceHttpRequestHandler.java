@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
@@ -28,6 +29,15 @@ public class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
         }
         CacheControl cacheControl = resourceProperties.getCache().getCachecontrol().toHttpCacheControl();
         this.setCacheControl(cacheControl);
+    }
+
+    @Override
+    protected MediaType getMediaType(HttpServletRequest request,
+                                     Resource resource) {
+        if(resource instanceof FilePathResource) {
+            return ((FilePathResource) resource).getMediaType();
+        }
+        return super.getMediaType(request, resource);
     }
 
     @Override

@@ -6,13 +6,14 @@ import java.io.File;
 import java.util.LinkedList;
 
 /**
- * 视频转 gif
- * 目标 gif
+ * 图像裁剪
+ * @author liqiwen
  */
-public class Video2GifConverter extends AbstractMediaConverter {
+public class ImageCropConverter extends AbstractMediaConverter {
 
-    public Video2GifConverter(String ffmpegPath) {
-        super(ffmpegPath, null);
+
+    public ImageCropConverter(String ffmpegPath, String graphicsMagickPath) {
+        super(ffmpegPath, graphicsMagickPath);
     }
 
     @Override

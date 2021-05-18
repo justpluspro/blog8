@@ -3,6 +3,7 @@ package com.qwli7.blog.file.converter;
 import com.qwli7.blog.file.vo.ControlArgs;
 
 import java.io.File;
+import java.util.LinkedList;
 
 /**
  * 视频转音频
@@ -19,5 +20,10 @@ public class Video2AudioConverter extends AbstractMediaConverter {
     @Override
     public void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs) {
 
+    }
+
+    @Override
+    public LinkedList<String> buildCommands() {
+        return null;
     }
 }

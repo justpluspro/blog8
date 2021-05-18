@@ -205,6 +205,9 @@ public abstract class AbstractMediaConverter {
     public abstract void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs);
 
 
+    public abstract LinkedList<String> buildCommands();
+
+
     /**
      * 关闭进程的线程
      */
