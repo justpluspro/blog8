@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -234,7 +235,11 @@ public class FileService implements InitializingBean {
 //    }
 
 
-    public Resource processFile(String requestPath) {
+    public Optional<Resource> processFile(String requestPath) {
+
+        ResizeResolver resizeResolver = new ResizeResolver(requestPath);
+
+
         return null;
     }
 
