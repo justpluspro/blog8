@@ -39,4 +39,8 @@ public class Resize {
     public void setQuality(Integer quality) {
         this.quality = quality;
     }
+
+    public boolean isValid() {
+        return true;
+    }
 }

@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -236,11 +237,70 @@ public class FileService implements InitializingBean {
 
 
     public Optional<Resource> processFile(String requestPath) {
+        if(StringUtils.isEmpty(requestPath)) {
+            return Optional.empty();
+        }
+
 
         ResizeResolver resizeResolver = new ResizeResolver(requestPath);
+        final String sourcePath = resizeResolver.getSourcePath();
+        Optional<Path> targetFile = searchFile(sourcePath);
+        if(!targetFile.isPresent()) {
+            return Optional.empty();
+        }
+        final Path file = targetFile.get();
 
+        final String ext = StringUtils.getFilenameExtension(sourcePath);
+
+        final Resize resize = resizeResolver.getResize();
+        if (resize == null || resize.isValid()) {
+            if(isProcessableImage(ext)) {
+                return Optional.empty();
+            }
+        } else {
+
+            return getThumbnailFile(resize, file);
+        }
+        if(isProcessableVideo(ext)) {
+            return Optional.empty();
+        }
+        return Optional.of(new ReadablePathResource(file));
+    }
+
+    private boolean isProcessableVideo(String ext) {
+        return false;
+    }
+
+    private boolean isProcessableImage(String ext) {
+        return false;
+    }
+
+    private Optional<Resource> getThumbnailFile(Resize resize, Path file) {
+        if(resize.isValid()) {
+            return Optional.empty();
+        }
+
+        LinkedList<String> commands = new LinkedList<>();
+        commands.add(file.toFile().getAbsolutePath());
+        commands.add("-quality");
+        commands.add("90%");
+        commands.add("-resize");
+        if(resize.getWidth() != null) {
+            commands.add(resize.getWidth() + "");
+        }
+        if(resize.getHeight() != null) {
+            commands.add("x" + resize.getHeight());
+        }
 
         return null;
+    }
+
+    private Optional<Path> searchFile(String sourcePath) {
+        final Path file = Paths.get(rootPath.toString(), sourcePath);
+        if(file.toFile().isDirectory() || !file.toFile().exists()) {
+            return Optional.empty();
+        }
+        return Optional.of(file);
     }
 
 

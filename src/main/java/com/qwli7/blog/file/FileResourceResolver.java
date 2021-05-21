@@ -29,7 +29,7 @@ public class FileResourceResolver implements ResourceResolver {
     @Override
     public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations,
                                     ResourceResolverChain chain) {
-        logger.info("获取的文件 requestPath:[{}]", requestPath);
+        logger.info("method<resolveResource> requestPath:[{}]", requestPath);
         if(request == null) {
             return null;
         }
@@ -37,7 +37,7 @@ public class FileResourceResolver implements ResourceResolver {
         if(!HttpMethod.GET.name().equals(method) && !HttpMethod.OPTIONS.name().equals(method)) {
             return null;
         }
-        return fileService.processFile(requestPath).map(ReadablePathResource::new).orElse(null);
+        return fileService.processFile(requestPath).orElse(null);
     }
 
     @Override

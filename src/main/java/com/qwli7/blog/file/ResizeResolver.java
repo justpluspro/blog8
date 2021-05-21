@@ -24,8 +24,17 @@ public class ResizeResolver {
         this.sourcePath = getResourcePathFromResize();
     }
 
+    public Resize getResize() {
+        return resize;
+    }
+
     private String getResourcePathFromResize() {
         return null;
+    }
+
+
+    public String getSourcePath() {
+        return sourcePath;
     }
 
 
