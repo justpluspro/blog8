@@ -241,18 +241,35 @@ public class FileService implements InitializingBean {
             return Optional.empty();
         }
 
+        // requestPath  video/test.mp4  video/test.mp4/900
 
         ResizeResolver resizeResolver = new ResizeResolver(requestPath);
         final String sourcePath = resizeResolver.getSourcePath();
+
+        // 判断是否有缩放属性
+        final Resize resize = resizeResolver.getResize();
+        // 判断源文件是否存在
         Optional<Path> targetFile = searchFile(sourcePath);
         if(!targetFile.isPresent()) {
             return Optional.empty();
         }
+
+        // 如果没有缩放属性
+        if(resize == null) {
+            // 直接返回源文件
+            return Optional.of(new ReadablePathResource(targetFile.get()));
+        }
+
+        // 如果缩放属性无效
+        if(resize.invalid()) {
+            return Optional.empty();
+        }
+
+        // 解析缩放属性，判断缩略图中是否含有该缩略图
         final Path file = targetFile.get();
 
         final String ext = StringUtils.getFilenameExtension(sourcePath);
 
-        final Resize resize = resizeResolver.getResize();
         if (resize == null || resize.isValid()) {
             if(isProcessableImage(ext)) {
                 return Optional.empty();
