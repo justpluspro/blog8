@@ -261,9 +261,9 @@ public class FileService implements InitializingBean {
         }
 
         // 如果缩放属性无效
-        if(resize.invalid()) {
-            return Optional.empty();
-        }
+//        if(resize.invalid()) {
+//            return Optional.empty();
+//        }
 
         // 解析缩放属性，判断缩略图中是否含有该缩略图
         final Path file = targetFile.get();
