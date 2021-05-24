@@ -66,8 +66,8 @@ public class MainController {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }
-//        final PageDto<MomentArchive> archivePageDto = momentService.selectArchivePage(queryParam);
-//        model.addAttribute("archivePageDto", archivePageDto);
+        final PageDto<MomentArchive> archivePageDto = momentService.selectArchivePage(queryParam);
+        model.addAttribute("archivePageDto", archivePageDto);
         return "moments";
     }
 

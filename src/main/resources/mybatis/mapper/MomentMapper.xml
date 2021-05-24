@@ -86,14 +86,13 @@
     </select>
 
     <select id="countArchive" resultType="int" parameterType="MomentQueryParam">
-        select count(1)
-        from blog_moment
-        <where>
-            <if test="query != null and query !=''">
-                content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+        SELECT count(1) FROM (
+            SELECT DATE_FORMAT(create_at, '%Y-%m-%d') as date FROM blog_moment bm
+            <if test="query != null and query != ''">
+                bm.content LIKE concat('%', ${query,jdbcType=VARCHAR}, '%')
             </if>
-        </where>
-        group by date_format(create_at, '%Y-%m-%d') as archiveDate order by archiveDate desc
+            GROUP BY date)
+        AS bmd
     </select>
 
 

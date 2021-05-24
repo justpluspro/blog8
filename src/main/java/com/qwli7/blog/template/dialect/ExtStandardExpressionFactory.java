@@ -22,7 +22,7 @@ public class ExtStandardExpressionFactory implements IExpressionObjectFactory {
     private static final String PAGE_EVALUATION_VARIABLE_NAME = "page";
     private static final String DATE_EVALUATION_VARIABLE_NAME = "datetime";
     private static final String M2H_EVALUATION_VARIABLE_NAME = "m2h";
-    private static final String JSOUP_EVALUATION_VARIABLE_NAME = "joups";
+    private static final String JSOUP_EVALUATION_VARIABLE_NAME = "jsoups";
     private static final Set<String> ALL_EXPRESSION_OBJECT_NAMES = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(PAGE_EVALUATION_VARIABLE_NAME,
                     DATE_EVALUATION_VARIABLE_NAME,

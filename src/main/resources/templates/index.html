@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>李启文的博客</title>
+    <title>首页</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="/static/tabler/css/tabler.min.css"/>
     <link rel="stylesheet" href="/static/css/github-markdown.css">
@@ -103,7 +103,7 @@
                                                 </small>
                                             </div>
                                             <div class="d-flex pt-3 mt-auto">
-                                                <small class="text-muted" th:text="${article.postAt}">2021-3-1 16:31:59</small>
+                                                <small class="text-muted" th:text="${#datetime.format(article.postAt, 'yyyy-MM-dd HH:mm')}">2021-3-1 16:31:59</small>
                                             </div>
                                         </div>
                                     </div>
@@ -120,16 +120,16 @@
                     </ul>
                 </div>
                 <div class="col-md-6 col-xl-4" th:if="${latestMoments != null}">
-                    <h3 th:text="${latestMoments.archiveDate}">2021-3-1</h3>
+                    <h3 th:text="${#datetime.format(latestMoments.archiveDate, 'yyyy-MM-dd')}">2021-3-1</h3>
                     <div class="card" th:each="moment: ${latestMoments.moments}" style="cursor: pointer" th:data-momentid="${moment.id}">
                         <a th:if="!${#strings.isEmpty(moment.featureImage)}" href="#" class="d-block">
-                            <img alt="moment featureImage" th:src="${moment.featureImage}" src="https://preview.tabler.io/static/photos/1b73704b282a8ec6.jpg" class="card-img-top">
+                            <img alt="moment featureImage" th:src="${moment.featureImage}" src="" class="card-img-top">
                         </a>
                         <div class="card-body">
-                            <div class="markdown-body" th:utext="${moment.content}"></div>
+                            <div class="markdown-body" th:text="${#jsoups.parse(moment.content, 20)}"></div>
                             <div class="d-flex align-items-center pt-5">
                                 <div class="text-muted">
-                                    <small th:text="${moment.createAt}">10:23</small>
+                                    <small th:text="${#datetime.format(moment.createAt, 'HH:mm')}">10:23</small>
                                 </div>
                                 <div class="ms-auto">
                                     <span class="text-muted">
@@ -174,7 +174,7 @@
     for(elem of document.querySelectorAll('[data-momentid]')) {
         elem.addEventListener('click', function() {
             window.location.href = rootPath + 'moment/'+this.dataset.momentid;
-        })
+        });
     }
 </script>
 

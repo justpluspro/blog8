@@ -16,7 +16,6 @@ public class MomentArchive implements Serializable {
     /**
      * 归档日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate archiveDate;
 
     /**

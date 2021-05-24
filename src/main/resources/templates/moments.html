@@ -73,38 +73,35 @@
         </div>
     </header>
     <div class="content">
-        <div class="container-xl">
+        <div class="container">
             <div class="row">
                 <div class="col-md-12 col-xl-8">
                     <ul class="list list-timeline">
-                        <li>
-                            <div class="list-timeline-icon bg-twitter"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
-                                <!-- SVG icon code -->
-                            </div>
-                            <div class="list-timeline-content">
+                        <li th:each="archivePage: ${archivePageDto.data}">
+                            <div class="list-timeline-content my-3">
                                 <div class="list-timeline-time">10 hrs ago</div>
-                                <p class="list-timeline-title">2021-05-11</p>
-                                <div class="card">
+                                <p class="list-timeline-title" th:text="${#datetime.format(archivePage.archiveDate, 'yyyy-MM-dd')}">2021-05-11</p>
+                                <div class="card mb-3" style="cursor: pointer;" th:data-momentid="${moment.id}" th:each="moment: ${archivePage.moments}">
                                     <div class="row row-0">
-<!--                                        <div class="col-3" th:if="!${#strings.isEmpty(article.featureImage)}">-->
-<!--                                            <img th:src="${article.featureImage}" class="w-100 h-100 rounded-start object-cover" alt="Card side image">-->
-<!--                                        </div>-->
+                                        <div class="col-3" th:if="!${#strings.isEmpty(moment.featureImage)}">
+                                            <img src="" th:src="${moment.featureImage}" class="w-100 h-100 rounded-start object-cover" alt="Card side image">
+                                        </div>
                                         <div class="col">
                                             <div class="card-body">
-                                                <div class="markdown" style="word-break: break-all">flutter form builder beta2 增加 StatelessField 增加...</div>
+                                                <div class="markdown" style="word-break: break-all" th:text="${#jsoups.parse(moment.content, 20)}"></div>
                                                 <div class="d-flex align-items-center pt-5">
                                                     <div class="text-muted">
-                                                        <small>10:23</small>
+                                                        <small th:text="${#datetime.format(moment.createAt, 'HH:mm')}">10:23</small>
                                                     </div>
                                                     <div class="ms-auto">
-                                    <span class="text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                        <small th:text="10"></small>
-                                    </span>
+                                                        <span class="text-muted">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
+                                                            <small th:text="${moment.hits}"></small>
+                                                        </span>
                                                         <span class="ms-3 text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
-                                        <small th:text="20"></small>
-                                    </span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
+                                                            <small th:text="${moment.comments}"></small>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -113,122 +110,13 @@
                                 </div>
                             </div>
                         </li>
-                        <li>
-                            <div class="list-timeline-icon bg-twitter"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
-                                <!-- SVG icon code -->
-                            </div>
-                            <div class="list-timeline-content">
-                                <div class="list-timeline-time">10 hrs ago</div>
-                                <p class="list-timeline-title">2021-05-11</p>
-                                <div class="card">
-                                    <div class="row row-0">
-                                        <!--                                        <div class="col-3" th:if="!${#strings.isEmpty(article.featureImage)}">-->
-                                        <!--                                            <img th:src="${article.featureImage}" class="w-100 h-100 rounded-start object-cover" alt="Card side image">-->
-                                        <!--                                        </div>-->
-                                        <div class="col">
-                                            <div class="card-body">
-                                                <div class="markdown" style="word-break: break-all">flutter form builder beta2 增加 StatelessField 增加...</div>
-                                                <div class="d-flex align-items-center pt-5">
-                                                    <div class="text-muted">
-                                                        <small>10:23</small>
-                                                    </div>
-                                                    <div class="ms-auto">
-                                    <span class="text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                        <small th:text="10"></small>
-                                    </span>
-                                                        <span class="ms-3 text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
-                                        <small th:text="20"></small>
-                                    </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="list-timeline-icon bg-twitter"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
-                                <!-- SVG icon code -->
-                            </div>
-                            <div class="list-timeline-content">
-                                <div class="list-timeline-time">10 hrs ago</div>
-                                <p class="list-timeline-title">2021-05-11</p>
-                                <div class="card">
-                                    <div class="row row-0">
-                                        <!--                                        <div class="col-3" th:if="!${#strings.isEmpty(article.featureImage)}">-->
-                                        <!--                                            <img th:src="${article.featureImage}" class="w-100 h-100 rounded-start object-cover" alt="Card side image">-->
-                                        <!--                                        </div>-->
-                                        <div class="col">
-                                            <div class="card-body">
-                                                <div class="markdown" style="word-break: break-all">flutter form builder beta2 增加 StatelessField 增加...</div>
-                                                <div class="d-flex align-items-center pt-5">
-                                                    <div class="text-muted">
-                                                        <small>10:23</small>
-                                                    </div>
-                                                    <div class="ms-auto">
-                                    <span class="text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                        <small th:text="10"></small>
-                                    </span>
-                                                        <span class="ms-3 text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
-                                        <small th:text="20"></small>
-                                    </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="list-timeline-icon bg-twitter"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
-                                <!-- SVG icon code -->
-                            </div>
-                            <div class="list-timeline-content">
-                                <div class="list-timeline-time">10 hrs ago</div>
-                                <p class="list-timeline-title">2021-05-11</p>
-                                <div class="card">
-                                    <div class="row row-0">
-                                        <!--                                        <div class="col-3" th:if="!${#strings.isEmpty(article.featureImage)}">-->
-                                        <!--                                            <img th:src="${article.featureImage}" class="w-100 h-100 rounded-start object-cover" alt="Card side image">-->
-                                        <!--                                        </div>-->
-                                        <div class="col">
-                                            <div class="card-body">
-                                                <div class="markdown" style="word-break: break-all">flutter form builder beta2 增加 StatelessField 增加...</div>
-                                                <div class="d-flex align-items-center pt-5">
-                                                    <div class="text-muted">
-                                                        <small>10:23</small>
-                                                    </div>
-                                                    <div class="ms-auto">
-                                    <span class="text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                        <small th:text="10"></small>
-                                    </span>
-                                                        <span class="ms-3 text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
-                                        <small th:text="20"></small>
-                                    </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-
                     </ul>
 
-<!--                    <ul class="pagination justify-content-center mt-2">-->
-<!--                        <li class="page-item" th:each="page: ${#page.startPage(moments, 5)}">-->
-<!--                            <a class="page-link" href="#" th:text="${page}">1</a>-->
-<!--                        </li>-->
-<!--                    </ul>-->
+                    <ul class="pagination justify-content-center mt-2">
+                        <li class="page-item">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -238,6 +126,14 @@
 <script src="/static/js/jquery.min.js"></script>
 <!-- Tabler Core -->
 <script src="/static/tabler/js/tabler.min.js"></script>
+<script>
+    let rootPath = '[[@{/}]]';
+    for(elem of document.querySelectorAll('[data-momentid]')) {
+        elem.addEventListener('click', function() {
+            window.location.href = rootPath + 'moment/'+this.dataset.momentid;
+        });
+    }
+</script>
 
 </body>
 </html>
