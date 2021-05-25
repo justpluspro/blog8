@@ -61,9 +61,31 @@
         <div class="content">
             <div class="container-xl">
                 <div class="row justify-content-center">
-                    <div class="col-12 mb-5">
+                    <div class="col-12">
                         <h2 style="font-size: 1.75rem;" th:text="${article.title}">Android 利用IPP协议静默打印</h2>
                         <div class="markdown-body" th:utext="${article.content}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" th:if="${articleNav != null}">
+                    <div class="col-lg-6 col-sm-6 my-2" th:if="${articleNav.prevArticle != null}">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div>
+                                    <a th:href="@{/article/} + ${articleNav.prevArticle.id}" class="text-truncate">上一篇</a>
+                                </div>
+                                <small th:text="${articleNav.prevArticle.title}" class="d-block item-except text-sm text-muted h-1">这是上一篇文章</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-sm-6 my-2" th:if="${articleNav.nextArticle != null}">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div>
+                                    <a th:href="@{/article/} + ${articleNav.nextArticle.id}" class="text-truncate">下一篇</a>
+                                </div>
+                                <small th:text="${articleNav.nextArticle.title}"  class="d-block item-except text-sm text-muted h-1">这是下一篇文章</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,24 +93,14 @@
         </div>
     </div>
 
-    <footer class="footer footer-transparent d-print-none">
+    <footer class="footer footer-transparent d-print-none border-top bg-white">
         <div class="container">
-            <div class="row text-center align-items-center flex-row-reverse">
-                <div class="col-lg-auto ms-lg-auto">
-                    <ul class="list-inline list-inline-dots mb-0">
-                        <li class="list-inline-item"><a href="./license.html" class="link-secondary">10.23ms</a></li>
-                        <li class="list-inline-item"><a href="https://github.com/tabler/tabler" target="_blank" class="link-secondary" rel="noopener">Source code</a></li>
-                    </ul>
-                </div>
-                <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+            <div class="row">
+                <div class="col-12 mt-3 mt-lg-0">
                     <ul class="list-inline list-inline-dots mb-0">
                         <li class="list-inline-item">
-                            Copyright &copy; 2021
-                            <a href="." class="link-secondary">qwli7</a>.
-                            All rights reserved.
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="./changelog.html" class="link-secondary" rel="noopener">v1.0.0-beta</a>
+                            Copyright &copy; [[${#datetime.now()}]] liqiwen.com
+                            <a href="." class="link-secondary">苏ICP备15040862号-1</a>.
                         </li>
                     </ul>
                 </div>

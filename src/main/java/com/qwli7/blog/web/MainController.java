@@ -2,6 +2,7 @@ package com.qwli7.blog.web;
 
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.Article;
+import com.qwli7.blog.entity.ArticleNav;
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.dto.PageDto;
@@ -58,6 +59,9 @@ public class MainController {
             throw new ResourceNotFoundException("article.notFound", "内容不存在");
         }
         model.addAttribute("article", articleOp.get());
+
+        final Optional<ArticleNav> articleNav = articleService.selectArticleNav(articleOp.get().getId());
+        articleNav.ifPresent(nav -> model.addAttribute("articleNav", nav));
         return "article";
     }
 

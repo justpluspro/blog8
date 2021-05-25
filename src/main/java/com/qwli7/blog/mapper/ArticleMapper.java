@@ -98,4 +98,18 @@ public interface ArticleMapper {
      * @return long
      */
     long countByCategory(Category category);
+
+    /**
+     * 获取上一篇文章
+     * @param id id
+     * @return Article
+     */
+    Optional<Article> selectPreArticle(int id);
+
+    /**
+     * 获取下一篇文章
+     * @param id id
+     * @return Article
+     */
+    Optional<Article> selectNextArticle(int id);
 }

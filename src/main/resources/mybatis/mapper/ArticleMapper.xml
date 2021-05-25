@@ -204,4 +204,17 @@
     <select id="countByCategory" resultType="long">
         select count(id) from blog_article where category_id = #{id,jdbcType=INTEGER}
     </select>
+
+    <select id="selectPreArticle" resultType="com.qwli7.blog.entity.Article">
+        SELECT id, title, alias FROM blog_article
+        WHERE id <![CDATA[ < ]]> #{id}
+        ORDER BY id DESC LIMIT 1
+    </select>
+
+    <select id="selectNextArticle" resultType="com.qwli7.blog.entity.Article">
+        SELECT id, title, alias
+        FROM blog_article
+        WHERE id <![CDATA[ > ]]>  #{id}
+        ORDER BY id ASC LIMIT 1
+    </select>
 </mapper>

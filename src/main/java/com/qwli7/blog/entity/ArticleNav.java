@@ -19,6 +19,10 @@ public class ArticleNav implements Serializable {
      */
     private Article nextArticle;
 
+    public ArticleNav() {
+        super();
+    }
+
     public ArticleNav(Article prevArticle, Article nextArticle) {
         this.nextArticle = nextArticle;
         this.prevArticle = prevArticle;

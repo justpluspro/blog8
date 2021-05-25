@@ -5,3 +5,8 @@
     background-color: transparent;
     border-color: transparent;
 }
+
+
+html, body {
+    font-size: 1rem !important;
+}

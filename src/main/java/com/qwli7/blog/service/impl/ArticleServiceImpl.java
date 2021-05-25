@@ -349,17 +349,22 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     @Transactional(readOnly = true)
     @Override
     public Optional<ArticleNav> selectArticleNav(int id) {
-        return Optional.empty();
+        Optional<Article> preArticleOp = articleMapper.selectPreArticle(id);
+        Optional<Article> nextArticleOp = articleMapper.selectNextArticle(id);
+        ArticleNav articleNav = new ArticleNav();
+        preArticleOp.ifPresent(articleNav::setPrevArticle);
+        nextArticleOp.ifPresent(articleNav::setNextArticle);
+        return Optional.of(articleNav);
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void hits(int id) {
         final Article article = articleMapper.selectById(id).orElseThrow(()
                 -> new ResourceNotFoundException("article.notExists", "文章不存在"));
         // 登录情况下不统计点击量
-        if(!BlogContext.isAuthenticated()) {
+        if(BlogContext.isAuthenticated()) {
             return;
         }
         articleMapper.addHits(id, article.getHits() + 1);
