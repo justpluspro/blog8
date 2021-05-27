@@ -5,7 +5,9 @@
     <title th:text="${article.title}"></title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/github-markdown.css">
+    <link rel="stylesheet" href="/static/css/prism.css">
 </head>
 <body class="antialiased">
     <div class="page">
@@ -63,8 +65,7 @@
                 <div class="row justify-content-center">
                     <div class="col-12">
                         <h2 style="font-size: 1.75rem;" th:text="${article.title}">Android 利用IPP协议静默打印</h2>
-                        <div class="markdown-body" th:utext="${article.content}">
-                        </div>
+                        <div class="markdown-body" th:utext="${article.content}"></div>
                     </div>
                 </div>
                 <div class="row" th:if="${articleNav != null}">
@@ -98,8 +99,8 @@
             <div class="row">
                 <div class="col-12 mt-3 mt-lg-0">
                     <ul class="list-inline list-inline-dots mb-0">
-                        <li class="list-inline-item">
-                            Copyright &copy; [[${#datetime.now()}]] liqiwen.com
+                        <li class="list-inline-item small">
+                            Copyright &copy; [[${#datetime.nowYear()}]] liqiwen.com
                             <a href="." class="link-secondary">苏ICP备15040862号-1</a>.
                         </li>
                     </ul>
@@ -113,6 +114,7 @@
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
     <!-- Tabler Core -->
     <script type="text/javascript" src="/static/tabler/js/tabler.min.js"></script>
+    <script type="text/javascript" src="/static/js/prism.js"></script>
     <script>
         let rootPath = '[[@{/}]]';
         let articleId = '[[${article.id}]]'

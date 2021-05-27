@@ -6,6 +6,33 @@
     border-color: transparent;
 }
 
+.page-link {
+    padding: .25rem 0.85rem;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #000000;
+}
+
+.title {
+    font-size: 1.25rem;
+    color: #000000;
+    font-weight: 500;
+}
+.title a {
+    color: #000000;
+}
+
+.summary p{
+    font-size: 0.875rem;
+}
+
+
 
 html, body {
     font-size: 1rem !important;

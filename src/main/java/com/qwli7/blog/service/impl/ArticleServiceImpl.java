@@ -253,6 +253,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
                 }
             } catch (IOException | ParseException ex){
                 ex.printStackTrace();
+                return new PageDto<>(queryParam, 0, new ArrayList<>());
             }
         }
 
@@ -367,7 +368,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         if(BlogContext.isAuthenticated()) {
             return;
         }
-        articleMapper.addHits(id, article.getHits() + 1);
+        articleMapper.updateHits(id, article.getHits() + 1);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

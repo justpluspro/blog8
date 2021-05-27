@@ -1,6 +1,8 @@
 package com.qwli7.blog.template.helper;
 
 import com.qwli7.blog.entity.dto.PageDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +14,10 @@ import java.util.List;
  **/
 public class Pages {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     public List<Integer> startPage(PageDto<?> pageDto, Integer fixedCount) {
+        logger.info("method<startPage> pageDto currentPage:[{}], totalPage:[{}]", pageDto.getPage(), pageDto.getTotalPage());
         Integer totalPage = pageDto.getTotalPage();
         Integer currentPage = pageDto.getPage();
         List<Integer> pages = new ArrayList<>();
@@ -27,16 +31,16 @@ public class Pages {
             //fixedCount  = 6 当前页往前减 3，当前页往后加 2
             //fixedCount = 5 当前页往前减 2，当前页往后加 2
             //固定数目为偶数
-            if(fixedCount%2 == 0) {
-                start = currentPage - fixedCount/2;
-                end = currentPage + (fixedCount/2) - 1;
+            if(fixedCount % 2 == 0) {
+                start = currentPage - fixedCount / 2;
+                end = currentPage + (fixedCount / 2) - 1;
             } else { //固定数目为奇数
-                start = currentPage - (fixedCount/2);
-                end = currentPage + (fixedCount/2);
+                start = currentPage - (fixedCount / 2);
+                end = currentPage + (fixedCount / 2);
             }
             if (start < 1) {
                 start = 1;
-                end = start + fixedCount-1;
+                end = start + fixedCount - 1;
                 if(end > totalPage) {
                     end = totalPage;
                 }
@@ -45,15 +49,16 @@ public class Pages {
             //不足就前后补
             if (end > totalPage) {
                 end = totalPage;
-                start = end - (fixedCount-1);
+                start = end - ( fixedCount - 1 );
                 if(start < 1) {
                     start = 1;
                 }
             }
         }
-        for(int i = start; i <=end ; i++) {
+        for(int i = start; i <= end; i++) {
             pages.add(i);
         }
+        logger.info("method<startPage> pages: [{}]", pages);
         return pages;
     }
 }

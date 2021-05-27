@@ -25,6 +25,12 @@ public class Dates {
         return LocalDate.now();
     }
 
+    public String nowYear() {
+        final String format = format(now(), "yyyy-MM-dd");
+        return format.substring(0, format.indexOf("-"));
+    }
+
+
 
     public long millis() {
         return System.currentTimeMillis();
