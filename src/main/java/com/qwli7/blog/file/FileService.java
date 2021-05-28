@@ -2,11 +2,15 @@ package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.file.vo.VideoCutParams;
+import com.qwli7.blog.util.SystemType;
+import com.qwli7.blog.util.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -23,6 +27,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -41,35 +47,40 @@ public class FileService implements InitializingBean {
     /**
      * 文件存放根路径
      */
-    private final Path rootPath;
+    private final Path uploadRootPath = Paths.get(System.getProperty("user.home"), "upload");
 
     /**
      * 缩略图存放路径
      */
-    private final Path thumbPath;
+    private final Path uploadThumbPath = Paths.get(System.getProperty("user.home"), "upload", "thumb");
 
     /**
      * 读写锁
      */
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
+
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+
     /**
      * 文件属性
      */
     private final FileProperties fileProperties;
 
-    public FileService(FileProperties fileProperties) throws IOException {
+    public FileService(FileProperties fileProperties) {
         this.fileProperties = fileProperties;
 
-        this.rootPath = Paths.get(System.getProperty("user.dir") ,fileProperties.getUploadPath(), "/");
-        this.thumbPath = Paths.get(System.getProperty("user.dir"), fileProperties.getUploadThumbPath(), "/");
-        logger.info("rootPath:[{}]", rootPath);
-        logger.info("thumbPath:[{}]", thumbPath);
-        if(!rootPath.toFile().exists() && rootPath.toFile().isDirectory()) {
-            Files.createDirectories(rootPath);
-        }
-        if(!thumbPath.toFile().exists() && thumbPath.toFile().isDirectory()) {
-            Files.createDirectories(thumbPath);
+        logger.info("method<FileService> uploadRootPath:[{}]", uploadRootPath);
+        logger.info("method<FileService> uploadThumbPath:[{}]", uploadThumbPath);
+        try {
+            if (!uploadRootPath.toFile().exists()) {
+                Files.createDirectories(uploadRootPath);
+            }
+            if (!uploadThumbPath.toFile().exists()) {
+                Files.createDirectories(uploadThumbPath);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("本地文件服务已经开启，创建上传目录失败", ex);
         }
     }
 
@@ -90,20 +101,20 @@ public class FileService implements InitializingBean {
     /**
      * 上传文件
      * @param dirPath dirPath
-     * @param file file
+     * @param files files
      * @return FileInfoDetail
      */
-    public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
+    public FileInfoDetail uploadFile(String dirPath, List<MultipartFile> files) {
         readWriteLock.writeLock().lock();
         try {
             Path path;
             if(StringUtils.isEmpty(dirPath) || StringUtils.pathEquals(dirPath, FileUtil.pathSeparator)) {
-                path = rootPath;
+                path = uploadRootPath;
             } else {
                 while (StringUtils.startsWithIgnoreCase(dirPath, FileUtil.pathSeparator)) {
                     dirPath = dirPath.substring(1);
                 }
-                path = rootPath.resolve(dirPath);
+                path = uploadRootPath.resolve(dirPath);
             }
 
             logger.info("filePath:[{}]", path.toAbsolutePath());
@@ -113,17 +124,19 @@ public class FileService implements InitializingBean {
                 throw new LogicException("path.notDirectories", "指定路径非文件夹");
             }
 
-            String fileName = file.getOriginalFilename();
-            //去除文件中的非法字符
-            if(StringUtils.isEmpty(fileName)) {
-                throw new LogicException("fileName.isEmpty", "文件名称不能为空");
-            }
 
-            Path dest = path.resolve(fileName);
-            try (InputStream in = new BufferedInputStream(file.getInputStream())) {
-                Files.copy(path, dest);
-            } catch (IOException ex) {
-                throw new LogicException("file.already.exists", "文件已经存在");
+            for(MultipartFile file: files) {
+                String fileName = file.getOriginalFilename();
+                //去除文件中的非法字符
+                if(StringUtils.isEmpty(fileName)) {
+                    throw new LogicException("fileName.isEmpty", "文件名称不能为空");
+                }
+                Path dest = path.resolve(fileName);
+                try (InputStream in = new BufferedInputStream(file.getInputStream())) {
+                    Files.copy(in, dest);
+                } catch (IOException ex) {
+                    throw new LogicException("file.already.exists", "文件已经存在");
+                }
             }
             //目标文件
 
@@ -151,7 +164,7 @@ public class FileService implements InitializingBean {
             final Path filePath = Paths.get(path, fileName);
             //跟 root 合并成一个完整的路径
             final String cleanPath = StringUtils.cleanPath(filePath.toString());
-            final Path fullPath = rootPath.resolve(Paths.get(cleanPath));
+            final Path fullPath = uploadRootPath.resolve(Paths.get(cleanPath));
             if(fileType == FileType.DIRECTORY) {
                 if(fullPath.toFile().exists()) {
                     throw new LogicException("directories.exists", "文件夹已经存在");
@@ -197,7 +210,7 @@ public class FileService implements InitializingBean {
     }
 
     private Path getFullPath(String path) {
-        return rootPath.resolve(Paths.get(path));
+        return uploadRootPath.resolve(Paths.get(path));
     }
 
     /**
@@ -235,53 +248,69 @@ public class FileService implements InitializingBean {
 //        return null;
 //    }
 
-
-    public Optional<Resource> processFile(String requestPath) {
-        if(StringUtils.isEmpty(requestPath)) {
-            return Optional.empty();
-        }
+    /**
+     * 获取处理过后的文件
+     * @param requestPath 请求文件路径
+     * @param supportWebp 是否支持 webp
+     *                   除开 Safari 外，其他的浏览器都应该是支持 webp 的
+     * @return Resource
+     */
+    public Optional<Resource> processFile(String requestPath, boolean supportWebp) {
 
         // requestPath  video/test.mp4  video/test.mp4/900
 
-        ResizeResolver resizeResolver = new ResizeResolver(requestPath);
-        final String sourcePath = resizeResolver.getSourcePath();
+        Path file = Paths.get(uploadRootPath.toString(), requestPath);
 
-        // 判断是否有缩放属性
-        final Resize resize = resizeResolver.getResize();
-        // 判断源文件是否存在
-        Optional<Path> targetFile = searchFile(sourcePath);
-        if(!targetFile.isPresent()) {
-            return Optional.empty();
-        }
+        return Optional.of(new ReadablePathResource(file));
 
-        // 如果没有缩放属性
-        if(resize == null) {
-            // 直接返回源文件
-            return Optional.of(new ReadablePathResource(targetFile.get()));
-        }
-
-        // 如果缩放属性无效
-//        if(resize.invalid()) {
+//        ResizeResolver resizeResolver = new ResizeResolver(requestPath);
+//        final String sourcePath = resizeResolver.getSourcePath();
+//
+//        // 判断是否有缩放属性
+//        final Resize resize = resizeResolver.getResize();
+//        // 判断源文件是否存在
+//        Optional<Path> targetFile = searchFile(sourcePath);
+//        if(!targetFile.isPresent()) {
 //            return Optional.empty();
 //        }
-
-        // 解析缩放属性，判断缩略图中是否含有该缩略图
-        final Path file = targetFile.get();
-
-        final String ext = StringUtils.getFilenameExtension(sourcePath);
-
-        if (resize == null || resize.isValid()) {
-            if(isProcessableImage(ext)) {
-                return Optional.empty();
-            }
-        } else {
-
-            return getThumbnailFile(resize, file);
-        }
-        if(isProcessableVideo(ext)) {
-            return Optional.empty();
-        }
-        return Optional.of(new ReadablePathResource(file));
+//
+//        // 如果没有缩放属性
+//        if(resize == null) {
+//            // 直接返回源文件
+//            return Optional.of(new ReadablePathResource(targetFile.get()));
+//        }
+//
+//        // 如果缩放属性无效
+////        if(resize.invalid()) {
+////            return Optional.empty();
+////        }
+//
+//        // 解析缩放属性，判断缩略图中是否含有该缩略图
+//        final Path file = targetFile.get();
+//
+//        final String ext = StringUtils.getFilenameExtension(sourcePath);
+//
+//        if (resize == null || resize.isValid()) {
+//            if(isProcessableImage(ext)) {
+//                return Optional.empty();
+//            }
+//        } else {
+//
+//            return getThumbnailFile(resize, file);
+//        }
+//        if(isProcessableVideo(ext)) {
+//            final Future<?> future = threadPoolTaskExecutor.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//
+//                }
+//            });
+//
+////            final Object o = future.get(10, TimeUnit.SECONDS);
+//            return Optional.empty();
+//        }
+//        return Optional.of(new ReadablePathResource(file));
     }
 
     private boolean isProcessableVideo(String ext) {
@@ -313,7 +342,7 @@ public class FileService implements InitializingBean {
     }
 
     private Optional<Path> searchFile(String sourcePath) {
-        final Path file = Paths.get(rootPath.toString(), sourcePath);
+        final Path file = Paths.get(uploadRootPath.toString(), sourcePath);
         if(file.toFile().isDirectory() || !file.toFile().exists()) {
             return Optional.empty();
         }

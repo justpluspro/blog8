@@ -188,6 +188,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         return new PageDto<>(queryParam, count, momentArchives);
     }
 
+    /**
+     * 获取动态上下导航
+     * @param id id
+     * @return MomentNav
+     */
     @Transactional(readOnly = true)
     @Override
     public Optional<MomentNav> selectMomentNav(int id) {

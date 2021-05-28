@@ -1,13 +1,16 @@
 package com.qwli7.blog.file;
 
+import com.qwli7.blog.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.resource.ResourceResolver;
 import org.springframework.web.servlet.resource.ResourceResolverChain;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,7 +18,7 @@ import java.util.List;
  * 2021/3/17 15:32
  * 功能：FileResourceResolver
  **/
-public class FileResourceResolver implements ResourceResolver {
+class FileResourceResolver implements ResourceResolver {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -29,15 +32,18 @@ public class FileResourceResolver implements ResourceResolver {
     @Override
     public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations,
                                     ResourceResolverChain chain) {
-        logger.info("method<resolveResource> requestPath:[{}]", requestPath);
-        if(request == null) {
+        logger.info("method<resolveResource> static resource requestPath: [{}]", requestPath);
+        if(request == null || StringUtils.isEmpty(requestPath)) {
             return null;
         }
-        final String method = request.getMethod();
-        if(!HttpMethod.GET.name().equals(method) && !HttpMethod.OPTIONS.name().equals(method)) {
+        final String method = request.getMethod().toLowerCase();
+
+        if(!Arrays.asList(HttpMethod.GET.name().toLowerCase(), HttpMethod.OPTIONS.name().toLowerCase()).contains(method)) {
+            // get static resource if not 'get' or 'options'
+            // will return null
             return null;
         }
-        return fileService.processFile(requestPath).orElse(null);
+        return fileService.processFile(requestPath, WebUtils.isSupportWebp(request)).orElse(null);
     }
 
     @Override

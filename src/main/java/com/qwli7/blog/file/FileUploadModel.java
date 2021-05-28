@@ -3,6 +3,7 @@ package com.qwli7.blog.file;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 文件上传模型
@@ -19,7 +20,7 @@ public class FileUploadModel implements Serializable {
     /**
      * 待上传的文件
      */
-    private MultipartFile file;
+    private List<MultipartFile> files;
     
     public String getPath() {
         return path;
@@ -29,11 +30,11 @@ public class FileUploadModel implements Serializable {
         this.path = path;
     }
 
-    public MultipartFile getFile() {
-        return file;
+    public List<MultipartFile> getFiles() {
+        return files;
     }
 
-    public void setFile(MultipartFile file) {
-        this.file = file;
+    public void setFiles(List<MultipartFile> files) {
+        this.files = files;
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @author qwli7 
  * 2021/3/2 8:42
@@ -37,9 +39,9 @@ public class FileController {
      */
     @PostMapping(value = "file/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(FileUploadModel fileUploadModel) {
-        final MultipartFile file = fileUploadModel.getFile();
+        final List<MultipartFile> files = fileUploadModel.getFiles();
         final String path = fileUploadModel.getPath();
-        FileInfoDetail fileInfoDetail = fileService.uploadFile(path, file);
+        FileInfoDetail fileInfoDetail = fileService.uploadFile(path, files);
         return ResponseEntity.ok(fileInfoDetail);
     }
 
