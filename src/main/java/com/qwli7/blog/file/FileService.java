@@ -291,14 +291,10 @@ public class FileService implements InitializingBean {
 
         Path thumbFile;
         final Path thumbDirParent = thumbDir.getParent();
-//        final Path parent = file.getParent();
         final boolean forceResize = resize.isForceResize();
         final Integer height = resize.getHeight();
         final Integer width = resize.getWidth();
 
-//        file.getFileName().toString().var
-//        final String filenameExtension = StringUtils.getFilenameExtension(file.toString());
-//        final String filename = StringUtils.getFilename(file.getFileName().toString());
         String thumbFileSuffix;
         if(forceResize) {
             thumbFileSuffix = "_h" + height + "_w" + width + "_force";
@@ -321,10 +317,10 @@ public class FileService implements InitializingBean {
                 return Optional.of(new ReadableThumbPathResource(thumbFile));
             }
             final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.IMG2IMG);
-            final ControlArgs controlArgs = new ControlArgs();
-            controlArgs.setAction(ConvertAction.IMG2IMG.getAction());
-            mediaConverter.convert(file.toFile(), thumbFile.toFile(), controlArgs);
-//                mediaProcessor.resizeImage(resize, file, thumbFile);
+            final ResizeControlArgs resizeControlArgs = new ResizeControlArgs();
+            resizeControlArgs.setResize(resize);
+            resizeControlArgs.setAction(ConvertAction.IMG2IMG.getAction());
+            mediaConverter.convert(file.toFile(), thumbFile.toFile(), resizeControlArgs);
         }
 
         if(MediaUtils.canHandleVideo(filenameExtension)) {
@@ -345,9 +341,9 @@ public class FileService implements InitializingBean {
                 });
                 final String s = future.get(10, TimeUnit.SECONDS);
                 if("success".equals(s)) {
-
+                    return Optional.of(new ReadableThumbPathResource(thumbFile));
                 }
-            }catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
                 ex.printStackTrace();
             }finally {
                 semaphore.release();

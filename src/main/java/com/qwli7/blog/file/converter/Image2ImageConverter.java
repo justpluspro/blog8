@@ -41,13 +41,15 @@ public class Image2ImageConverter extends AbstractMediaConverter {
             if(resize.isForceResize()) {
                 commands.add(resize.getWidth() + "x" + resize.getHeight() + "!");
             } else {
-                if(resize.getWidth() != null && resize.getWidth() != 0) {
+                if(resize.getWidth() != null && resize.getHeight() != null) {
+                    commands.add(resize.getWidth() + "x" + resize.getHeight());
+                } else if(resize.getWidth() != null && resize.getWidth() > 0) {
                     commands.add(resize.getWidth() + "x");
-                }
-                if(resize.getHeight() != null && resize.getHeight() > 0) {
+                } else if(resize.getHeight() != null && resize.getHeight() > 0) {
                     commands.add("x"+ resize.getHeight());
+                } else {
+                    // impossible branch
                 }
-//            commands.add(resize.getWidth())
             }
             commands.add("-strip");
             commands.add("-quality");

@@ -129,13 +129,6 @@ public abstract class AbstractMediaConverter {
         return !StringUtils.isEmpty(versionStr);
     }
 
-    /**
-     * 获取 ffprobe 可执行 path
-     * @return String
-     */
-    public String getFfprobePath() {
-        return ffprobePath;
-    }
 
     /**
      * gm 是否可以执行
@@ -160,10 +153,50 @@ public abstract class AbstractMediaConverter {
         return !StringUtils.isEmpty(versionStr);
     }
 
+    /**
+     * 检查 ffprobe 工作状态是否正常
+     * @return boolean
+     */
+    public boolean ffprobeAvailable() {
+        File ffprobeFile = new File(getFfprobePath());
+        if(Files.notExists(ffprobeFile.toPath())) {
+            logger.error("method<ffprobeAvailable> ffprobe 工作状态异常! ffprobe 路径不存在");
+            return false;
+        }
+        if(!ffprobeFile.canExecute()) {
+            if(!ffprobeFile.setExecutable(true)) {
+                logger.error("method<ffprobeAvailable> 设置 ffprobe 可执行权限失败! ");
+                return false;
+            }
+        }
+        List<String> cmds = new ArrayList<>(2);
+        cmds.add(getFfprobePath());
+        cmds.add(VERSION);
+        String versionStr = doProcess(cmds);
+        return !StringUtils.isEmpty(versionStr);
+    }
+
+
+    /**
+     * 获取 ffprobe 可执行 path
+     * @return String
+     */
+    public String getFfprobePath() {
+        return ffprobePath;
+    }
+
+    /**
+     * 获取 graphicsMagickPath 执行路径
+     * @return String
+     */
     public String getGraphicsMagickPath() {
         return graphicsMagickPath;
     }
 
+    /**
+     * 获取 ffmpegPath 执行路径
+     * @return String
+     */
     public String getFfmpegPath() {
         return ffmpegPath;
     }
@@ -218,7 +251,11 @@ public abstract class AbstractMediaConverter {
      */
     public abstract void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs);
 
-
+    /**
+     * 构建执行指令
+     * @param controlArgs controlArgs
+     * @return LinkedList
+     */
     public abstract LinkedList<String> buildCommands(ControlArgs controlArgs);
 
 
