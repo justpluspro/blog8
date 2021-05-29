@@ -259,13 +259,34 @@ public class FileService implements InitializingBean {
 
         // requestPath  video/test.mp4  video/test.mp4/900
 
+
+        final ResizeResolver rr = new ResizeResolver(requestPath);
+        final String sourcePath = rr.getSourcePath();
+        final Resize resize = rr.getResize();
+        if(!resize.isValid()) {
+            // 无效的缩放属性
+            return Optional.empty();
+        }
+        if(resize.isKeepRate()) {
+            //原样输出
+            Path file = Paths.get(uploadRootPath.toString(), sourcePath);
+            return Optional.of(new ReadablePathResource(file));
+        }
+        final String filenameExtension = StringUtils.getFilenameExtension(sourcePath);
+        if(MediaUtils.canHandleImage(filenameExtension)) {
+
+
+
+        }
+        if(MediaUtils.canHandleVideo(filenameExtension)) {
+
+        }
+
+
         Path file = Paths.get(uploadRootPath.toString(), requestPath);
 
         return Optional.of(new ReadablePathResource(file));
 
-//        ResizeResolver resizeResolver = new ResizeResolver(requestPath);
-//        final String sourcePath = resizeResolver.getSourcePath();
-//
 //        // 判断是否有缩放属性
 //        final Resize resize = resizeResolver.getResize();
 //        // 判断源文件是否存在

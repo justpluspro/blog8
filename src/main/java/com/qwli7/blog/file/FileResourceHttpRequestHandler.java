@@ -17,7 +17,7 @@ import java.util.Collections;
  * 2021/3/17 15:27
  * 功能：FileResourceHttpRequestHandler
  **/
-public class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
+class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
 
 
     public FileResourceHttpRequestHandler(FileResourceResolver fileResourceResolver, ResourceProperties resourceProperties) {
