@@ -25,7 +25,7 @@ public class MediaProcessor {
         this.fileProperties = fileProperties;
         this.converters = new HashMap<>();
         converters.put("img2img", new Image2ImageConverter(fileProperties.getGraphicsMagickPath()));
-        converters.put("video2img", new Video2ImageConverter(fileProperties.getFfmpegPath()));
+//        converters.put("video2img", new Video2ImageConverter(fileProperties.getFfmpegPath()));
     }
 
     /**

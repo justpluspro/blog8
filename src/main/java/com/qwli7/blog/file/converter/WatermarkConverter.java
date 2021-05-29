@@ -43,12 +43,12 @@ public class WatermarkConverter extends AbstractMediaConverter {
             if ("video2watermark".equals(action)) {
                 commands = buildAddVideo2WatermarkCommand(sourceFile, targetFile, text);
                 processBashPath = getFfmpegPath();
-                doProcess(commands, processBashPath);
+                doProcess(commands);
             } else {
                 commands = buildAddImage2WatermarkCommand(sourceFile, targetFile, text);
                 processBashPath = getGraphicsMagickPath();
             }
-            doProcess(commands, processBashPath);
+            doProcess(commands);
         }
     }
 

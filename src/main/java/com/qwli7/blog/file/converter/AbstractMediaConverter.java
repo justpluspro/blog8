@@ -1,6 +1,6 @@
 package com.qwli7.blog.file.converter;
 
-import com.qwli7.blog.file.MediaConverter;
+import com.qwli7.blog.file.FileUtil;
 import com.qwli7.blog.file.vo.ControlArgs;
 import com.qwli7.blog.file.vo.VideoConvertParams;
 import org.slf4j.Logger;
@@ -9,8 +9,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 抽象媒体转换器
@@ -90,7 +91,17 @@ public abstract class AbstractMediaConverter {
         }
         controlArgs.setInputFile(sourceFile);
         controlArgs.setOutputFile(targetFile);
-
+        try {
+            if (Files.notExists(targetFile.toPath().getParent())) {
+                Files.createDirectories(targetFile.toPath().getParent());
+            }
+            if (Files.notExists(targetFile.toPath())) {
+                Files.createFile(targetFile.toPath());
+            }
+        } catch (IOException ex){
+            logger.error("method<convert> create targetFile error:[{}]", ex.getMessage(), ex);
+            return;
+        }
         //做一些校验工作
         doConvert(sourceFile, targetFile, controlArgs);
     }
@@ -111,9 +122,10 @@ public abstract class AbstractMediaConverter {
                 return false;
             }
         }
-        List<String> cmds = new ArrayList<>(1);
+        List<String> cmds = new ArrayList<>(2);
+        cmds.add(getFfmpegPath());
         cmds.add(VERSION);
-        String versionStr = doProcess(cmds, getFfmpegPath());
+        String versionStr = doProcess(cmds);
         return !StringUtils.isEmpty(versionStr);
     }
 
@@ -141,9 +153,10 @@ public abstract class AbstractMediaConverter {
                 return false;
             }
         }
-        List<String> cmds = new ArrayList<>(1);
+        List<String> cmds = new ArrayList<>(2);
+        cmds.add(getGraphicsMagickPath());
         cmds.add(VERSION);
-        String versionStr = doProcess(cmds, getGraphicsMagickPath());
+        String versionStr = doProcess(cmds);
         return !StringUtils.isEmpty(versionStr);
     }
 
@@ -158,18 +171,16 @@ public abstract class AbstractMediaConverter {
     /**
      * 调用进程执行
      * @param commands 待执行的命令
-     * @param bash bash 或者 exe 所在的目录
      * @return String
      */
-    public String doProcess(List<String> commands, String bash) {
+    public String doProcess(List<String> commands) {
         if(CollectionUtils.isEmpty(commands)) {
             return null;
         }
         LinkedList<String> cmds = new LinkedList<>(commands);
-        cmds.addFirst(bash);
 
         String commandStr = String.join(" ", cmds);
-        logger.info("method<doProcess> 进程执行的完整指令为：[{}]", commandStr);
+        logger.info("method<doProcess> full commands is：[{}]", commandStr);
         final Runtime runtime = Runtime.getRuntime();
         Process process = null;
         try {
@@ -186,10 +197,11 @@ public abstract class AbstractMediaConverter {
             //获取执行结果
             String result = errorStream.stringBuffer.append(inputStream.stringBuffer).toString();
             // 输出执行的命令信息
-            logger.info("method<doProcess> 进行执行指令结果: [{}]", result);
+            logger.info("method<doProcess> command execute result is: [{}]", result);
             return result;
         } catch (Exception ex){
-            logger.error("method<doProcess> 进程执行指令异常: [{}]", ex.getMessage(), ex);
+            ex.printStackTrace();
+            logger.error("method<doProcess> command execute occurred exception: [{}]", ex.getMessage(), ex);
             return null;
         } finally {
             if(null != process) {
@@ -224,7 +236,7 @@ public abstract class AbstractMediaConverter {
         @Override
         public void run() {
             this.process.destroy();
-            logger.error("method<ProcessKiller#run> 销毁进程：[{}]", process);
+            logger.error("method<ProcessKiller#run> destroy process：[{}]", process);
         }
     }
 

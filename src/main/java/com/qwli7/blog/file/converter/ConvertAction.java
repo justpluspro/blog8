@@ -6,8 +6,37 @@ package com.qwli7.blog.file.converter;
  * @since 2.4
  */
 public enum ConvertAction {
+    /**
+     * 图片转图片
+     */
     IMG2IMG("img2img"),
-    VIDEO2IMG("video2Img");
+
+    /**
+     * 视频转图片
+     * 一般是获取首帧
+     */
+    VIDEO2IMG("video2Img"),
+
+    /**
+     * 视频转视频
+     */
+    VIDEO2VIDEO("video2video"),
+
+    /**
+     * 加水印
+     */
+    WATERMARK("watermark"),
+
+    /**
+     * 视频转 gif
+     */
+    VIDEO2GIF("video2gif"),
+
+    /**
+     * 元数据
+     */
+    METADATA("metadata"),
+    ;
 
     String action;
 

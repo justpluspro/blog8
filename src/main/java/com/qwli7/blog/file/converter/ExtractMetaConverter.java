@@ -210,7 +210,7 @@ public class ExtractMetaConverter extends AbstractMediaConverter {
      */
     private void extractMetaInfoUseFfprobe(File sourceFile) {
         final List<String> commands = createMetaInfoCommandUseFfprobe(sourceFile);
-        final String resultStr = doProcess(commands, getFfprobePath());
+        final String resultStr = doProcess(commands);
         logger.info("resultStr: [{}]", resultStr);
 
     }
@@ -220,7 +220,7 @@ public class ExtractMetaConverter extends AbstractMediaConverter {
     private void extractVideoMetaInfo(File sourceFile) {
 
         final List<String> commands = buildVideoMetaInfoCommand(sourceFile);
-        final String resultStr = doProcess(commands, getFfmpegPath());
+        final String resultStr = doProcess(commands);
 
         Matcher matcher = DURATION_PATTERN.matcher(resultStr);
         Matcher videoStreamMatcher = VIDEO_STREAM_PATTERN.matcher(resultStr);

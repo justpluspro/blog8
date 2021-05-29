@@ -1,5 +1,7 @@
 package com.qwli7.blog.file.vo;
 
+import com.qwli7.blog.file.Resize;
+
 /**
  * 缩放控制参数
  * @author liqiwen
@@ -7,43 +9,13 @@ package com.qwli7.blog.file.vo;
  */
 public class ResizeControlArgs extends ControlArgs {
 
-    private boolean forceResize;
+    private Resize resize;
 
-    private Integer width;
-
-    private Integer height;
-
-    private Integer quality;
-
-    public boolean isForceResize() {
-        return forceResize;
+    public Resize getResize() {
+        return resize;
     }
 
-    public void setForceResize(boolean forceResize) {
-        this.forceResize = forceResize;
-    }
-
-    public Integer getWidth() {
-        return width;
-    }
-
-    public void setWidth(Integer width) {
-        this.width = width;
-    }
-
-    public Integer getHeight() {
-        return height;
-    }
-
-    public void setHeight(Integer height) {
-        this.height = height;
-    }
-
-    public Integer getQuality() {
-        return quality;
-    }
-
-    public void setQuality(Integer quality) {
-        this.quality = quality;
+    public void setResize(Resize resize) {
+        this.resize = resize;
     }
 }

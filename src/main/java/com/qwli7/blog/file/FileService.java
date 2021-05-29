@@ -1,11 +1,9 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
-import com.qwli7.blog.file.converter.AbstractMediaConverter;
-import com.qwli7.blog.file.converter.ConvertAction;
-import com.qwli7.blog.file.converter.Image2ImageConverter;
-import com.qwli7.blog.file.converter.Video2ImageConverter;
+import com.qwli7.blog.file.converter.*;
 import com.qwli7.blog.file.vo.ControlArgs;
+import com.qwli7.blog.file.vo.ResizeControlArgs;
 import com.qwli7.blog.file.vo.VideoCutParams;
 import com.qwli7.blog.util.SystemType;
 import com.qwli7.blog.util.SystemUtils;
@@ -29,9 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -63,21 +59,20 @@ public class FileService implements InitializingBean {
     private final Path uploadThumbPath;
     private final Semaphore semaphore;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    private final ExecutorService executorService;
     private final FileProperties fileProperties;
-    private final MediaProcessor mediaProcessor;
     private Map<ConvertAction, AbstractMediaConverter> converters;
 
     public FileService(FileProperties fileProperties) throws IOException {
         this.fileProperties = fileProperties;
         this.uploadRootPath = Paths.get(fileProperties.getUploadPath());
         this.uploadThumbPath = fileProperties.getUploadThumbPath() == null ? null : Paths.get(fileProperties.getUploadThumbPath());
-        mediaProcessor = new MediaProcessor(fileProperties);
         FileUtil.forceMkdir(uploadRootPath);
         if(uploadThumbPath != null) {
             FileUtil.forceMkdir(uploadThumbPath);
         }
         semaphore = new Semaphore(fileProperties.getTotalSem());
+        executorService = Executors.newFixedThreadPool(fileProperties.getTotalSem());
     }
 
 
@@ -292,52 +287,74 @@ public class FileService implements InitializingBean {
     private Optional<Resource> getThumbnailFile(Path file, Resize resize, boolean supportWebp) {
         final Lookup lookup = Lookup.newLookup(file).regularFile(true).mustDir(false).mustExists(true);
 
+        final Path thumbDir = getThumbDir(file);
+
         Path thumbFile;
-        final Path parent = file.getParent();
+        final Path thumbDirParent = thumbDir.getParent();
+//        final Path parent = file.getParent();
         final boolean forceResize = resize.isForceResize();
         final Integer height = resize.getHeight();
         final Integer width = resize.getWidth();
+
+//        file.getFileName().toString().var
+//        final String filenameExtension = StringUtils.getFilenameExtension(file.toString());
+//        final String filename = StringUtils.getFilename(file.getFileName().toString());
+        String thumbFileSuffix;
         if(forceResize) {
-            thumbFile = Paths.get(parent.toString(), "_h" + height + "_w" + width + "_force", file.getFileName().toString());
+            thumbFileSuffix = "_h" + height + "_w" + width + "_force";
         } else {
             if(width == null || width == 0) {
-                thumbFile = Paths.get(parent.toString(), "_h" + height, file.getFileName().toString());
+                thumbFileSuffix = "_h" + height;
             } else if(height == null || height == 0) {
-                thumbFile = Paths.get(parent.toString(), "_w" + width, file.getFileName().toString());
+                thumbFileSuffix = "_w" + width;
             } else {
-                thumbFile = Paths.get(parent.toString(), "_h" + height + "_w" + width, file.getFileName().toString());
+                thumbFileSuffix = "_h" + height + "_w" + width;
             }
         }
-        if(Files.exists(thumbFile)) {
-            return Optional.of(new ReadableThumbPathResource(thumbFile));
-        } else {
-            final String ext = StringUtils.getFilenameExtension(file.toString());
-            boolean toWebp = supportWebp && (MediaUtils.isJPEG(ext) || MediaUtils.isPNG(ext));
-            //缩略图不存在，处理下
-            if(MediaUtils.canHandleImage(ext)) {
-                final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.IMG2IMG);
-                final ControlArgs controlArgs = new ControlArgs();
-                controlArgs.setAction(ConvertAction.IMG2IMG.getAction());
-                mediaConverter.convert(file.toFile(), thumbFile.toFile(), controlArgs);
+
+        String filenameExtension = StringUtils.getFilenameExtension(file.getFileName().toString());
+        boolean toWebp = supportWebp && (MediaUtils.isJPEG(filenameExtension) || MediaUtils.isPNG(filenameExtension));
+        //缩略图不存在，处理下
+        if(MediaUtils.canHandleImage(filenameExtension)) {
+            thumbFile = Paths.get(thumbDirParent.toString(),  file.getFileName().toString().replace(".", "@")+ thumbFileSuffix+ "." + filenameExtension);
+            if(Files.exists(thumbFile)) {
+                return Optional.of(new ReadableThumbPathResource(thumbFile));
+            }
+            final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.IMG2IMG);
+            final ControlArgs controlArgs = new ControlArgs();
+            controlArgs.setAction(ConvertAction.IMG2IMG.getAction());
+            mediaConverter.convert(file.toFile(), thumbFile.toFile(), controlArgs);
 //                mediaProcessor.resizeImage(resize, file, thumbFile);
-            }
-
-            if(MediaUtils.canHandleVideo(ext)) {
-                final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.VIDEO2IMG);
-                final ControlArgs controlArgs = new ControlArgs();
-//                semaphore.acquire();
-                mediaConverter.convert(file.toFile(), thumbFile.toFile(), controlArgs);
-            }
         }
 
-        return Optional.of(new ReadableThumbPathResource(thumbFile));
-//        String ext = StringUtils.getFilenameExtension(file.toString());
-//        boolean toWebp = supportWebp && (MediaUtils.isJPEG(ext) || MediaUtils.isPNG(ext));
-//        Path thumbFile = getThumbPath(file, resize, toWebp);
-//        String sourceExt = toWebp ? MediaUtils.WEBP : MediaUtils.canHandleVideo(ext) ? MediaUtils.PNG : ext;
-//        if(Files.exists(thumbFile)) {
-//            return Optional.of(new ReadablePathResource(thumbFile));
-//        }
+        if(MediaUtils.canHandleVideo(filenameExtension)) {
+            thumbFile = Paths.get(thumbDirParent.toString(),  file.getFileName().toString().replace(".", "@")+ thumbFileSuffix+ ".png");
+            if(Files.exists(thumbFile)) {
+                return Optional.of(new ReadableThumbPathResource(thumbFile));
+            }
+            try {
+                semaphore.acquire();
+                Path finalThumbFile = thumbFile;
+                final Future<String> future = executorService.submit(() -> {
+                    final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.VIDEO2IMG);
+                    ResizeControlArgs resizeControlArgs = new ResizeControlArgs();
+                    resizeControlArgs.setResize(resize);
+                    resizeControlArgs.setAction(ConvertAction.VIDEO2IMG.getAction());
+                    mediaConverter.convert(file.toFile(), finalThumbFile.toFile(), resizeControlArgs);
+                    return "success";
+                });
+                final String s = future.get(10, TimeUnit.SECONDS);
+                if("success".equals(s)) {
+
+                }
+            }catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                ex.printStackTrace();
+            }finally {
+                semaphore.release();
+            }
+
+        }
+        return Optional.of(new ReadablePathResource(file));
     }
 
 
@@ -415,6 +432,10 @@ public class FileService implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         converters = new HashMap<>();
         converters.put(ConvertAction.IMG2IMG, new Image2ImageConverter(fileProperties.getGraphicsMagickPath()));
-        converters.put(ConvertAction.VIDEO2IMG,  new Video2ImageConverter(fileProperties.getFfmpegPath()));
+        converters.put(ConvertAction.VIDEO2IMG,  new Video2ImageConverter(fileProperties.getFfmpegPath(), fileProperties.getGraphicsMagickPath()));
+        converters.put(ConvertAction.WATERMARK, new WatermarkConverter(fileProperties.getFfmpegPath(), fileProperties.getGraphicsMagickPath()));
+        converters.put(ConvertAction.VIDEO2VIDEO, new Video2VideoConverter(fileProperties.getFfmpegPath()));
+        converters.put(ConvertAction.VIDEO2GIF, new Video2GifConverter(fileProperties.getFfmpegPath()));
+        converters.put(ConvertAction.METADATA, new ExtractMetaConverter(fileProperties.getFfmpegPath(), fileProperties.getGraphicsMagickPath()));
     }
 }
