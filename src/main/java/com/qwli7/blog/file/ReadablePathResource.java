@@ -1,6 +1,5 @@
 package com.qwli7.blog.file;
 
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -14,7 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-public class ReadablePathResource implements FilePathResource {
+/**
+ * 可读取的文件资源
+ * @author liqiwen
+ * @since 2.3
+ */
+class ReadablePathResource implements FilePathResource {
 
     private static final String WEBP = "webp";
 

@@ -102,12 +102,11 @@ public class ResizeResolver {
                 return INVALID_RESIZE;
             }
         }
-        // 只有一个数字
+        // 600
         try {
             return new Resize(Integer.parseInt(resizeStrOrFilename), Integer.parseInt(resizeStrOrFilename), false, false);
         } catch (NumberFormatException e){
             return INVALID_RESIZE;
         }
-
     }
 }

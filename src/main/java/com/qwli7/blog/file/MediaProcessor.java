@@ -1,7 +1,13 @@
 package com.qwli7.blog.file;
 
-import java.util.Arrays;
-import java.util.List;
+import com.qwli7.blog.file.converter.AbstractMediaConverter;
+import com.qwli7.blog.file.converter.Image2ImageConverter;
+import com.qwli7.blog.file.converter.Video2ImageConverter;
+import com.qwli7.blog.file.vo.ControlArgs;
+import org.springframework.boot.autoconfigure.data.ConditionalOnRepositoryType;
+
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * @author qwli7 
@@ -10,8 +16,16 @@ import java.util.List;
  **/
 public class MediaProcessor {
 
-    private MediaProcessor() {
+    private final Map<String, AbstractMediaConverter> converters;
+
+    private final FileProperties fileProperties;
+
+    public MediaProcessor(FileProperties fileProperties) {
         super();
+        this.fileProperties = fileProperties;
+        this.converters = new HashMap<>();
+        converters.put("img2img", new Image2ImageConverter(fileProperties.getGraphicsMagickPath()));
+        converters.put("video2img", new Video2ImageConverter(fileProperties.getFfmpegPath()));
     }
 
     /**
@@ -35,5 +49,39 @@ public class MediaProcessor {
      */
     public static boolean canHandle(String ext) {
         return extensions.contains(ext);
+    }
+
+    /**
+     * gm convert -resize '200x200' -strip -quality 80% input.jpg output.jpg
+     * @param resize resize
+     * @param file file
+     */
+    public void resizeImage(Resize resize, Path file, Path output) {
+        final String graphicsMagickPath = fileProperties.getGraphicsMagickPath();
+        List<String> commands = new ArrayList<>();
+        commands.add(graphicsMagickPath);
+        commands.add("-convert");
+        commands.add("-resize");
+        if(resize.isForceResize()) {
+            commands.add(resize.getWidth() + "x" + resize.getHeight() + "!");
+        } else {
+            if(resize.getWidth() != null && resize.getWidth() != 0) {
+                commands.add(resize.getWidth() + "x");
+            }
+            if(resize.getHeight() != null && resize.getHeight() > 0) {
+                commands.add("x"+ resize.getHeight());
+            }
+//            commands.add(resize.getWidth())
+        }
+        commands.add("-strip");
+        commands.add("-quality");
+        commands.add(resize.getQuality() + "");
+        commands.add(file.toFile().getAbsolutePath());
+        commands.add(output.toFile().getAbsolutePath());
+
+        final AbstractMediaConverter mediaConverter = converters.get("img2img");
+        final ControlArgs controlArgs = new ControlArgs();
+        controlArgs.setAction("img2img");
+        mediaConverter.convert(file.toFile(), output.toFile(), new ControlArgs());
     }
 }

@@ -23,7 +23,7 @@ public class Video2AudioConverter extends AbstractMediaConverter {
     }
 
     @Override
-    public LinkedList<String> buildCommands() {
+    public LinkedList<String> buildCommands(ControlArgs controlArgs) {
         return null;
     }
 }

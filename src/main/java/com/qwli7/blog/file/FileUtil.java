@@ -198,4 +198,7 @@ public class FileUtil {
         }
     }
 
+    public static void forceMkdir(Path uploadRootPath) throws IOException {
+        Files.createDirectories(uploadRootPath);
+    }
 }

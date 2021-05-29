@@ -43,7 +43,7 @@ class FileResourceResolver implements ResourceResolver {
             // will return null
             return null;
         }
-        return fileService.processFile(requestPath, WebUtils.isSupportWebp(request)).orElse(null);
+        return fileService.getProcessedFile(requestPath, WebUtils.isSupportWebp(request)).orElse(null);
     }
 
     @Override

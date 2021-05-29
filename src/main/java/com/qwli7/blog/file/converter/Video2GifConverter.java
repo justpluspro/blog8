@@ -21,7 +21,7 @@ public class Video2GifConverter extends AbstractMediaConverter {
     }
 
     @Override
-    public LinkedList<String> buildCommands() {
+    public LinkedList<String> buildCommands(ControlArgs controlArgs) {
         return null;
     }
 }

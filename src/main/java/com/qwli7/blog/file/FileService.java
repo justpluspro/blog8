@@ -1,6 +1,11 @@
 package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
+import com.qwli7.blog.file.converter.AbstractMediaConverter;
+import com.qwli7.blog.file.converter.ConvertAction;
+import com.qwli7.blog.file.converter.Image2ImageConverter;
+import com.qwli7.blog.file.converter.Video2ImageConverter;
+import com.qwli7.blog.file.vo.ControlArgs;
 import com.qwli7.blog.file.vo.VideoCutParams;
 import com.qwli7.blog.util.SystemType;
 import com.qwli7.blog.util.SystemUtils;
@@ -23,11 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -37,51 +40,44 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author qwli7
  * 2021/3/2 8:37
  * 功能：FileService
+ * 本地文件服务
+ * <ul>
+ *     <li>图片/视频文件的缩放以及获取文件信息</li>
+ *     <li>文件/文件夹的拷贝和重命名</li>
+ *     <li>文件的拷贝</li>
+ *     <li>文件/文件夹的移动</li>
+ *     <li>文件/文件夹的删除</li>
+ *     <li>部分文件的编辑</li>
+ *     <li>文件保护，私有</li>
+ * </ul>
+ *
  **/
 @Conditional(value = FileCondition.class)
 @Service
 public class FileService implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-
-    /**
-     * 文件存放根路径
-     */
-    private final Path uploadRootPath = Paths.get(System.getProperty("user.home"), "upload");
-
-    /**
-     * 缩略图存放路径
-     */
-    private final Path uploadThumbPath = Paths.get(System.getProperty("user.home"), "upload", "thumb");
-
-    /**
-     * 读写锁
-     */
+    private static final int MAX_NAME_LENGTH = 255;
+    private static final Set<String> editableExts = new HashSet<>(Arrays.asList("js", "css", "json","txt", "xml", "html", "md"));
+    private final Path uploadRootPath;
+    private final Path uploadThumbPath;
+    private final Semaphore semaphore;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-
-
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-
-    /**
-     * 文件属性
-     */
     private final FileProperties fileProperties;
+    private final MediaProcessor mediaProcessor;
+    private Map<ConvertAction, AbstractMediaConverter> converters;
 
-    public FileService(FileProperties fileProperties) {
+    public FileService(FileProperties fileProperties) throws IOException {
         this.fileProperties = fileProperties;
-
-        logger.info("method<FileService> uploadRootPath:[{}]", uploadRootPath);
-        logger.info("method<FileService> uploadThumbPath:[{}]", uploadThumbPath);
-        try {
-            if (!uploadRootPath.toFile().exists()) {
-                Files.createDirectories(uploadRootPath);
-            }
-            if (!uploadThumbPath.toFile().exists()) {
-                Files.createDirectories(uploadThumbPath);
-            }
-        } catch (IOException ex) {
-            throw new RuntimeException("本地文件服务已经开启，创建上传目录失败", ex);
+        this.uploadRootPath = Paths.get(fileProperties.getUploadPath());
+        this.uploadThumbPath = fileProperties.getUploadThumbPath() == null ? null : Paths.get(fileProperties.getUploadThumbPath());
+        mediaProcessor = new MediaProcessor(fileProperties);
+        FileUtil.forceMkdir(uploadRootPath);
+        if(uploadThumbPath != null) {
+            FileUtil.forceMkdir(uploadThumbPath);
         }
+        semaphore = new Semaphore(fileProperties.getTotalSem());
     }
 
 
@@ -250,16 +246,18 @@ public class FileService implements InitializingBean {
 
     /**
      * 获取处理过后的文件
+     * 如果访问的是缩略图，则返回缩略图
+     *      图片访问缩略图
+     *      视频返回视频封面
+     *
+     * 如果访问的是原图，则直接返回原图
+     * 如果访问的是视频，则视频可能会被缩放返回
      * @param requestPath 请求文件路径
      * @param supportWebp 是否支持 webp
      *                   除开 Safari 外，其他的浏览器都应该是支持 webp 的
      * @return Resource
      */
-    public Optional<Resource> processFile(String requestPath, boolean supportWebp) {
-
-        // requestPath  video/test.mp4  video/test.mp4/900
-
-
+    public Optional<Resource> getProcessedFile(String requestPath, boolean supportWebp) {
         final ResizeResolver rr = new ResizeResolver(requestPath);
         final String sourcePath = rr.getSourcePath();
         final Resize resize = rr.getResize();
@@ -267,100 +265,92 @@ public class FileService implements InitializingBean {
             // 无效的缩放属性
             return Optional.empty();
         }
-        if(resize.isKeepRate()) {
-            //原样输出
-            Path file = Paths.get(uploadRootPath.toString(), sourcePath);
-            return Optional.of(new ReadablePathResource(file));
-        }
-        final String filenameExtension = StringUtils.getFilenameExtension(sourcePath);
-        if(MediaUtils.canHandleImage(filenameExtension)) {
-
-
-
-        }
-        if(MediaUtils.canHandleVideo(filenameExtension)) {
-
-        }
-
-
-        Path file = Paths.get(uploadRootPath.toString(), requestPath);
-
-        return Optional.of(new ReadablePathResource(file));
-
-//        // 判断是否有缩放属性
-//        final Resize resize = resizeResolver.getResize();
-//        // 判断源文件是否存在
-//        Optional<Path> targetFile = searchFile(sourcePath);
-//        if(!targetFile.isPresent()) {
-//            return Optional.empty();
-//        }
-//
-//        // 如果没有缩放属性
-//        if(resize == null) {
-//            // 直接返回源文件
-//            return Optional.of(new ReadablePathResource(targetFile.get()));
-//        }
-//
-//        // 如果缩放属性无效
-////        if(resize.invalid()) {
-////            return Optional.empty();
-////        }
-//
-//        // 解析缩放属性，判断缩略图中是否含有该缩略图
-//        final Path file = targetFile.get();
-//
-//        final String ext = StringUtils.getFilenameExtension(sourcePath);
-//
-//        if (resize == null || resize.isValid()) {
-//            if(isProcessableImage(ext)) {
-//                return Optional.empty();
-//            }
-//        } else {
-//
-//            return getThumbnailFile(resize, file);
-//        }
-//        if(isProcessableVideo(ext)) {
-//            final Future<?> future = threadPoolTaskExecutor.submit(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//
-//                }
-//            });
-//
-////            final Object o = future.get(10, TimeUnit.SECONDS);
-//            return Optional.empty();
-//        }
-//        return Optional.of(new ReadablePathResource(file));
-    }
-
-    private boolean isProcessableVideo(String ext) {
-        return false;
-    }
-
-    private boolean isProcessableImage(String ext) {
-        return false;
-    }
-
-    private Optional<Resource> getThumbnailFile(Resize resize, Path file) {
-        if(resize.isValid()) {
+        final Optional<Path> path = searchFile(sourcePath);
+        if(!path.isPresent()) {
             return Optional.empty();
         }
-
-        LinkedList<String> commands = new LinkedList<>();
-        commands.add(file.toFile().getAbsolutePath());
-        commands.add("-quality");
-        commands.add("90%");
-        commands.add("-resize");
-        if(resize.getWidth() != null) {
-            commands.add(resize.getWidth() + "");
-        }
-        if(resize.getHeight() != null) {
-            commands.add("x" + resize.getHeight());
+        final Path file = path.get();
+        if(uploadThumbPath == null) {
+            return Optional.of(new ReadablePathResource(file));
         }
 
-        return null;
+        if(resize.isKeepRate()) {
+            //原样输出
+            return Optional.of(new ReadablePathResource(file));
+        }
+        return getThumbnailFile(file, resize, supportWebp);
     }
+
+
+    /**
+     * 获取缩略图文件
+     * @param resize resize
+     * @param file file
+     * @param supportWebp supportWebp
+     * @return Optional
+     */
+    private Optional<Resource> getThumbnailFile(Path file, Resize resize, boolean supportWebp) {
+        final Lookup lookup = Lookup.newLookup(file).regularFile(true).mustDir(false).mustExists(true);
+
+        Path thumbFile;
+        final Path parent = file.getParent();
+        final boolean forceResize = resize.isForceResize();
+        final Integer height = resize.getHeight();
+        final Integer width = resize.getWidth();
+        if(forceResize) {
+            thumbFile = Paths.get(parent.toString(), "_h" + height + "_w" + width + "_force", file.getFileName().toString());
+        } else {
+            if(width == null || width == 0) {
+                thumbFile = Paths.get(parent.toString(), "_h" + height, file.getFileName().toString());
+            } else if(height == null || height == 0) {
+                thumbFile = Paths.get(parent.toString(), "_w" + width, file.getFileName().toString());
+            } else {
+                thumbFile = Paths.get(parent.toString(), "_h" + height + "_w" + width, file.getFileName().toString());
+            }
+        }
+        if(Files.exists(thumbFile)) {
+            return Optional.of(new ReadableThumbPathResource(thumbFile));
+        } else {
+            final String ext = StringUtils.getFilenameExtension(file.toString());
+            boolean toWebp = supportWebp && (MediaUtils.isJPEG(ext) || MediaUtils.isPNG(ext));
+            //缩略图不存在，处理下
+            if(MediaUtils.canHandleImage(ext)) {
+                final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.IMG2IMG);
+                final ControlArgs controlArgs = new ControlArgs();
+                controlArgs.setAction(ConvertAction.IMG2IMG.getAction());
+                mediaConverter.convert(file.toFile(), thumbFile.toFile(), controlArgs);
+//                mediaProcessor.resizeImage(resize, file, thumbFile);
+            }
+
+            if(MediaUtils.canHandleVideo(ext)) {
+                final AbstractMediaConverter mediaConverter = converters.get(ConvertAction.VIDEO2IMG);
+                final ControlArgs controlArgs = new ControlArgs();
+//                semaphore.acquire();
+                mediaConverter.convert(file.toFile(), thumbFile.toFile(), controlArgs);
+            }
+        }
+
+        return Optional.of(new ReadableThumbPathResource(thumbFile));
+//        String ext = StringUtils.getFilenameExtension(file.toString());
+//        boolean toWebp = supportWebp && (MediaUtils.isJPEG(ext) || MediaUtils.isPNG(ext));
+//        Path thumbFile = getThumbPath(file, resize, toWebp);
+//        String sourceExt = toWebp ? MediaUtils.WEBP : MediaUtils.canHandleVideo(ext) ? MediaUtils.PNG : ext;
+//        if(Files.exists(thumbFile)) {
+//            return Optional.of(new ReadablePathResource(thumbFile));
+//        }
+    }
+
+
+    private Path getThumbDir(Path file) {
+        return uploadThumbPath.resolve(uploadRootPath.relativize(file));
+    }
+
+    private Path getThumbPath(Path file, Resize resize, boolean toWebp) {
+        Path thumbDir = getThumbDir(file);
+        String name = resize.toString();
+        return thumbDir.resolve(toWebp ? String.format("%s.WEBP", name) : name);
+    }
+
 
     private Optional<Path> searchFile(String sourcePath) {
         final Path file = Paths.get(uploadRootPath.toString(), sourcePath);
@@ -387,8 +377,44 @@ public class FileService implements InitializingBean {
         return new ArrayList<>();
     }
 
+
+    static class Lookup {
+        private boolean regularFile;
+
+        private boolean mustDir;
+
+        private boolean mustExists;
+
+        private Path file;
+
+        private Lookup(Path file) {
+            this.file = file;
+        }
+
+        public Lookup regularFile(boolean regularFile) {
+            this.regularFile = regularFile;
+            return this;
+        }
+
+        public Lookup mustDir(boolean mustDir) {
+            this.mustDir = mustDir;
+            return this;
+        }
+
+        public Lookup mustExists(boolean mustExists) {
+            this.mustExists = mustExists;
+            return this;
+        }
+
+        public static Lookup newLookup(Path path) {
+            return new Lookup(path);
+        }
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        converters = new HashMap<>();
+        converters.put(ConvertAction.IMG2IMG, new Image2ImageConverter(fileProperties.getGraphicsMagickPath()));
+        converters.put(ConvertAction.VIDEO2IMG,  new Video2ImageConverter(fileProperties.getFfmpegPath()));
     }
 }

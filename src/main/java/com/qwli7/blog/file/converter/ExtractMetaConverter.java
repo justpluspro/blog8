@@ -55,7 +55,7 @@ public class ExtractMetaConverter extends AbstractMediaConverter {
     }
 
     @Override
-    public LinkedList<String> buildCommands() {
+    public LinkedList<String> buildCommands(ControlArgs controlArgs) {
         return null;
     }
 

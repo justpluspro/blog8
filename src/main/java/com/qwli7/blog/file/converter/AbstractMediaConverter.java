@@ -9,10 +9,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 抽象媒体转换器
@@ -78,16 +76,20 @@ public abstract class AbstractMediaConverter {
      * @param targetFile 目标文件
      * @param controlArgs 控制参数
      */
-    protected void convert(File sourceFile, File targetFile, ControlArgs controlArgs) {
+    public void convert(File sourceFile, File targetFile, ControlArgs controlArgs) {
         if(!sourceFile.exists()) {
-            logger.error("method<convert> 源文件存在");
+            logger.error("method<convert> 源文件不存在");
             return;
         }
         final String action = controlArgs.getAction();
-        if(StringUtils.isEmpty(action) && Arrays.asList("video2video", "video2image", "video2gif").contains(action)) {
+
+        final Optional<String> actionOp = Arrays.stream(ConvertAction.values()).map(ConvertAction::getAction).filter(e -> e.equals(action)).findAny();
+        if(!actionOp.isPresent()) {
             logger.error("method<convert> 无指定的转换动作");
             return;
         }
+        controlArgs.setInputFile(sourceFile);
+        controlArgs.setOutputFile(targetFile);
 
         //做一些校验工作
         doConvert(sourceFile, targetFile, controlArgs);
@@ -205,7 +207,7 @@ public abstract class AbstractMediaConverter {
     public abstract void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs);
 
 
-    public abstract LinkedList<String> buildCommands();
+    public abstract LinkedList<String> buildCommands(ControlArgs controlArgs);
 
 
     /**

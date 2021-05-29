@@ -1,5 +1,6 @@
 package com.qwli7.blog.file.vo;
 
+import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -9,9 +10,27 @@ import java.io.Serializable;
  */
 public class ControlArgs implements Serializable {
 
-
     private String action;
 
+    private File inputFile;
+
+    private File outputFile;
+
+    public File getInputFile() {
+        return inputFile;
+    }
+
+    public void setInputFile(File inputFile) {
+        this.inputFile = inputFile;
+    }
+
+    public File getOutputFile() {
+        return outputFile;
+    }
+
+    public void setOutputFile(File outputFile) {
+        this.outputFile = outputFile;
+    }
 
     public String getAction() {
         return action;

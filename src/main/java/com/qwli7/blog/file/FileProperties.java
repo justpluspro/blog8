@@ -16,15 +16,44 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource(value = "classpath:blog.properties")
 public class FileProperties {
 
-    /**
-     * 上传路径
-     */
     private String uploadPath;
-
-    /**
-     * 缩略图路径
-     */
     private String uploadThumbPath;
+    private int totalSem;
+    private String ffmpegPath;
+    private String ffprobePath;
+    private String graphicsMagickPath;
+
+    public String getFfmpegPath() {
+        return ffmpegPath;
+    }
+
+    public String getGraphicsMagickPath() {
+        return graphicsMagickPath;
+    }
+
+    public String getFfprobePath() {
+        return ffprobePath;
+    }
+
+    public void setFfmpegPath(String ffmpegPath) {
+        this.ffmpegPath = ffmpegPath;
+    }
+
+    public void setFfprobePath(String ffprobePath) {
+        this.ffprobePath = ffprobePath;
+    }
+
+    public void setGraphicsMagickPath(String graphicsMagickPath) {
+        this.graphicsMagickPath = graphicsMagickPath;
+    }
+
+    public int getTotalSem() {
+        return totalSem;
+    }
+
+    public void setTotalSem(int totalSem) {
+        this.totalSem = totalSem;
+    }
 
     public String getUploadThumbPath() {
         return uploadThumbPath;
