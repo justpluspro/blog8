@@ -5,6 +5,8 @@ import com.qwli7.blog.file.vo.ControlArgs;
 import com.qwli7.blog.file.vo.ResizeControlArgs;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 
 /**
@@ -22,6 +24,11 @@ public class Image2ImageConverter extends AbstractMediaConverter {
     public void doConvert(File sourceFile, File targetFile, ControlArgs controlArgs) {
         if(!graphicsMagicAvailable()) {
             logger.error("method<doConvert> gm 不可用");
+            try {
+                Files.deleteIfExists(targetFile.toPath());
+            } catch (IOException ex){
+              logger.info("静默删除目标文件: [{}]", targetFile);
+            }
             return;
         }
         final LinkedList<String> commands = buildCommands(controlArgs);

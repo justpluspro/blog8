@@ -37,4 +37,9 @@ public class MediaUtils {
     public static boolean isPNG(String ext) {
         return "png".equals(ext.toLowerCase());
     }
+
+    public static boolean canHandle(String fileExtension) {
+        canHandleVideoExts.addAll(canHandleImageExts);
+        return canHandleVideoExts.contains(fileExtension.toLowerCase());
+    }
 }

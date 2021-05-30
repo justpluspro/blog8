@@ -1,11 +1,11 @@
 package com.qwli7.blog.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -15,6 +15,8 @@ import java.nio.file.Files;
  * @since 2.0
  */
 public class StreamUtils {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private StreamUtils() {
         super();
@@ -50,5 +52,23 @@ public class StreamUtils {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public static StringBuffer readInputStream(InputStream inputStream) {
+        StringBuffer stringBuffer = new StringBuffer();
+        if(inputStream == null) {
+            return stringBuffer;
+        }
+        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+            return stringBuffer;
+        } catch (IOException ex){
+            ex.printStackTrace();
+        }
+        return stringBuffer;
     }
 }

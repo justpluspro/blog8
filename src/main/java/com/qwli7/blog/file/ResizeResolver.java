@@ -6,6 +6,14 @@ import org.springframework.util.StringUtils;
 
 /**
  * 缩放尺寸解析
+ * <ul>
+ *     <li>test.png => empty</li>
+ *     <li>test.png/200 => new Resize(200)</li>
+ *     <li>test.png/200x300 => new Resize(200, 300, false)</li>
+ *     <li>test.png/200x300! => new Resize(200, 300, true)</li>
+ *     <li>test.png/x300 => new Resize(null, 300, false)</li>
+ *     <li>test.png/200s => new Resize(200, null, false)</li>
+ * </ul>
  * @author liqiwen
  * @since 2.0
  */
@@ -23,20 +31,24 @@ public class ResizeResolver {
 
     public ResizeResolver(String filePath) {
         this.resize = resolveResize(filePath);
-        this.sourcePath = getResourcePathFromResize(filePath);
+        this.sourcePath = getResourcePathByResizePath(filePath);
     }
 
     public Resize getResize() {
         return resize;
     }
 
-    private String getResourcePathFromResize(String filePath) {
-        final Resize resize = getResize();
-        final boolean keepRate = resize.isKeepRate();
-        if(keepRate) {
+    private String getResourcePathByResizePath(String filePath) {
+        final String fileExtension = FileUtil.getFileExtension(filePath);
+        if(StringUtils.isEmpty(StringUtils.trimAllWhitespace(fileExtension))) {
             return filePath;
         }
-        return filePath.substring(0, filePath.lastIndexOf("/"));
+        String sourcePath = filePath;
+        int index = filePath.lastIndexOf("/");
+        if(index != -1) {
+            sourcePath = filePath.substring(0, index);
+        }
+        return sourcePath;
     }
 
 

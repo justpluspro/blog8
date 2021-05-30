@@ -39,9 +39,9 @@ public class FileController {
      */
     @PostMapping(value = "file/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(FileUploadModel fileUploadModel) {
-        final List<MultipartFile> files = fileUploadModel.getFiles();
+        final MultipartFile file = fileUploadModel.getFile();
         final String path = fileUploadModel.getPath();
-        FileInfoDetail fileInfoDetail = fileService.uploadFile(path, files);
+        FileInfoDetail fileInfoDetail = fileService.uploadFile(path, file);
         return ResponseEntity.ok(fileInfoDetail);
     }
 

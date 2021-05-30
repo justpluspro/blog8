@@ -2,18 +2,12 @@ package com.qwli7.blog.file;
 
 import com.qwli7.blog.exception.LogicException;
 import com.qwli7.blog.file.converter.*;
-import com.qwli7.blog.file.vo.ControlArgs;
 import com.qwli7.blog.file.vo.ResizeControlArgs;
-import com.qwli7.blog.file.vo.VideoCutParams;
-import com.qwli7.blog.util.SystemType;
-import com.qwli7.blog.util.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.io.Resource;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -23,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,7 +53,7 @@ public class FileService implements InitializingBean {
     private final Path uploadRootPath;
     private final Path uploadThumbPath;
     private final Semaphore semaphore;
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final ExecutorService executorService;
     private final FileProperties fileProperties;
     private Map<ConvertAction, AbstractMediaConverter> converters;
@@ -92,13 +87,14 @@ public class FileService implements InitializingBean {
     /**
      * 上传文件
      * @param dirPath dirPath
-     * @param files files
+     * @param file file
      * @return FileInfoDetail
      */
-    public FileInfoDetail uploadFile(String dirPath, List<MultipartFile> files) {
-        readWriteLock.writeLock().lock();
+    public FileInfoDetail uploadFile(String dirPath, MultipartFile file) {
+        lock.writeLock().lock();
         try {
             Path path;
+
             if(StringUtils.isEmpty(dirPath) || StringUtils.pathEquals(dirPath, FileUtil.pathSeparator)) {
                 path = uploadRootPath;
             } else {
@@ -108,43 +104,42 @@ public class FileService implements InitializingBean {
                 path = uploadRootPath.resolve(dirPath);
             }
 
-            logger.info("filePath:[{}]", path.toAbsolutePath());
             final Path parent = path.getParent();
             final boolean directories = FileUtil.createDirectories(parent);
             if(!directories) {
                 throw new LogicException("path.notDirectories", "指定路径非文件夹");
             }
 
-
-            for(MultipartFile file: files) {
-                String fileName = file.getOriginalFilename();
-                //去除文件中的非法字符
-                if(StringUtils.isEmpty(fileName)) {
-                    throw new LogicException("fileName.isEmpty", "文件名称不能为空");
-                }
-                Path dest = path.resolve(fileName);
-                try (InputStream in = new BufferedInputStream(file.getInputStream())) {
-                    Files.copy(in, dest);
-                } catch (IOException ex) {
-                    throw new LogicException("file.already.exists", "文件已经存在");
-                }
+            String fileName = file.getOriginalFilename();
+            //去除文件中的非法字符
+            if(StringUtils.isEmpty(fileName)) {
+                throw new LogicException("fileName.isEmpty", "文件名称不能为空");
             }
-            //目标文件
-
-//            return getFileInfoDetail(dest);
-            return null;
-
+            Path dest = path.resolve(fileName);
+            try (InputStream in = new BufferedInputStream(file.getInputStream())) {
+                Files.copy(in, dest);
+            } catch (FileAlreadyExistsException e){
+                throw new LogicException("file.already.exists", "文件已经存在");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            return getFileInfoDetail(dest);
         } finally {
-            readWriteLock.writeLock().unlock();
+            lock.writeLock().unlock();
         }
     }
+
+    private FileInfoDetail getFileInfoDetail(Path dest) {
+        return null;
+    }
+
 
     /**
      * 创建文件
      * @param fileCreate fileCreate
      */
     public void createFile(FileCreate fileCreate) {
-        final Lock lock = readWriteLock.writeLock();
+        final Lock lock = this.lock.writeLock();
         lock.lock();
 
         try {
@@ -185,7 +180,7 @@ public class FileService implements InitializingBean {
      * @param fileUpdated fileUpdated
      */
     public void updateFile(FileUpdated fileUpdated) {
-        final Lock lock = readWriteLock.writeLock();
+        final Lock lock = this.lock.writeLock();
         lock.lock();
         try {
             final String path = fileUpdated.getPath();
@@ -388,6 +383,22 @@ public class FileService implements InitializingBean {
     public List<Path> getPathsBetweenTwoPath(Path start, Path end) {
 
         return new ArrayList<>();
+    }
+
+
+    private boolean isEditable(String ext) {
+        return editableExts.stream().anyMatch(e -> e.equalsIgnoreCase(ext));
+    }
+
+    private void writeContent(Path path, String content) {
+        if(!isEditable(FileUtil.getFileExtension(path))) {
+            throw new LogicException("fileService.edit.unable", "该文件不可被编辑");
+        }
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e){
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 

@@ -3,6 +3,7 @@ package com.qwli7.blog.file.converter;
 import com.qwli7.blog.file.FileUtil;
 import com.qwli7.blog.file.vo.ControlArgs;
 import com.qwli7.blog.file.vo.VideoConvertParams;
+import com.qwli7.blog.util.StreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -12,6 +13,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * 抽象媒体转换器
@@ -150,6 +152,7 @@ public abstract class AbstractMediaConverter {
         cmds.add(getGraphicsMagickPath());
         cmds.add(VERSION);
         String versionStr = doProcess(cmds);
+        logger.info("检测 graphicsMagick 执行结果：" + versionStr);
         return !StringUtils.isEmpty(versionStr);
     }
 
@@ -210,25 +213,25 @@ public abstract class AbstractMediaConverter {
         if(CollectionUtils.isEmpty(commands)) {
             return null;
         }
-        LinkedList<String> cmds = new LinkedList<>(commands);
 
-        String commandStr = String.join(" ", cmds);
+        String commandStr = String.join(" ", commands);
         logger.info("method<doProcess> full commands is：[{}]", commandStr);
         final Runtime runtime = Runtime.getRuntime();
         Process process = null;
         try {
             ProcessBuilder builder = new ProcessBuilder();
-            builder.command(cmds);
+            builder.command(commands);
             process = builder.start();
             // 取输出流和错误流信息
-            PrintStream errorStream = new PrintStream(process.getErrorStream());
-            PrintStream inputStream = new PrintStream(process.getInputStream());
-            errorStream.start();
-            inputStream.start();
+            final InputStream errorStream = process.getErrorStream();
+            final InputStream inputStream = process.getInputStream();
+            final OutputStream outputStream = process.getOutputStream();
+            StringBuffer inputStreamBuffer = StreamUtils.readInputStream(inputStream);
+            StringBuffer errorStreamBuffer = StreamUtils.readInputStream(errorStream);
             // 等待进程执行结束
             process.waitFor();
             //获取执行结果
-            String result = errorStream.stringBuffer.append(inputStream.stringBuffer).toString();
+            String result = errorStreamBuffer.append(inputStreamBuffer).toString();
             // 输出执行的命令信息
             logger.info("method<doProcess> command execute result is: [{}]", result);
             return result;
@@ -280,7 +283,7 @@ public abstract class AbstractMediaConverter {
     /**
      * 打印结果的线程
      */
-    public class PrintStream extends Thread {
+    public class PrintStream implements Callable<String> {
         InputStream inputStream;
         BufferedReader bufferedReader = null;
         StringBuffer stringBuffer = new StringBuffer();
@@ -290,17 +293,18 @@ public abstract class AbstractMediaConverter {
         }
 
         @Override
-        public void run() {
+        public String call() {
             try {
                 if(null == inputStream) {
                     logger.error("method<PrintStream#run> 输入流出错，输出流为空");
-                    return;
+                    return "-1";
                 }
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     stringBuffer.append(line);
                 }
+                logger.info("输入流/错误流执行结果: [{}]", stringBuffer.toString());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 logger.error("method<PrintStream#run> 读取输入流出错:[{}]", ex.getMessage(), ex);
@@ -317,6 +321,7 @@ public abstract class AbstractMediaConverter {
                     logger.error("method<PrintStream#run> 关闭流失败:[{}]", e.getMessage(), e);
                 }
             }
+            return "1";
         }
     }
 }

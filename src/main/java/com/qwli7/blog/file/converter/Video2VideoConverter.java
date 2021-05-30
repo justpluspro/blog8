@@ -23,6 +23,16 @@ public class Video2VideoConverter extends AbstractMediaConverter {
 
     @Override
     public LinkedList<String> buildCommands(ControlArgs controlArgs) {
-        return null;
+        LinkedList<String> commands = new LinkedList<>();
+        commands.add(getFfmpegPath());
+        commands.add("-i");
+        commands.add(controlArgs.getInputFile().getAbsolutePath());
+
+
+
+
+
+
+        return commands;
     }
 }

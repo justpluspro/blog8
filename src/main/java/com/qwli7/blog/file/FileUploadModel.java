@@ -20,7 +20,7 @@ public class FileUploadModel implements Serializable {
     /**
      * 待上传的文件
      */
-    private List<MultipartFile> files;
+    private MultipartFile file;
     
     public String getPath() {
         return path;
@@ -30,11 +30,11 @@ public class FileUploadModel implements Serializable {
         this.path = path;
     }
 
-    public List<MultipartFile> getFiles() {
-        return files;
+    public MultipartFile getFile() {
+        return file;
     }
 
-    public void setFiles(List<MultipartFile> files) {
-        this.files = files;
+    public void setFile(MultipartFile file) {
+        this.file = file;
     }
 }
