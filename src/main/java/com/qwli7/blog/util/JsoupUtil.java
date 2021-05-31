@@ -17,6 +17,11 @@ public class JsoupUtil {
         super();
     }
 
+    /**
+     * 获取第一个 img 属性的 src
+     * @param html html
+     * @return String
+     */
     public static Optional<String> getFirstImage(String html) {
         if(StringUtils.isEmpty(html)) {
             return Optional.empty();
@@ -28,5 +33,25 @@ public class JsoupUtil {
         }
 
         return Optional.of(img.attr("src"));
+    }
+
+    /**
+     * 获取第一个视频的封面
+     * @param html html
+     * @return String
+     */
+    public static Optional<String> getFirstVideoPoster(String html) {
+        if(StringUtils.isEmpty(html)) {
+            return Optional.empty();
+        }
+        final Element video = Jsoup.parse(html).selectFirst("video");
+        if(video == null) {
+            return Optional.empty();
+        }
+        final String poster = video.attr("poster");
+        if(StringUtils.isEmpty(poster)) {
+            return Optional.empty();
+        }
+        return Optional.of(poster);
     }
 }

@@ -14,9 +14,6 @@ import java.io.StringReader;
  */
 public class MemoryTemplateResource implements ITemplateResource {
 
-    /**
-     * 模板对象
-     */
     private final Template template;
 
     public MemoryTemplateResource(Template template) {

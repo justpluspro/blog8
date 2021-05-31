@@ -67,20 +67,16 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
         return blogConfig.getCommentStrategy();
     }
 
-    @Transactional(readOnly = true, rollbackFor = LoginFailException.class)
+    @Transactional(readOnly = true)
     @Override
     public boolean authenticate(String name, String password) {
-        logger.info("method[authenticate] name:[{}], password:[{}]", name, password);
         loadConfig();
         final String loginName = this.blogConfig.getLoginName();
         final String configPassword = this.blogConfig.getPassword();
-        if(StringUtils.isEmpty(loginName) ||
-                StringUtils.isEmpty(configPassword)) {
+        if(StringUtils.isEmpty(loginName) || StringUtils.isEmpty(configPassword)) {
             return false;
         }
         final String encryptPassword = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
-        logger.info("encryptPassword:[{}]", encryptPassword);
-
         if(!loginName.equals(name) || !configPassword.equals(encryptPassword)) {
             throw new LoginFailException("login.failed", "登录失败");
         }

@@ -13,7 +13,6 @@ import org.springframework.context.annotation.PropertySource;
 @Conditional(FileCondition.class)
 @Configuration
 @ConfigurationProperties(prefix = "blog.file")
-@PropertySource(value = "classpath:blog.properties")
 public class FileProperties {
 
     private String uploadPath;

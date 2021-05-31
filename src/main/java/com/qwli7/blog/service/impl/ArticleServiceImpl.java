@@ -96,7 +96,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         article.setCreateAt(LocalDateTime.now());
 
         Set<Tag> tags = article.getTags();
-        int maxArticleTagSize = blogProperties.getMaxArticleTagCount();
+        int maxArticleTagSize = blogProperties.getMaxArticleTagSize();
         if(tags != null && tags.size() > maxArticleTagSize) {
             throw new LogicException("tags.exceed.limit", "标签最多不能超过5个");
         }

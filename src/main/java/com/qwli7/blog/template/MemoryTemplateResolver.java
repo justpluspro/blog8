@@ -8,6 +8,8 @@ import org.thymeleaf.cache.AlwaysValidCacheEntryValidity;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolution;
+
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,24 +21,46 @@ import java.util.Optional;
  **/
 public class MemoryTemplateResolver implements ITemplateResolver {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    public TemplateMode templateMode = TemplateMode.HTML;
 
-    /**
-     * 模板解析器顺序
-     */
-    private int order;
+    private boolean cacheable = false;
 
-    public void setOrder(int order) {
-        this.order = order;
-    }
+    private String characterEncoding = Charset.defaultCharset().name();
 
-    /**
-     * 模板业务实现类
-     */
     private final TemplateService templateService;
 
     public MemoryTemplateResolver(TemplateService templateService) {
         this.templateService = templateService;
+    }
+
+    public void setCacheable(boolean cacheable) {
+        this.cacheable = cacheable;
+    }
+
+    public boolean isCacheable() {
+        return cacheable;
+    }
+
+    public void setCharacterEncoding(String characterEncoding) {
+        this.characterEncoding = characterEncoding;
+    }
+
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
+    public void setTemplateMode(TemplateMode templateMode) {
+        this.templateMode = templateMode;
+    }
+
+    public TemplateMode getTemplateMode() {
+        return templateMode;
+    }
+
+    private int order;
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     @Override
@@ -61,7 +85,6 @@ public class MemoryTemplateResolver implements ITemplateResolver {
     public TemplateResolution resolveTemplate(IEngineConfiguration iEngineConfiguration,
                                               String ownerTemplate, String templateName,
                                               Map<String, Object> map) {
-        logger.info("method<resolveTemplate> resolve templateName:[{}]", templateName);
         final Optional<Template> templateOp = templateService.findByName(templateName);
         if (templateOp.isPresent()) {
             final Template template = templateOp.get();

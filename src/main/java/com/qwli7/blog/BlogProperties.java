@@ -2,7 +2,6 @@ package com.qwli7.blog;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * 博客属性配置
@@ -10,43 +9,46 @@ import org.springframework.context.annotation.PropertySource;
  * @since 1.2
  * @version 1.2
  */
-@ConfigurationProperties(prefix = "blog.core")
-@PropertySource(value = "classpath:blog.properties")
 @Configuration
+@ConfigurationProperties(prefix = "blog.core")
 public class BlogProperties {
 
-    /**
-     * MarkdownServerUrl
-     * 基于 NodeJs
-     */
     private String markdownServerUrl;
 
-    /**
-     * ip header
-     */
     private String ipHeader;
 
-    /**
-     * token header
-     */
     private String tokenHeader;
 
-    /**
-     * 默认分页大小
-     */
     private int defaultPageSize;
 
-    /**
-     * 每篇文章关联的最大标签数量
-     */
-    private int maxArticleTagCount;
+    private int maxArticleTagSize;
 
-    public int getMaxArticleTagCount() {
-        return maxArticleTagCount;
+    private String urlPrefix;
+
+    private boolean backup;
+
+    public boolean isBackup() {
+        return backup;
     }
 
-    public void setMaxArticleTagCount(int maxArticleTagCount) {
-        this.maxArticleTagCount = maxArticleTagCount;
+    public void setBackup(boolean backup) {
+        this.backup = backup;
+    }
+
+    public String getUrlPrefix() {
+        return urlPrefix;
+    }
+
+    public void setUrlPrefix(String urlPrefix) {
+        this.urlPrefix = urlPrefix;
+    }
+
+    public int getMaxArticleTagSize() {
+        return maxArticleTagSize;
+    }
+
+    public void setMaxArticleTagSize(int maxArticleTagSize) {
+        this.maxArticleTagSize = maxArticleTagSize;
     }
 
     public String getTokenHeader() {

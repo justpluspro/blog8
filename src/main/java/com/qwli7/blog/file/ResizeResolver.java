@@ -40,7 +40,7 @@ public class ResizeResolver {
 
     private String getResourcePathByResizePath(String filePath) {
         final String fileExtension = FileUtil.getFileExtension(filePath);
-        if(StringUtils.isEmpty(StringUtils.trimAllWhitespace(fileExtension))) {
+        if(!StringUtils.isEmpty(StringUtils.trimAllWhitespace(fileExtension))) {
             return filePath;
         }
         String sourcePath = filePath;

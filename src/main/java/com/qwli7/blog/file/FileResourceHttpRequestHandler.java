@@ -19,7 +19,6 @@ import java.util.Collections;
  **/
 class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
 
-
     public FileResourceHttpRequestHandler(FileResourceResolver fileResourceResolver, ResourceProperties resourceProperties) {
         super();
         this.setResourceResolvers(Collections.singletonList(fileResourceResolver));

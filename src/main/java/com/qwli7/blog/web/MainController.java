@@ -25,8 +25,6 @@ import java.util.Optional;
 @Controller
 public class MainController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-
     private final ArticleService articleService;
     private final MomentService momentService;
     private final BlogProperties blogProperties;

@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * @author liqiwen
  * @since 2.0
  */
-//@Service
+@Service
 public class TemplateServiceImpl implements TemplateService, HandlerMapping, InitializingBean, Ordered {
 
     private static final String DEFAULT_TEMPLATE_PATH = "defaultTemplate";

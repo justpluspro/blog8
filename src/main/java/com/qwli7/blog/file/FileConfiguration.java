@@ -1,7 +1,5 @@
 package com.qwli7.blog.file;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.context.ApplicationContext;
@@ -9,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -28,16 +25,9 @@ import java.util.Collections;
 @Conditional(FileCondition.class)
 public class FileConfiguration implements WebMvcConfigurer {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-
-    private static final String DEFAULT_MVC_STATIC_PATH_PATTERN = "/**";
-
-
     public FileConfiguration(WebMvcProperties mvcProperties) {
         String staticPathPattern = mvcProperties.getStaticPathPattern();
-        logger.info("method<FileConfiguration> staticPathPattern: [{}]", staticPathPattern);
-        if(DEFAULT_MVC_STATIC_PATH_PATTERN.equals(staticPathPattern)) {
-            logger.error("method<FileConfiguration> 文件服务已经配置，该配置不允许为 [/**]");
+        if("/**".equals(staticPathPattern)) {
             throw new RuntimeException("文件服务已配置，该文件配置不能为 /**");
         }
     }
@@ -72,14 +62,13 @@ public class FileConfiguration implements WebMvcConfigurer {
         }
         requestHandler.afterPropertiesSet();
 
-
         requestHandler.setUrlPathHelper(urlPathHelper);
-        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping(Collections.singletonMap(DEFAULT_MVC_STATIC_PATH_PATTERN, requestHandler));
+        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping(Collections.singletonMap("/**", requestHandler));
         mapping.setOrder(Ordered.LOWEST_PRECEDENCE);
         mapping.setPathMatcher(pathMatcher);
         mapping.setUrlPathHelper(urlPathHelper);
-//        simpleUrlHandlerMapping.setAlwaysUseFullPath(false);
-//        simpleUrlHandlerMapping.setOrder(Ordered.LOWEST_PRECEDENCE);
+//        mapping.setAlwaysUseFullPath(false);
+//        mapping.setOrder(Ordered.LOWEST_PRECEDENCE);
 
         return mapping;
     }

@@ -123,11 +123,14 @@ public class FileService implements InitializingBean {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+
+
             return getFileInfoDetail(dest);
         } finally {
             lock.writeLock().unlock();
         }
     }
+
 
     private FileInfoDetail getFileInfoDetail(Path dest) {
         return null;

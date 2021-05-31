@@ -8,8 +8,10 @@ import org.commonmark.Extension;
 import org.commonmark.ext.autolink.AutolinkExtension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.ext.heading.anchor.HeadingAnchorExtension;
+import org.commonmark.node.Image;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.AttributeProvider;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -70,7 +72,9 @@ public class DefaultMarkdown2Html implements Markdown2Html {
                     TablesExtension.create(),
                     HeadingAnchorExtension.create());
             this.parser = Parser.builder().extensions(extensionList).build();
-            this.renderer = HtmlRenderer.builder().extensions(extensionList).build();
+            this.renderer = HtmlRenderer.builder()
+                    .attributeProviderFactory((context) -> new ImageAttributeProvider())
+                    .extensions(extensionList).build();
         }
 
         @Override
@@ -114,6 +118,16 @@ public class DefaultMarkdown2Html implements Markdown2Html {
                 }
             }
             return "";
+        }
+    }
+
+    static class ImageAttributeProvider implements AttributeProvider {
+
+        @Override
+        public void setAttributes(Node node, String s, Map<String, String> attributes) {
+            if(node instanceof Image) {
+                attributes.put("class", "border");
+            }
         }
     }
 }

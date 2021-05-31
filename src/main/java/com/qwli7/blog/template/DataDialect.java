@@ -6,7 +6,7 @@ import org.thymeleaf.processor.IProcessor;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MyAutoDialect extends AbstractProcessorDialect {
+public class DataDialect extends AbstractProcessorDialect {
 
     /**
      * <data name=''></data>
@@ -17,7 +17,7 @@ public class MyAutoDialect extends AbstractProcessorDialect {
     private static final Set<IProcessor> processors = new HashSet<>();
 
 
-    public MyAutoDialect() {
+    public DataDialect() {
         super("template dialect",  //Dialect name
                 "hello", //Dialect prefix.  (hello:*)
                 1000); //Dialect precedence
