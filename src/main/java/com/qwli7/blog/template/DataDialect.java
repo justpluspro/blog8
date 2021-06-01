@@ -1,12 +1,24 @@
 package com.qwli7.blog.template;
 
+import com.qwli7.blog.template.data.AbstractDataProvider;
+import com.qwli7.blog.template.data.ArticleDataProvider;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.processor.IProcessor;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+/**
+ * Data 标签方言
+ * @author liqiwen
+ * @since 2.5
+ */
 public class DataDialect extends AbstractProcessorDialect {
+
+    private final Map<String, AbstractDataProvider<?>> dataProviderMap;
+
 
     /**
      * <data name=''></data>
@@ -21,6 +33,9 @@ public class DataDialect extends AbstractProcessorDialect {
         super("template dialect",  //Dialect name
                 "hello", //Dialect prefix.  (hello:*)
                 1000); //Dialect precedence
+        dataProviderMap = new HashMap<>();
+        ArticleDataProvider articleDataProvider = new ArticleDataProvider(null);
+        dataProviderMap.put(articleDataProvider.getName(), articleDataProvider);
     }
 
 
