@@ -5,11 +5,17 @@ import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.service.MomentService;
 import com.qwli7.blog.template.data.*;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.thymeleaf.dialect.AbstractDialect;
+import org.thymeleaf.dialect.AbstractProcessorDialect;
+import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
@@ -51,7 +57,9 @@ public class TemplateConfiguration {
 
 
     @Bean
-    public SpringTemplateEngine templateEngine(Markdown2Html markdown2Html, TemplateService templateService) {
+    public SpringTemplateEngine templateEngine(Markdown2Html markdown2Html,
+                                               ApplicationContext applicationContext,
+                                               TemplateService templateService) {
 
         final ITemplateResolver iTemplateResolver = templateResolver();
         SpringTemplateEngine springTemplateEngine = new SpringTemplateEngine();
@@ -61,11 +69,27 @@ public class TemplateConfiguration {
         Set<ITemplateResolver> templateResolvers = new HashSet<>();
         templateResolvers.add(iTemplateResolver);
         templateResolvers.add(memoryTemplateResolver);
-
         springTemplateEngine.setTemplateResolvers(templateResolvers);
-        springTemplateEngine.addDialect("expression-object", new ExtStandardExpressionDialect(markdown2Html));
-        springTemplateEngine.addDialect("data-dialect", new DataDialect());
+        springTemplateEngine.setAdditionalDialects(createDialects(applicationContext, markdown2Html));
+        springTemplateEngine.setEnableSpringELCompiler(true);
         return springTemplateEngine;
+    }
+
+    private Set<IDialect> createDialects(ApplicationContext applicationContext, Markdown2Html markdown2Html) {
+        Set<IDialect> dialectSet = new HashSet<>();
+        dialectSet.add(new ExtStandardExpressionDialect(markdown2Html));
+        dialectSet.add(new AbstractProcessorDialect("blog-data", "data", StandardDialect.PROCESSOR_PRECEDENCE) {
+            @Override
+            public Set<IProcessor> getProcessors(String dialectPrefix) {
+                Set<IProcessor> processors = new HashSet<>();
+                final DataElementTagProcessor dataElementTagProcessor = new DataElementTagProcessor(dialectPrefix);
+                dataElementTagProcessor.registerAllDataProvider(applicationContext);
+                processors.add(dataElementTagProcessor);
+                return processors;
+            }
+        });
+
+        return dialectSet;
     }
 
 

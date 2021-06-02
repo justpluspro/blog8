@@ -13,6 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.*;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
@@ -72,6 +73,12 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     private HandlerExecutionChain getHandlerExecutionChain(HttpServletRequest request, String lookupPath) {
         for(String pattern : urlPatterns) {
             if(antPathMatcher.match(pattern, lookupPath)) {
+                final Map<String, String[]> parameterMap = request.getParameterMap();
+                final Map<String, String> variablesMap = antPathMatcher.extractUriTemplateVariables(pattern, lookupPath);
+                for(String key: parameterMap.keySet()) {
+                    variablesMap.put(key, parameterMap.get(key)[0]);
+                }
+                request.setAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE, variablesMap);
                 // /  /article/ewqew  /moments  /moment/2021
                 TemplateQueryParam queryParam = new TemplateQueryParam();
                 queryParam.setEnable(true);

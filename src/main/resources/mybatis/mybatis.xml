@@ -7,8 +7,8 @@
         <setting name="useGeneratedKeys" value="true"/>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
         <setting name="defaultEnumTypeHandler" value="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
-<!--        <setting name="logImpl" value="STDOUT_LOGGING"/>-->
-<!--        <setting name="logPrefix" value="blog"/>-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <setting name="logPrefix" value="blog"/>
     </settings>
     <typeAliases>
         <typeAlias

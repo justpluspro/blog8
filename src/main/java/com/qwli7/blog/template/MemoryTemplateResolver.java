@@ -21,10 +21,19 @@ import java.util.Optional;
  **/
 public class MemoryTemplateResolver implements ITemplateResolver {
 
+    /**
+     * 模板模式
+     */
     public TemplateMode templateMode = TemplateMode.HTML;
 
+    /**
+     * 是否可缓存
+     */
     private boolean cacheable = false;
 
+    /**
+     * 模板编码，默认为 UTF-8
+     */
     private String characterEncoding = Charset.defaultCharset().name();
 
     private final TemplateService templateService;
