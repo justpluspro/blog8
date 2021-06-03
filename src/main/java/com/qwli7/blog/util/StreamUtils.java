@@ -6,8 +6,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Optional;
 
 /**
  * 流工具处理类
@@ -41,19 +43,20 @@ public class StreamUtils {
      * @param file file
      * @return String
      */
-    public static String readFileToString(File file) {
+    public static Optional<String> readFileToString(File file) {
         if(!file.exists() || file.isDirectory()) {
-            return null;
+            return Optional.empty();
         }
         try {
-            return StringUtils.collectionToDelimitedString(
-                    Files.readAllLines(file.toPath(), StandardCharsets.UTF_8), "\r\n");
+            return Optional.of(StringUtils.collectionToDelimitedString(
+                    Files.readAllLines(file.toPath(), Charset.defaultCharset()), "\r\n"));
         } catch (IOException ex){
             ex.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
-
+    
+    
     public static StringBuffer readInputStream(InputStream inputStream) {
         StringBuffer stringBuffer = new StringBuffer();
         if(inputStream == null) {
