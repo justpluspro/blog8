@@ -14,9 +14,7 @@ import java.util.Optional;
  */
 public class ArticleDataProvider extends AbstractDataProvider<Article> {
 
-
     private final ArticleService articleService;
-
 
     public ArticleDataProvider(ArticleService articleService) {
         super("article");
@@ -26,7 +24,6 @@ public class ArticleDataProvider extends AbstractDataProvider<Article> {
     @Override
     public Article queryData(Map<String, String> attributeMap) {
         final String idOrAlias = attributeMap.get("idOrAlias");
-//        final String idOrAlias = "4";
         final Optional<Article> articleOp = articleService.getArticle(idOrAlias);
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notExists", "文章未找到");

@@ -181,14 +181,15 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
                     if(templateNameEnumOp.isPresent()) {
                         final TemplateNameEnum templateNameEnum = templateNameEnumOp.get();
                         template.setName(nameWithoutExt);
-                        String content = StreamUtils.readFileToString(e);
-                        template.setContent(content);
-                        template.setEnable(true);
-                        template.setAllowComment(true);
-                        template.setCreateAt(LocalDateTime.now());
-                        template.setModifyAt(LocalDateTime.now());
-                        template.setPattern(templateNameEnum.pattern);
-                        defaultTemplateList.add(template);
+                        StreamUtils.readFileToString(e).ifPresent(content -> {
+                            template.setContent(content);
+                            template.setEnable(true);
+                            template.setAllowComment(true);
+                            template.setCreateAt(LocalDateTime.now());
+                            template.setModifyAt(LocalDateTime.now());
+                            template.setPattern(templateNameEnum.pattern);
+                            defaultTemplateList.add(template);
+                        });
                     }
                 });
                 if(defaultTemplateList.isEmpty()) {
@@ -197,11 +198,8 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
                 templateMapper.batchInsert(defaultTemplateList);
                 urlPatterns = defaultTemplateList.stream().map(Template::getPattern).collect(Collectors.toList());
             }
-        }  else {
-            templates.forEach(e -> {
-                final String pattern = e.getPattern();
-                urlPatterns.add(pattern);
-            });
+        } else {
+            urlPatterns = templates.stream().map(Template::getPattern).collect(Collectors.toList());
         }
     }
 

@@ -129,7 +129,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(readOnly = true)
     @Override
     public Optional<Moment> getMoment(int id) {
-        final Optional<Moment> momentOp= momentMapper.selectById(id);
+        final Optional<Moment> momentOp = momentMapper.selectById(id);
         if(!momentOp.isPresent()) {
             throw new ResourceNotFoundException("moment.notExists", "动态不存在");
         }

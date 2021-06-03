@@ -11,8 +11,8 @@ import java.util.Optional;
 public enum TemplateNameEnum {
 
     INDEX("index", "/"),
-    ARTICLE("article", "/article/{path}"),
-    MOMENT("moment", "/moment/{path}"),
+    ARTICLE("article", "/article/{idOrAlias}"),
+    MOMENT("moment", "/moment/{id}"),
     MOMENTS("moments", "/moments"),
     ;
     String name;

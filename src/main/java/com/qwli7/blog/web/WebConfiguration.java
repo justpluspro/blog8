@@ -9,7 +9,6 @@ import com.qwli7.blog.queue.MemoryDataContainer;
 import com.qwli7.blog.service.Markdown2Html;
 import com.qwli7.blog.service.impl.DefaultMarkdown2Html;
 import com.qwli7.blog.template.*;
-import com.qwli7.blog.template.data.DataElementTagProcessor;
 import com.qwli7.blog.template.dialect.ExtStandardExpressionDialect;
 import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
@@ -209,7 +208,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         Set<IProcessor> processors = new HashSet<>();
         processors.add(new SayToAttributeTagProcessor(prefix));
         DataElementTagProcessor dataElementTagProcessor = new DataElementTagProcessor(prefix);
-        dataElementTagProcessor.registerAllProcessors(applicationContext);
+        dataElementTagProcessor.registerAllDataProvider(applicationContext);
         processors.add(dataElementTagProcessor);
         return processors;
     }

@@ -31,7 +31,7 @@ public class StreamUtils {
      */
     public static String readResourceToString(Resource resource) {
         try (InputStream inputStream = resource.getInputStream()) {
-            return org.springframework.util.StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            return org.springframework.util.StreamUtils.copyToString(inputStream, Charset.defaultCharset());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,8 +55,12 @@ public class StreamUtils {
         }
         return Optional.empty();
     }
-    
-    
+
+    /**
+     * 读取 InputStream
+     * @param inputStream inputStream
+     * @return StringBuffer
+     */
     public static StringBuffer readInputStream(InputStream inputStream) {
         StringBuffer stringBuffer = new StringBuffer();
         if(inputStream == null) {

@@ -46,41 +46,42 @@ public class DataElementTagProcessor extends AbstractElementTagProcessor {
     protected void doProcess(ITemplateContext iTemplateContext,
                              IProcessableElementTag iProcessableElementTag,
                              IElementTagStructureHandler iElementTagStructureHandler) {
-
-        final IAttribute[] allAttributes = iProcessableElementTag.getAllAttributes();
-        Map<String, String> attributes = resolveAttr(allAttributes);
-        if(attributes.isEmpty()) {
-            return ;
-        }
-        String dataProviderName = "";
-        if(attributes.containsKey("name")) {
-            dataProviderName = attributes.get("name");
-            if(StringUtils.isEmpty(dataProviderName)) {
-                if(attributes.containsKey("alias")) {
-                    dataProviderName = attributes.get("alias");
+        try {
+            final IAttribute[] allAttributes = iProcessableElementTag.getAllAttributes();
+            Map<String, String> attributes = resolveAttr(allAttributes);
+            if (attributes.isEmpty()) {
+                return;
+            }
+            String dataProviderName = "";
+            if (attributes.containsKey("name")) {
+                dataProviderName = attributes.get("name");
+                if (StringUtils.isEmpty(dataProviderName)) {
+                    if (attributes.containsKey("alias")) {
+                        dataProviderName = attributes.get("alias");
+                    }
                 }
             }
+            if (StringUtils.isEmpty(dataProviderName)) {
+                return;
+            }
+            final AbstractDataProvider<?> dataProvider = dataProviderMap.get(dataProviderName);
+            attributes.remove("name");
+            attributes.remove("alias");
+
+            if (dataProvider == null) {
+                return;
+            }
+
+            WebEngineContext engineContext = (WebEngineContext) iTemplateContext;
+            final HttpServletRequest request = engineContext.getRequest();
+            Map<String, Object> variables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            mergeVariables(attributes, variables);
+            final Object data = dataProvider.queryData(attributes);
+            request.setAttribute(dataProviderName, data);
+
+        } finally {
+            iElementTagStructureHandler.removeElement();
         }
-        if(StringUtils.isEmpty(dataProviderName)) {
-            return;
-        }
-        final AbstractDataProvider<?> dataProvider = dataProviderMap.get(dataProviderName);
-        attributes.remove("name");
-        attributes.remove("alias");
-
-        if(dataProvider == null) {
-            return;
-        }
-
-        WebEngineContext engineContext = (WebEngineContext) iTemplateContext;
-        final HttpServletRequest request = engineContext.getRequest();
-        Map<String, Object> variables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        mergeVariables(attributes, variables);
-        final Object data = dataProvider.queryData(attributes);
-
-        request.setAttribute(dataProviderName, data);
-
-        iElementTagStructureHandler.removeElement();
     }
 
     private void mergeVariables(Map<String, String> attributes, Map<String, Object> variables) {
@@ -114,6 +115,8 @@ public class DataElementTagProcessor extends AbstractElementTagProcessor {
         final MomentDataProvider momentDataProvider = new MomentDataProvider(momentService);
         final LatestMomentsDataProvider latestMomentsDataProvider = new LatestMomentsDataProvider(momentService);
         final CategoriesDataProvider categoriesDataProvider = new CategoriesDataProvider(categoryService);
+        final ArticleNavDataProvider articleNavDataProvider = new ArticleNavDataProvider(articleService);
+        final MomentNavDataProvider momentNavDataProvider = new MomentNavDataProvider(momentService);
 
         dataProviderMap.put(momentDataProvider.getName(), momentDataProvider);
         dataProviderMap.put(momentsDataProvider.getName(), momentsDataProvider);
@@ -121,6 +124,8 @@ public class DataElementTagProcessor extends AbstractElementTagProcessor {
         dataProviderMap.put(articlesDataProvider.getName(), articlesDataProvider);
         dataProviderMap.put(latestMomentsDataProvider.getName(), latestMomentsDataProvider);
         dataProviderMap.put(categoriesDataProvider.getName(), categoriesDataProvider);
+        dataProviderMap.put(articleNavDataProvider.getName(), articleNavDataProvider);
+        dataProviderMap.put(momentNavDataProvider.getName(), momentNavDataProvider);
 
     }
 }

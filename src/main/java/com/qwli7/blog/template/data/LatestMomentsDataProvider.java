@@ -1,10 +1,8 @@
 package com.qwli7.blog.template.data;
 
-import com.qwli7.blog.entity.Moment;
+import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.service.MomentService;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,8 +10,7 @@ import java.util.Map;
  * @author liqiwen
  * @since 2.5
  */
-@Component
-public class LatestMomentsDataProvider extends AbstractDataProvider<List<Moment>> {
+public class LatestMomentsDataProvider extends AbstractDataProvider<MomentArchive> {
 
     private final MomentService momentService;
 
@@ -23,7 +20,7 @@ public class LatestMomentsDataProvider extends AbstractDataProvider<List<Moment>
     }
 
     @Override
-    public List<Moment> queryData(Map<String, String> attributeMap) {
-        return null;
+    public MomentArchive queryData(Map<String, String> attributeMap) {
+        return momentService.selectLatestMoments();
     }
 }
