@@ -29,12 +29,14 @@ import java.util.Map;
  */
 public class DataElementTagProcessor extends AbstractElementTagProcessor {
 
+    private static final String TAG_NAME = "data";
+
     private Map<String, AbstractDataProvider<?>> dataProviderMap;
 
     public DataElementTagProcessor(String dialectPrefix) {
         super(TemplateMode.HTML,
                 dialectPrefix, // 标签前缀：即  xxx:text，这里我们的前缀是 data
-                null,  // 匹配标签元素名称，如果是 div，则自定义的属性只能使用在 div 中，这里我们自定了 tag
+                TAG_NAME,  // 匹配标签元素名称，如果是 div，则自定义的属性只能使用在 div 中，这里我们自定了 tag
                 false, //标签名称是否要求有前缀
                 null,  // 自定义标签属性名称
                 false, //属性名称是否要求有前缀，如果为 true，Thymeleaf 会要求使用标签时必须加上前缀

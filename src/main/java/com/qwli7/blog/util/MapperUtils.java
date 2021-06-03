@@ -34,7 +34,7 @@ public class MapperUtils {
     }
 
 
-    private static <T> T obj2Bean(String jsonStr, Class<T> clazz) {
+    public static <T> T obj2Bean(String jsonStr, Class<T> clazz) {
         Assert.notNull(jsonStr, "待格式化的字符串不能为空");
         try {
             return objectMapper.readValue(jsonStr, clazz);

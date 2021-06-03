@@ -3,6 +3,7 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.BlogProperties;
 import com.qwli7.blog.entity.dto.ResultDto;
 import com.qwli7.blog.service.Markdown2Html;
+import com.qwli7.blog.util.MapperUtils;
 import com.qwli7.blog.util.WebUtils;
 import org.commonmark.Extension;
 import org.commonmark.ext.autolink.AutolinkExtension;
@@ -42,7 +43,7 @@ public class DefaultMarkdown2Html implements Markdown2Html {
         if(StringUtils.isEmpty(markdownServerUrl)) {
             this.delegate = new CommonMarkdown2Html();
         } else {
-            if(WebUtils.isRegularUrl(markdownServerUrl)) {
+            if(!WebUtils.isRegularUrl(markdownServerUrl)) {
                 throw new RuntimeException("NodeServer 已经配置, 但是 ServerUrl 非法, 请检查!");
             }
             this.delegate = new MarkdownConverter(markdownServerUrl, restTemplate);
@@ -105,17 +106,20 @@ public class DefaultMarkdown2Html implements Markdown2Html {
             if(StringUtils.isEmpty(markdown)) {
                 return "";
             }
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> httpEntity = new HttpEntity<>(markdown, headers);
-            final ResponseEntity<ResultDto> responseEntity = restTemplate.postForEntity(
-                    serverUrl, httpEntity, ResultDto.class);
-            if(responseEntity.getStatusCode().is2xxSuccessful()) {
-                final ResultDto resultDto = responseEntity.getBody();
-                if(resultDto != null && resultDto.isSuccess()) {
-                    return ((String) resultDto.getData());
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<String> httpEntity = new HttpEntity<>(markdown, headers);
+                final ResponseEntity<String> responseEntity = restTemplate.postForEntity(serverUrl, httpEntity, String.class);
+                if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                    final String body = responseEntity.getBody();
+                    final ResultDto resultDto = MapperUtils.obj2Bean(body, ResultDto.class);
+                    if (resultDto != null && resultDto.isSuccess()) {
+                        return resultDto.getData();
+                    }
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
             return "";
         }

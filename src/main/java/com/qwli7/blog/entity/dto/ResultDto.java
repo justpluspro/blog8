@@ -12,44 +12,40 @@ public class ResultDto implements Serializable {
     /**
      * 业务状态码
      */
-    private Integer code;
+    private boolean success;
 
     /**
      * 请求 message
      */
-    private String message;
+    private String msg;
 
     /**
      * 请求数据
      */
-    private Object data;
+    private String data;
 
 
     public boolean isSuccess() {
-        return 200 == this.code;
+        return success;
     }
 
-    public Integer getCode() {
-        return code;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public String getMsg() {
+        return msg;
     }
 
-    public String getMessage() {
-        return message;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(String data) {
         this.data = data;
     }
 }
