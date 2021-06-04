@@ -13,18 +13,15 @@
 # date: 2020-08-17
 #======================================================================
 
-# project name
-APPLICATION="@project.name@"
-
-
-# jar name
-APPLICATION="@build.finalName@.jar"
-
-
+# 项目名称
+SERVER_NAME="${project.artifactId}"
+# jar 名称
+JAR_NAME="${project.build.finalName}.jar"
 # bin目录绝对路径
 BIN_PATH=$(cd `dirname $0`; pwd)
 # 进入bin目录
 cd `dirname $0`
+
 # 返回到上一级项目根目录路径
 cd ..
 # 打印项目根目录绝对路径
@@ -33,7 +30,7 @@ BASE_PATH=`pwd`
 
 # 外部配置文件绝对目录,如果是目录需要/结尾，也可以直接指定文件
 # 如果指定的是目录,spring则会读取目录中的所有配置文件
-CONFIG_DIR=${BASE_PATH}"/config/"
+CONFIG_DIR=${BASE_PATH}"/config"
 
 # 项目日志输出绝对路径
 LOG_DIR=${BASE_PATH}"/logs"

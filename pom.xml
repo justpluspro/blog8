@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.3.6.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>com.qwli7</groupId>
     <artifactId>blog</artifactId>
@@ -21,6 +21,9 @@
         <commonmark.version>0.14.0</commonmark.version>
         <easy-captcha.version>1.6.2</easy-captcha.version>
         <lucene.version>8.8.1</lucene.version>
+        <mybatis.version>3.5.6</mybatis.version>
+        <mybatis-starter.version>2.1.2</mybatis-starter.version>
+        <jsoup.version>1.12.1</jsoup.version>
     </properties>
 
     <dependencies>
@@ -43,7 +46,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.12.1</version>
+            <version>${jsoup.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.whvcse</groupId>
@@ -53,12 +56,12 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.6</version>
+            <version>${mybatis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.2</version>
+            <version>${mybatis-starter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -167,19 +170,62 @@
     </repositories>
 
     <build>
-        <finalName>
-            ${project.artifactId}-${project.version}
-        </finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
+<!--        <finalName>-->
+<!--            ${project.artifactId}-${project.version}-->
+<!--        </finalName>-->
         <plugins>
+
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <!-- 生成的 jar 中，不要包含 pom.xml 和 pom.properties 这两个文件 -->
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifest>
+                            <!-- 是否要把第三方jar加入到类构建路径 -->
+                            <addClasspath> true </addClasspath>
+                            <!-- 外部依赖 jar 包的最终位置 -->
+                            <!-- 因为我们将第三方 jar 和本项目 jar 放在同一个目录下，这里就使用 ./ -->
+                            <classpathPrefix>./</classpathPrefix>
+                            <!-- 项目启动类 -->
+                            <mainClass>com.qwli7.blog.BlogApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+
+
+            </plugin>
+            <!-- SpringBoot 的插件会将三方的 jar 打进项目的 jar 中，这样会导致 FatJar -->
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <includeSystemScope>true</includeSystemScope>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <descriptors>
+                        <!-- 具体的配置文件 -->
+                        <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!-- 绑定到 maven 的 package 动作上 -->
+                        <phase>package</phase>
+                        <!-- 执行一次 -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
