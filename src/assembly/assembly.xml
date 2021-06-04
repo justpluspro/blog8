@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
+    <!--打包名称，唯一标识-->
+    <id>${project.build.finalName}</id>
+    <!-- 打包格式，可以手动修改 -->
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <!--文件设置-->
+    <fileSets>
+        <fileSet>
+            <!--目标目录,会处理目录里面的所有文件-->
+            <directory>${project.basedir}/src/main/resources/config</directory>
+            <!--相对于打包后的目录-->
+            <outputDirectory>config</outputDirectory>
+            <fileMode>0644</fileMode>
+            <!--文件过滤-->
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+            <!--文件权限-->
+            <fileMode>0755</fileMode>
+            <!--如果是脚本，一定要改为unix.如果是在windows上面编码，会出现dos编写问题-->
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+    </fileSets>
+    <files>
+        <!--包含打包后的jar文件，可以不加入<outputDirectory/>,默认打包的目录-->
+        <file>
+            <source>${project.build.directory}/${project.build.finalName}.jar</source>
+        </file>
+        <!--这种方式也可以进行文件处理，但是针对单文件-->
+        <!-- <file>
+             <source>${project.basedir}/src/main/resources/script/start.sh</source>
+             <fileMode>0755</fileMode>
+             <lineEnding>unix</lineEnding>
+         </file>-->
+    </files>
+</assembly>
