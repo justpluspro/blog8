@@ -9,7 +9,7 @@
         这个名字最终会追加到打包的名字的结尾，例如项目的名字为 test-1.0-SNAPSHOT,
         那么打包出来的包名为 test-1.0-SNAPSHOT-xxx.tar.gz
     -->
-    <id>bin</id>
+    <id>${profileActive}-${project.version}</id>
 <!--    <id>${project.build.finalName}</id>-->
     <!-- 打包格式，可以手动修改 -->
     <formats>
@@ -103,7 +103,7 @@
 <!--        </file>-->
 <!--        &lt;!&ndash;这种方式也可以进行文件处理，但是针对单文件&ndash;&gt;-->
 <!--        &lt;!&ndash; <file>-->
-<!--             <source>${project.basedir}/src/main/resources/script/start.sh</source>-->
+<!--             <source>${project.basedir}/src/main/resources/script/startup.sh</source>-->
 <!--             <fileMode>0755</fileMode>-->
 <!--             <lineEnding>unix</lineEnding>-->
 <!--         </file>&ndash;&gt;-->

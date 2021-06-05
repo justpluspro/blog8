@@ -1,4 +1,4 @@
-#! /bin/shell
+#! /bin/bash
 
 #======================================================================
 # 项目启动 shell 脚本
@@ -14,9 +14,9 @@
 #======================================================================
 
 # 项目名称
-SERVER_NAME="${project.artifactId}"
+APPLICATION="${project.artifactId}"
 # jar 名称
-JAR_NAME="${project.build.finalName}.jar"
+APPLICATION_JAR="${project.build.finalName}.jar"
 # bin目录绝对路径
 BIN_PATH=$(cd `dirname $0`; pwd)
 # 进入bin目录
@@ -30,7 +30,23 @@ BASE_PATH=`pwd`
 
 # 外部配置文件绝对目录,如果是目录需要/结尾，也可以直接指定文件
 # 如果指定的是目录,spring则会读取目录中的所有配置文件
-CONFIG_DIR=${BASE_PATH}"/config"
+CONFIG_DIR=${BASE_PATH}"/config/"
+
+# 进程ID
+PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
+if [ -n "$PIDS" ]; then
+    echo "ERROR: The ${APPLICATION} is running....!"
+    echo "PID: $PID"
+    exit 1
+fi
+
+if [ -n "$SERVER_PORT" ]; then
+    SERVER_PORT_COUNT=`netstat -tln | grep $SERVER_PORT | wc -l`
+    if [ $SERVER_PORT_COUNT -gt 0 ]; then
+        echo "ERROR: The $SERVER_NAME port $SERVER_PORT already used!"
+        exit 1
+    fi
+fi
 
 # 项目日志输出绝对路径
 LOG_DIR=${BASE_PATH}"/logs"
@@ -48,6 +64,10 @@ NOW_PRETTY=`date +'%Y-%m-%m %H:%M:%S'`
 
 # 启动日志
 STARTUP_LOG="================================================ ${NOW_PRETTY} ================================================\n"
+
+# 获取应用端口号
+SERVER_PORT=`sed -nr '/port: [0-9]+/ s/.*port: +([0-9]+).*/\1/p' ${CONFIG_DIR}/application.yml`
+STARTUP_LOG="${STARTUP_LOG}Occupy Port: ${SERVER_PORT}"
 
 # 如果logs文件夹不存在,则创建文件夹
 if [[ ! -d "${LOG_DIR}" ]]; then
@@ -67,6 +87,8 @@ fi
 # 创建新的项目运行日志
 echo "" > ${LOG_PATH}
 
+
+
 # 如果项目启动日志不存在,则创建,否则追加
 #echo "${STARTUP_LOG}" >> ${LOG_STARTUP_PATH}
 
@@ -80,8 +102,17 @@ echo "" > ${LOG_PATH}
 # -XX:MaxMetaspaceSize=320m:限制Metaspace增长的上限，防止因为某些情况导致Metaspace无限的使用本地内存，影响到其他程序
 # -XX:-OmitStackTraceInFastThrow:解决重复异常不打印堆栈信息问题
 #==========================================================================================
-JAVA_OPT="-server -Xms256m -Xmx256m -Xmn512m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m"
-JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
+JAVA_MEM_OPTS=""
+BITS=`java -version 2>&1 | grep -i 64-bit`
+if [ -n "$BITS" ]; then
+    JAVA_MEM_OPTS="-server -Xms256m -Xmx256m -Xmn512m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m"
+    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:-OmitStackTraceInFastThrow"
+    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR}"
+    else
+    JAVA_MEM_OPTS="-server -Xms256m -Xmx256m -Xmn512m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m"
+    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:-OmitStackTraceInFastThrow"
+    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR}"
+fi
 
 #=======================================================
 # 将命令启动相关日志追加到日志文件
@@ -98,20 +129,34 @@ STARTUP_LOG="${STARTUP_LOG}application bin  path: ${BIN_PATH}\n"
 # 输出项目config路径
 STARTUP_LOG="${STARTUP_LOG}application config path: ${CONFIG_DIR}\n"
 # 打印日志路径
-STARTUP_LOG="${STARTUP_LOG}application log  path: ${LOG_PATH}\n"
+STARTUP_LOG="${STARTUP_LOG}application log path: ${LOG_PATH}\n"
 # 打印JVM配置
-STARTUP_LOG="${STARTUP_LOG}application JAVA_OPT : ${JAVA_OPT}\n"
+STARTUP_LOG="${STARTUP_LOG}application JAVA_MEM_OPTS : ${JAVA_MEM_OPTS}\n"
 
 
 # 打印启动命令
-STARTUP_LOG="${STARTUP_LOG}application startup command: nohup java ${JAVA_OPT} -jar ${BASE_PATH}/boot/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &\n"
+STARTUP_LOG="${STARTUP_LOG}application startup command: nohup java ${JAVA_MEM_OPTS} -jar ${BASE_PATH}/lib/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &\n"
 
 
 #======================================================================
 # 执行启动命令：后台启动项目,并将日志输出到项目根目录下的logs文件夹下
 #======================================================================
-nohup java ${JAVA_OPT} -jar ${BASE_PATH}/boot/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &
+STARTUP_LOG="${STARTUP_LOG}Starting the $APPLICATION}....\n"
+nohup java ${JAVA_MEM_OPTS} -jar ${BASE_PATH}/lib/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &
 
+COUNT=0
+while [ $COUNT -lt 1 ]; do
+  echo -e '.\c'
+  sleep 1
+  if [ -n "$SERVER_PORT" ]; then
+      COUNT=`netstat -an | grep $SERVER_PORT | wc -l`
+      else
+      COUNT=`ps -f | grep java | grep $BASE_PATH | awk '${print $2}' | wc -l`
+  fi
+  if [ $COUNT -gt 0 ]; then
+      break
+  fi
+done
 
 # 进程ID
 PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
