@@ -13,5 +13,5 @@ if [ -z "$PROFILE" ]; then
     PROFILE=local
 fi
 echo "profile: ${PROFILE}"
-mvn clen package -P${PROFILE} -DskipTests
+mvn clean package -P${PROFILE} -DskipTests
 echo "profile: ${PROFILE}"

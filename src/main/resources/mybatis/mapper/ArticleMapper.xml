@@ -30,15 +30,13 @@
                ba.title,
                ba.summary,
                ba.post_at,
-               ba.create_at,
-               ba.modify_at,
                ba.is_private,
                ba.alias,
+                ba.content,
                ba.hits,
                ba.comments,
                ba.status,
                ba.feature_image,
-               ba.allow_comment,
                GROUP_CONCAT(batt.tag_id) AS tag_ids,
                bc.id AS category_id,
                bc.name AS category_name
@@ -126,8 +124,9 @@
                 </foreach>
             </if>
             <if test="query != null and query != ''">
-                AND content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
-                OR summary LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
+                AND (title LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
+                OR content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
+                OR summary LIKE concat('%', #{query,jdbcType=VARCHAR}, '%'))
             </if>
         </where>
     </select>
@@ -156,7 +155,7 @@
         </where>
         GROUP BY ba.id
         ORDER BY ba.id DESC
-        LIMIT #{start} OFFSET #{offset}
+        LIMIT #{size} OFFSET #{start}
     </select>
 
     <update id="addHits">

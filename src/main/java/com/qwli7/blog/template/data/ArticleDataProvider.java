@@ -24,7 +24,7 @@ public class ArticleDataProvider extends AbstractDataProvider<Article> {
     @Override
     public Article queryData(Map<String, String> attributeMap) {
         final String idOrAlias = attributeMap.get("idOrAlias");
-        final Optional<Article> articleOp = articleService.getArticle(idOrAlias);
+        final Optional<Article> articleOp = articleService.findArticle(idOrAlias);
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notExists", "文章未找到");
         }

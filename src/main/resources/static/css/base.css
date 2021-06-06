@@ -1,3 +1,21 @@
+html,body {
+    margin: 0;
+    font-family: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #3b3e43;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+a.nav-link {
+    padding: 0 !important;
+}
+
+.nav-item {
+    margin-right: 32px !important;
+}
+
 .page-item.active .page-link {
     z-index: 3;
     color: #000000;

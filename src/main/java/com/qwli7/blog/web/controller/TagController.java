@@ -41,7 +41,7 @@ public class TagController {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }
-        return tagService.selectPage(queryParam);
+        return tagService.findPage(queryParam);
     }
 
     /**
@@ -51,7 +51,7 @@ public class TagController {
      */
     @GetMapping("tag/{id}")
     public Tag selectById(@PathVariable("id") int id) {
-        return tagService.selectById(id).orElseThrow(()
+        return tagService.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("tag.notExists","标签不存在"));
     }
 

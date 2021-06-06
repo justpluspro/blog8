@@ -40,19 +40,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Category> getAll() {
+    public List<Category> findAll() {
         return categoryMapper.findAll();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Category> selectByName(String name) {
+    public Optional<Category> findByName(String name) {
         return categoryMapper.findByName(name);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Category> selectById(int id) {
+    public Optional<Category> findById(int id) {
         return categoryMapper.findById(id);
     }
 
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(int id) {
         final Category category = categoryMapper.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("category.notExists", "分类不存在"));
+                new LogicException("category.notExists", "分类不存在"));
 
         long count = articleMapper.countByCategory(category);
         if(count > 0) {
@@ -87,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void update(final Category category) {
         final Optional<Category> categoryOp = categoryMapper.findById(category.getId());
         if(!categoryOp.isPresent()) {
-            throw new ResourceNotFoundException("category.notExists", "分类不存在");
+            throw new LogicException("category.notExists", "分类不存在");
         }
         final Category old = categoryOp.get();
         if(old.getName().equals(category.getName())) {

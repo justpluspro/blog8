@@ -27,7 +27,7 @@ public interface CommentMapper {
      * @param id id
      * @return Comment
      */
-    Optional<Comment> selectById(Integer id);
+    Optional<Comment> findById(Integer id);
 
     /**
      * 插入评论
@@ -40,7 +40,7 @@ public interface CommentMapper {
      * @param ip ip
      * @return Comment
      */
-    Optional<Comment> selectLatestCommentByIp(String ip);
+    Optional<Comment> findLatestCommentByIp(String ip);
 
     /**
      * 删除评论根据 id
@@ -66,5 +66,5 @@ public interface CommentMapper {
      * @param commentQueryParam commentQueryParam
      * @return List
      */
-    List<Comment> selectPage(CommentQueryParam commentQueryParam);
+    List<Comment> findPage(CommentQueryParam commentQueryParam);
 }

@@ -21,16 +21,16 @@ BASE_PATH=`pwd`
 # 如果指定的是目录,spring则会读取目录中的所有配置文件
 CONFIG_DIR=${BASE_PATH}"/config/"
 
-PIDS=`ps -ef | grep java | grep "$CONFIG_DIR" | awk '${print $2}'`
+PIDS=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
 if [ -z "$PIDS" ]; then
     echo "ERROR: The $APPLICATION does not started!"
     exit 1
 fi
 
 
-echo -e "Stopping the ${APPLICATION} ...\c"
+echo -e "Stopping the ${APPLICATION} ...\n"
 for PID in $PIDS; do
-    kill $PID > /dev/null/ 2>&1
+    kill -9 $PID
 done
 
 COUNT=0

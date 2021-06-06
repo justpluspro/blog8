@@ -1,8 +1,6 @@
 package com.qwli7.blog.template.data;
 
-import com.qwli7.blog.entity.ArticleNav;
 import com.qwli7.blog.entity.MomentNav;
-import com.qwli7.blog.service.ArticleService;
 import com.qwli7.blog.service.MomentService;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +32,6 @@ public class MomentNavDataProvider extends AbstractDataProvider<MomentNav> {
         if(id < 0) {
             return new MomentNav();
         }
-        return momentService.selectMomentNav(id).orElse(new MomentNav());
+        return momentService.findMomentNav(id).orElse(new MomentNav());
     }
 }

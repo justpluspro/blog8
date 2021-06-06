@@ -74,7 +74,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void update(Moment moment) {
-        momentMapper.selectById(moment.getId()).orElseThrow(()
+        momentMapper.findById(moment.getId()).orElseThrow(()
                 -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
         moment.setModifyAt(LocalDateTime.now());
         momentMapper.update(moment);
@@ -87,7 +87,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void delete(int id) {
-        final Moment oldMoment = momentMapper.selectById(id).orElseThrow(()
+        final Moment oldMoment = momentMapper.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
         momentMapper.deleteById(id);
         commentMapper.deleteByModule(new CommentModule(id, getModuleName()));
@@ -102,7 +102,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void updateHits(int id, int hits) {
-        final Optional<Moment> momentOp = momentMapper.selectById(id);
+        final Optional<Moment> momentOp = momentMapper.findById(id);
         if(!momentOp.isPresent()) {
             throw new ResourceNotFoundException("moment.notExists", "动态不存在");
         }
@@ -117,8 +117,8 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<Moment> getMomentForEdit(int id) {
-        return momentMapper.selectById(id);
+    public Optional<Moment> findMomentForEdit(int id) {
+        return momentMapper.findById(id);
     }
 
     /**
@@ -128,8 +128,8 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<Moment> getMoment(int id) {
-        final Optional<Moment> momentOp = momentMapper.selectById(id);
+    public Optional<Moment> findMoment(int id) {
+        final Optional<Moment> momentOp = momentMapper.findById(id);
         if(!momentOp.isPresent()) {
             throw new ResourceNotFoundException("moment.notExists", "动态不存在");
         }
@@ -148,12 +148,12 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Transactional(readOnly = true)
     @Override
-    public PageDto<Moment> selectPage(MomentQueryParam queryParam) {
+    public PageDto<Moment> findPage(MomentQueryParam queryParam) {
         int count = momentMapper.count(queryParam);
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
-        List<Moment> moments = momentMapper.selectPage(queryParam);
+        List<Moment> moments = momentMapper.findPage(queryParam);
         if(CollectionUtils.isEmpty(moments)) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
@@ -170,13 +170,13 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Transactional(readOnly = true)
     @Override
-    public PageDto<MomentArchive> selectArchivePage(MomentQueryParam queryParam) {
+    public PageDto<MomentArchive> findArchivePage(MomentQueryParam queryParam) {
         int count = momentMapper.countArchive(queryParam);
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
 
-        final List<MomentArchive> momentArchives = momentMapper.selectArchivePage(queryParam);
+        final List<MomentArchive> momentArchives = momentMapper.findArchivePage(queryParam);
         if(CollectionUtils.isEmpty(momentArchives)) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
@@ -195,12 +195,12 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<MomentNav> selectMomentNav(int id) {
-        Moment current = momentMapper.selectById(id).orElseThrow(() ->
+    public Optional<MomentNav> findMomentNav(int id) {
+        Moment current = momentMapper.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("moment.notExists", "动态不存在"));
         MomentNav momentNav = new MomentNav();
-        final Optional<Moment> preMomentOp = momentMapper.selectPreMoment(current);
-        final Optional<Moment> nextMomentOp = momentMapper.selectNextMoment(current);
+        final Optional<Moment> preMomentOp = momentMapper.findPreMoment(current);
+        final Optional<Moment> nextMomentOp = momentMapper.findNextMoment(current);
         nextMomentOp.ifPresent(momentNav::setNextMoment);
         preMomentOp.ifPresent(momentNav::setPrevMoment);
         return Optional.of(momentNav);
@@ -234,7 +234,7 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void hits(int id) {
-        final Moment moment = momentMapper.selectById(id).orElseThrow(()
+        final Moment moment = momentMapper.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
         // 登录的情况下不增加点击量
         if(BlogContext.isAuthenticated()) {
@@ -243,10 +243,11 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
         momentMapper.updateHits(id, moment.getHits()+1);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public MomentArchive selectLatestMoments() {
+    public MomentArchive findLatestMoments() {
         MomentQueryParam queryParam = new MomentQueryParam();
-        MomentArchive momentArchive =  momentMapper.selectLatestMoments(queryParam);
+        MomentArchive momentArchive =  momentMapper.findLatestMoments(queryParam);
         if(momentArchive == null) {
             return null;
         }
@@ -255,17 +256,6 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
             processMoments(moments);
         }
         return momentArchive;
-    }
-
-    @Override
-    public Moment selectById(int id) {
-        final Optional<Moment> momentOp = momentMapper.selectById(id);
-        if(!momentOp.isPresent()) {
-            throw new ResourceNotFoundException("moment.notFound", "动态不存在");
-        }
-        final Moment moment = momentOp.get();
-        processMoment(moment);
-        return moment;
     }
 
     /**
@@ -285,9 +275,9 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
     public void validateBeforeInsert(CommentModule module) {
         Assert.notNull(module, "commentModule not null.");
         final Integer id = module.getId();
-        final Optional<Moment> momentOp = momentMapper.selectById(id);
+        final Optional<Moment> momentOp = momentMapper.findById(id);
         if(!momentOp.isPresent()) {
-            throw new ResourceNotFoundException("comment.notExists", "动态不存在");
+            throw new LogicException("comment.notExists", "动态不存在");
         }
         final Moment moment = momentOp.get();
 
@@ -306,13 +296,13 @@ public class MomentServiceImpl implements MomentService, CommentModuleHandler {
      */
     @Override
     public void validateBeforeQuery(CommentModule module) {
-//        momentMapper.selectById()
         final Integer id = module.getId();
         final String name = module.getName();
         if(!getModuleName().equals(name)) {
             throw new LogicException("invalid.module", "无效的模块");
         }
-        final Moment moment = momentMapper.selectById(id).orElseThrow(() -> new LogicException("moment.notExists", "动态不存在"));
+        final Moment moment = momentMapper.findById(id).orElseThrow(()
+                -> new LogicException("moment.notExists", "动态不存在"));
 
         if(moment.getPrivate() && !BlogContext.isAuthenticated()) {
             throw new LogicException("illegal.operator", "无效的操作");

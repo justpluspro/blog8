@@ -56,7 +56,7 @@
         </where>
         ORDER BY create_at DESC
         <if test="!ignorePaging">
-            LIMIT #{start} OFFSET #{offset}
+            LIMIT  #{offset} OFFSET #{start}
         </if>
     </select>
 </mapper>

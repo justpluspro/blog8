@@ -12,18 +12,15 @@ import org.springframework.core.Ordered;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.*;
-import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -95,14 +92,17 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     }
 
 
+    @Transactional(readOnly = true)
     @Override
     public Template findTemplate(String templateName) {
-        return templateMapper.findByName(templateName).orElseThrow(() -> new LogicException("template.notExists", "模板不存在"));
+        return templateMapper.findByName(templateName).orElseThrow(()
+                -> new LogicException("template.notExists", "模板不存在"));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Template> getAllTemplates(TemplateQueryParam queryParam) {
-        return templateMapper.listAll(queryParam);
+        return templateMapper.findAll(queryParam);
     }
 
     @Override
@@ -137,8 +137,9 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
 
     @Override
     public void deleteTemplate(int id) {
-        Template template = templateMapper.findById(id).orElseThrow(() -> new LogicException("template.notExists", "模板不存在"));
-        templateMapper.delete(id);
+        Template template = templateMapper.findById(id).orElseThrow(()
+                -> new LogicException("template.notExists", "模板不存在"));
+        templateMapper.deleteById(id);
         urlPatterns.remove(template.getPattern());
     }
 
@@ -156,7 +157,7 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
     public void afterPropertiesSet() throws Exception {
         TemplateQueryParam queryParam = new TemplateQueryParam();
         queryParam.setEnable(true);
-        final List<Template> templates = templateMapper.listAll(queryParam);
+        final List<Template> templates = templateMapper.findAll(queryParam);
         if(CollectionUtils.isEmpty(templates)) {
             // register local templates
 

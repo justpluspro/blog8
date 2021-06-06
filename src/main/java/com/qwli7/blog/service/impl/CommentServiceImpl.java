@@ -100,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
         // 父评论不为空
         if(parent != null) {
             // 判断父评论是否存在
-            final Optional<Comment> parentOp = commentMapper.selectById(parent.getId());
+            final Optional<Comment> parentOp = commentMapper.findById(parent.getId());
             if(!parentOp.isPresent()) {
                 throw new LogicException("parent.notExists", "父评论不存在");
             }
@@ -154,7 +154,7 @@ public class CommentServiceImpl implements CommentService {
                     checking = true;
                     break;
                 case FIRST: //第一次评论需要审核
-                    Optional<Comment> commentOp = commentMapper.selectLatestCommentByIp(ip);
+                    Optional<Comment> commentOp = commentMapper.findLatestCommentByIp(ip);
                     if(commentOp.isPresent()) {
                         // 如果存在，则看最近一条的评论是什么状态
                         final Comment ipComment = commentOp.get();
@@ -201,7 +201,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Transactional(readOnly = true)
     @Override
-    public PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam) {
+    public PageDto<CommentDto> findPage(CommentQueryParam commentQueryParam) {
         final CommentModule commentModule = commentQueryParam.getCommentModule();
         final Optional<CommentModuleHandler> commentModuleHandlerOp = moduleHandlers.stream().filter(e ->
                 e.getModuleName().equals(commentModule.getName())
@@ -219,7 +219,7 @@ public class CommentServiceImpl implements CommentService {
         if(count == 0) {
             return new PageDto<>(commentQueryParam, 0, new ArrayList<>());
         }
-        List<Comment> comments = commentMapper.selectPage(commentQueryParam);
+        List<Comment> comments = commentMapper.findPage(commentQueryParam);
         if(CollectionUtils.isEmpty(comments)) {
             return new PageDto<>(commentQueryParam, 0, new ArrayList<>());
         }
@@ -235,7 +235,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void delete(Comment comment) {
-        final Optional<Comment> commentOp = commentMapper.selectById(comment.getId());
+        final Optional<Comment> commentOp = commentMapper.findById(comment.getId());
         if(!commentOp.isPresent()) {
             throw new LogicException("comment.notExists", "评论不存在");
         }
@@ -248,7 +248,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void update(UpdateComment updateComment) {
-        final Comment comment = commentMapper.selectById(updateComment.getId()).orElseThrow(() ->
+        final Comment comment = commentMapper.findById(updateComment.getId()).orElseThrow(() ->
                 new LogicException("comment.notExists", "评论不存在"));
         final Boolean admin = comment.getAdmin();
         if(!admin) {
@@ -257,6 +257,9 @@ public class CommentServiceImpl implements CommentService {
         // 内容相同
         if(comment.getContent().equals(updateComment.getContent())) {
             return;
+        }
+        if(!BlogContext.isAuthenticated() && !comment.getAdmin()) {
+            throw new LogicException("", "非管理员不能修改评论");
         }
 
         Comment update = new Comment();
@@ -271,7 +274,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public SavedComment check(int id) {
-        final Comment comment = commentMapper.selectById(id).orElseThrow(()
+        final Comment comment = commentMapper.findById(id).orElseThrow(()
                 -> new LogicException("comment.notExists", "评论不存在"));
         final CommentStatus status = comment.getStatus();
         final Boolean checking = comment.getChecking();

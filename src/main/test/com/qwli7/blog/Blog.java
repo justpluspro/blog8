@@ -35,7 +35,7 @@ public class Blog {
         queryParam.setPage(1);
         queryParam.setSize(blogProperties.getDefaultPageSize());
 
-        final PageDto<MomentArchive> momentArchivePageDto = momentService.selectArchivePage(queryParam);
+        final PageDto<MomentArchive> momentArchivePageDto = momentService.findArchivePage(queryParam);
         System.out.println(momentArchivePageDto);
     }
 }

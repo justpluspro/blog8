@@ -10,10 +10,13 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UrlPathHelper;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +29,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 /**
  * @author qwli7
@@ -402,6 +406,27 @@ public class FileService implements InitializingBean {
         } catch (IOException e){
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+
+    public List<String> findDirectories(String path) {
+        path = StringUtils.cleanPath(path);
+        final Path tempPath = Paths.get(uploadRootPath.toString(), path);
+        if(Files.notExists(tempPath) || !Files.isDirectory(tempPath)) {
+            throw new LogicException("", "无法获取到当前目录");
+        }
+        try {
+            return Files.list(tempPath).filter(Files::isDirectory).map(e -> e.getFileName().toString()).collect(Collectors.toList());
+        } catch (Exception ex){
+            throw new LogicException("", "");
+        }
+    }
+
+
+    public static void main(String[] args) {
+        String path = "//dfadsa/vdaf//\\\fds";
+        final String s = StringUtils.cleanPath(path);
+        System.out.println(s);
     }
 
 

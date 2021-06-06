@@ -66,12 +66,5 @@ public interface TagMapper {
      * @param queryParam queryParam
      * @return List
      */
-    List<Tag> selectPage(CommonQueryParam queryParam);
-
-    /**
-     * 根据 id 查询 Tag
-     * @param id id
-     * @return Tag
-     */
-    Optional<Tag> selectById(int id);
+    List<Tag> findPage(CommonQueryParam queryParam);
 }

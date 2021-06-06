@@ -45,14 +45,14 @@ public interface TemplateMapper {
      * 删除一个模板
      * @param id id
      */
-    void delete(int id);
+    void deleteById(int id);
 
     /**
      * 查询所有的模板
      * @param queryParam queryParam
      * @return List
      */
-    List<Template> listAll(TemplateQueryParam queryParam);
+    List<Template> findAll(TemplateQueryParam queryParam);
 
     /**
      * 批量插入模板列表

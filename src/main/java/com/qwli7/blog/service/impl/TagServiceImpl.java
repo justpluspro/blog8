@@ -70,12 +70,12 @@ public class TagServiceImpl implements TagService {
      */
     @Transactional(readOnly = true)
     @Override
-    public PageDto<Tag> selectPage(CommonQueryParam queryParam) {
+    public PageDto<Tag> findPage(CommonQueryParam queryParam) {
         int count = tagMapper.count(queryParam);
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
-        return new PageDto<>(queryParam, count, tagMapper.selectPage(queryParam));
+        return new PageDto<>(queryParam, count, tagMapper.findPage(queryParam));
     }
 
     /**
@@ -85,8 +85,8 @@ public class TagServiceImpl implements TagService {
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<Tag> selectById(int id) {
-        return tagMapper.selectById(id);
+    public Optional<Tag> findById(int id) {
+        return tagMapper.findById(id);
     }
 
     /**

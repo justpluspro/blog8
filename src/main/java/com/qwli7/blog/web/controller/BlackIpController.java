@@ -39,7 +39,7 @@ public class BlackIpController {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }
-        return blackIpService.selectPage(queryParam);
+        return blackIpService.findPage(queryParam);
     }
 
     /**

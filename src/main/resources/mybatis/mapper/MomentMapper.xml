@@ -108,7 +108,7 @@
             <if test="query != null and query != ''">
                 bm.content LIKE concat('%', ${query,jdbcType=VARCHAR}, '%')
             </if>
-            GROUP BY bm.date)
+            GROUP BY date)
         AS bmd
     </select>
 
@@ -147,7 +147,7 @@
             </if>
         </where>
         ORDER BY bm.create_at DESC
-        LIMIT #{start} OFFSET #{offset}
+        LIMIT #{offset} OFFSET #{start}
     </select>
 
     <select id="findPreMoment" resultType="com.qwli7.blog.entity.Moment">

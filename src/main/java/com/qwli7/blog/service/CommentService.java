@@ -26,7 +26,7 @@ public interface CommentService {
      * @param commentQueryParam 评论查询参数
      * @return PageDto
      */
-    PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam);
+    PageDto<CommentDto> findPage(CommentQueryParam commentQueryParam);
 
     /**
      * 删除评论

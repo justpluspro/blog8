@@ -49,7 +49,7 @@ public class MomentController {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }
-        return ResponseEntity.ok(momentService.selectPage(queryParam));
+        return ResponseEntity.ok(momentService.findPage(queryParam));
     }
 
     /**
@@ -94,7 +94,7 @@ public class MomentController {
      */
     @GetMapping("moment/{id}")
     public Moment getMomentForEdit(@PathVariable("id") int id) {
-        return momentService.getMomentForEdit(id).orElseThrow(()
+        return momentService.findMomentForEdit(id).orElseThrow(()
                 -> new ResourceNotFoundException("moment.notExists", "动态不存在"));
     }
 }

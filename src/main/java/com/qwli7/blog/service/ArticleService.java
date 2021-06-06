@@ -34,7 +34,7 @@ public interface ArticleService {
      * @param queryParam queryParam
      * @return PageDto
      */
-    PageDto<Article> selectPage(ArticleQueryParam queryParam);
+    PageDto<Article> findPage(ArticleQueryParam queryParam);
 
     /**
      * 删除文章
@@ -47,21 +47,21 @@ public interface ArticleService {
      * @param id id
      * @return Article
      */
-    Optional<Article> getArticleForEdit(int id);
+    Optional<Article> findArticleForEdit(int id);
 
     /**
      * 获取文章
      * @param idOrAlias id 或者别名
      * @return Article
      */
-    Optional<Article> getArticle(String idOrAlias);
+    Optional<Article> findArticle(String idOrAlias);
 
     /**
      * 获取文章导航
      * @param id id
      * @return ArticleNav
      */
-    Optional<ArticleNav> selectArticleNav(int id);
+    Optional<ArticleNav> findArticleNav(int id);
 
     /**
      * 更新点击量

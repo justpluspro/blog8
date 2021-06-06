@@ -25,7 +25,7 @@ import java.util.Optional;
 @Authenticated
 @RestController
 @RequestMapping("api")
-@Validated
+//@Validated
 public class ArticleController {
 
 
@@ -43,9 +43,9 @@ public class ArticleController {
      * @return ResponseEntity
      */
     @PostMapping("article")
-    public ResponseEntity<?> save(@RequestBody @Valid Article article) {
-            ArticleSaved articleSaved = articleService.save(article);
-            return ResponseEntity.ok(articleSaved);
+    public ResponseEntity<?> save(@RequestBody Article article) {
+        ArticleSaved articleSaved = articleService.save(article);
+        return ResponseEntity.ok(articleSaved);
     }
 
     /**
@@ -54,11 +54,11 @@ public class ArticleController {
      * @return PageDto
      */
     @GetMapping("articles")
-    public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
+    public PageDto<Article> findPage(ArticleQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }
-        return articleService.selectPage(queryParam);
+        return articleService.findPage(queryParam);
     }
 
     /**
@@ -68,7 +68,7 @@ public class ArticleController {
      */
     @GetMapping("article/{id}")
     public Article getArticleForEdit(@PathVariable("id") @Min(value = 1, message = "invalid id") int id) {
-        final Optional<Article> articleOp = articleService.getArticleForEdit(id);
+        final Optional<Article> articleOp = articleService.findArticleForEdit(id);
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notFound", "内容没找到");
         }
@@ -99,7 +99,11 @@ public class ArticleController {
         return ResponseEntity.noContent().build();
     }
 
-
+    /**
+     * 批量删除文章
+     * @param ids ids
+     * @return ResponseEntity
+     */
     @DeleteMapping("article/delete/batch")
     public ResponseEntity<?> deleteInBatch(@RequestBody List<Integer> ids) {
         articleService.deleteByIds(ids);

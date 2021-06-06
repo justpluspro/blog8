@@ -2,7 +2,6 @@ package com.qwli7.blog.template.data;
 
 import com.qwli7.blog.entity.ArticleNav;
 import com.qwli7.blog.service.ArticleService;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -32,6 +31,6 @@ public class ArticleNavDataProvider extends AbstractDataProvider<ArticleNav> {
         if(id < 0) {
             return new ArticleNav();
         }
-        return articleService.selectArticleNav(id).orElse(new ArticleNav());
+        return articleService.findArticleNav(id).orElse(new ArticleNav());
     }
 }

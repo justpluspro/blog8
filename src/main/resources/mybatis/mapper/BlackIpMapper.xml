@@ -40,6 +40,6 @@
                 ip LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
-        ORDER BY create_at DESC LIMIT #{start} OFFSET #{offset}
+        ORDER BY create_at DESC LIMIT #{offset} OFFSET #{start}
     </select>
 </mapper>

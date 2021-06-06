@@ -16,7 +16,7 @@ public interface BlackIpService {
      * @param queryParam queryParam
      * @return PageDto
      */
-    PageDto<BlackIp> selectPage(CommonQueryParam queryParam);
+    PageDto<BlackIp> findPage (CommonQueryParam queryParam);
 
     /**
      * 是否是黑名单

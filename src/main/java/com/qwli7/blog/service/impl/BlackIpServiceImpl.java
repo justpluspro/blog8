@@ -29,24 +29,24 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public PageDto<BlackIp> selectPage(CommonQueryParam queryParam) {
+    public PageDto<BlackIp> findPage(CommonQueryParam queryParam) {
         int count = blackIpMapper.count(queryParam);
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
-        return new PageDto<>(queryParam, count, blackIpMapper.selectPage(queryParam));
+        return new PageDto<>(queryParam, count, blackIpMapper.findPage(queryParam));
     }
 
     @Transactional(readOnly = true)
     @Override
     public boolean isBlackIp(String ip) {
-        return blackIpMapper.selectByIp(ip).isPresent();
+        return blackIpMapper.findByIp(ip).isPresent();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void save(BlackIp blackIp) {
-        if(blackIpMapper.selectByIp(blackIp.getIp()).isPresent()) {
+        if(blackIpMapper.findByIp(blackIp.getIp()).isPresent()) {
             throw new LogicException("blackIp.exists", "黑名单存在");
         }
         blackIpMapper.insert(blackIp);
@@ -55,7 +55,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void delete(int id) {
-        final Optional<BlackIp> blackIpOp = blackIpMapper.selectById(id);
+        final Optional<BlackIp> blackIpOp = blackIpMapper.findById(id);
         if(!blackIpOp.isPresent()) {
             throw new LogicException("blackIp.notExists", "黑名单不存在");
         }

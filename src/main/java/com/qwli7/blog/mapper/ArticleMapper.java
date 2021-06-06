@@ -27,14 +27,14 @@ public interface ArticleMapper {
      * @param alias alias
      * @return Article
      */
-    Optional<Article> selectByAlias(String alias);
+    Optional<Article> findByAlias(String alias);
 
     /**
      * 根据 id 获取文章
      * @param id id
      * @return Article
      */
-    Optional<Article> selectById(int id);
+    Optional<Article> findById(int id);
 
     /**
      * 统计文章数量
@@ -48,7 +48,7 @@ public interface ArticleMapper {
      * @param queryParam queryParam
      * @return List
      */
-    List<Article> selectPage(HandledArticleQueryParam queryParam);
+    List<Article> findPage(HandledArticleQueryParam queryParam);
 
     /**
      * 添加文章点击量
@@ -90,7 +90,7 @@ public interface ArticleMapper {
      */
     void deleteById(int id);
 
-    List<Article> selectByIds(List<Integer> ids);
+    List<Article> findByIds(List<Integer> ids);
 
     /**
      * 查询分类下的文章
@@ -104,12 +104,12 @@ public interface ArticleMapper {
      * @param id id
      * @return Article
      */
-    Optional<Article> selectPreArticle(int id);
+    Optional<Article> findPrePage(int id);
 
     /**
      * 获取下一篇文章
      * @param id id
      * @return Article
      */
-    Optional<Article> selectNextArticle(int id);
+    Optional<Article> findNextArticle(int id);
 }

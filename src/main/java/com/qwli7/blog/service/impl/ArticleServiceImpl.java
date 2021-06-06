@@ -96,9 +96,8 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         article.setCreateAt(LocalDateTime.now());
 
         Set<Tag> tags = article.getTags();
-        int maxArticleTagSize = blogProperties.getMaxArticleTagSize();
-        if(tags != null && tags.size() > maxArticleTagSize) {
-            throw new LogicException("tags.exceed.limit", "标签最多不能超过5个");
+        if(tags != null && tags.size() > blogProperties.getMaxArticleTagSize()) {
+            throw new LogicException("tags.exceed.limit", "标签最多不能超过"+ blogProperties.getMaxArticleTagSize() +"个");
         }
 
         final Category category = article.getCategory();
@@ -111,7 +110,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
         final String alias = article.getAlias();
         if(!StringUtils.isEmpty(alias)) {
-            Optional<Article> articleOp = articleMapper.selectByAlias(alias);
+            Optional<Article> articleOp = articleMapper.findByAlias(alias);
             if(articleOp.isPresent()) {
                 throw new LogicException("alias.exists", "别名已经存在");
             }
@@ -134,20 +133,18 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
             case SCHEDULED:
                 LocalDateTime postAt = article.getPostAt();
                 if(postAt == null || postAt.isBefore(LocalDateTime.now())) {
-                    article.setPostAt(LocalDateTime.now());
-                    article.setModifyAt(LocalDateTime.now());
-                    article.setStatus(ArticleStatus.POST);
+                    throw new LogicException("postAt.illegal", "发布时间不能是一个过去的时间或者空");
                 } else {
                     final long seconds = TimeUtils.getSeconds(postAt, LocalDateTime.now());
                     if(seconds <= 0) {
-                        throw new LogicException("scheduled.error", "预计发布文章错误");
+                        throw new LogicException("scheduled.error", "计划发布时间错误");
                     }
                     ArticlePostRunnable articlePostRunnable = new ArticlePostRunnable(article);
                     scheduledExecutorService.schedule(articlePostRunnable, seconds, TimeUnit.SECONDS);
                 }
                 break;
             default:
-                throw new LogicException("illegal.status", "非法状态");
+                throw new LogicException("illegal.status", "非法的文章状态");
         }
 
         String featureImage = article.getFeatureImage();
@@ -159,19 +156,20 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         articleMapper.insert(article);
         processArticleTagsAfterInsertOrUpdate(article);
 
-        if(ArticleStatus.POST == article.getStatus()) {
+        if(ArticleStatus.POST == status) {
             publisher.publishEvent(new ArticlePostEvent(this, article));
         }
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                try {
+            try {
+                if(articleIndexer != null) {
                     articleIndexer.addIndex(article);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             }
         });
         return new ArticleSaved(article.getId(), true);
@@ -185,13 +183,13 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     @Override
     public void update(Article article) {
 
-        Optional<Article> articleOp = articleMapper.selectById(article.getId());
+        Optional<Article> articleOp = articleMapper.findById(article.getId());
         if(!articleOp.isPresent()) {
-            throw new ResourceNotFoundException("article.notFound", "文章未找到");
+            throw new LogicException("article.notFound", "文章未找到");
         }
         String alias = article.getAlias();
         if(!StringUtils.isEmpty(alias)) {
-            Optional<Article> oldOp = articleMapper.selectByAlias(alias);
+            Optional<Article> oldOp = articleMapper.findByAlias(alias);
             if(oldOp.isPresent() && !oldOp.get().getId().equals(article.getId())) {
                 throw new LogicException("article.alias.exists", "文章别名已被使用");
             }
@@ -208,6 +206,10 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
             }
         } else if(article.getStatus().equals(ArticleStatus.DRAFT)) {
             article.setPostAt(oldArticle.getPostAt());
+        }
+        final Set<Tag> tags = article.getTags();
+        if(tags != null && tags.size() > blogProperties.getMaxArticleTagSize()) {
+            throw new LogicException("tags.exceed.limit", "文章标签最多不能超过 "+ blogProperties.getMaxArticleTagSize() +" 个");
         }
         processArticleTagsAfterInsertOrUpdate(article);
         articleMapper.update(article);
@@ -226,7 +228,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      */
     @Transactional(readOnly = true)
     @Override
-    public PageDto<Article> selectPage(ArticleQueryParam queryParam) {
+    public PageDto<Article> findPage(ArticleQueryParam queryParam) {
         final Integer categoryId = queryParam.getCategoryId();
         Category category;
         HandledArticleQueryParam handledArticleQueryParam = new HandledArticleQueryParam();
@@ -240,6 +242,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
             }
         }
 
+        // 未登录的情况下只取已发布的
         if(!BlogContext.isAuthenticated()) {
             handledArticleQueryParam.setStatuses(Collections.singletonList(ArticleStatus.POST));
         }
@@ -261,12 +264,11 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         if(count == 0) {
             return new PageDto<>(queryParam, 0, new ArrayList<>());
         }
-
         handledArticleQueryParam.setPage(queryParam.getPage());
         handledArticleQueryParam.setSize(queryParam.getSize());
         handledArticleQueryParam.setStart(queryParam.getStart());
         handledArticleQueryParam.setOffset(queryParam.getSize());
-        List<Article> articles = articleMapper.selectPage(handledArticleQueryParam);
+        List<Article> articles = articleMapper.findPage(handledArticleQueryParam);
 
         processArticlesTags(articles);
         processContentsAndFeatureImages(articles);
@@ -281,7 +283,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteById(int id) {
-        final Optional<Article> articleOp = articleMapper.selectById(id);
+        final Optional<Article> articleOp = articleMapper.findById(id);
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notExists", "内容未找到");
         }
@@ -299,8 +301,8 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<Article> getArticleForEdit(int id) {
-        return articleMapper.selectById(id);
+    public Optional<Article> findArticleForEdit(int id) {
+        return articleMapper.findById(id);
     }
 
 
@@ -311,7 +313,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<Article> getArticle(String idOrAlias) {
+    public Optional<Article> findArticle(String idOrAlias) {
         Integer id = null;
         try{
             id = Integer.parseInt(idOrAlias);
@@ -320,9 +322,9 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         }
         Optional<Article> articleOp;
         if(id == null) {
-            articleOp = articleMapper.selectByAlias(idOrAlias);
+            articleOp = articleMapper.findByAlias(idOrAlias);
         } else {
-            articleOp = articleMapper.selectById(id);
+            articleOp = articleMapper.findById(id);
         }
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notExists", "文章不存在");
@@ -331,11 +333,9 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         final ArticleStatus status = article.getStatus();
 
         // 未登录情况下
-        if(!BlogContext.isAuthenticated()) {
-            // 非发布状态  || 私人文章不允许访问
-            if (!ArticleStatus.POST.equals(status) || article.getPrivate() == null || article.getPrivate()) {
-                throw new LogicException("invalid.articleStatus", "无效的状态");
-            }
+        if(!BlogContext.isAuthenticated() && !ArticleStatus.POST.equals(status)) {
+            // 非发布状态
+            throw new LogicException("invalid.articleStatus", "无效的状态");
         }
         processArticlesTags(Collections.singletonList(article));
         processContentAndFeatureImage(article);
@@ -349,9 +349,9 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
      */
     @Transactional(readOnly = true)
     @Override
-    public Optional<ArticleNav> selectArticleNav(int id) {
-        Optional<Article> preArticleOp = articleMapper.selectPreArticle(id);
-        Optional<Article> nextArticleOp = articleMapper.selectNextArticle(id);
+    public Optional<ArticleNav> findArticleNav(int id) {
+        Optional<Article> preArticleOp = articleMapper.findPrePage(id);
+        Optional<Article> nextArticleOp = articleMapper.findNextArticle(id);
         ArticleNav articleNav = new ArticleNav();
         preArticleOp.ifPresent(articleNav::setPrevArticle);
         nextArticleOp.ifPresent(articleNav::setNextArticle);
@@ -362,7 +362,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void hits(int id) {
-        final Article article = articleMapper.selectById(id).orElseThrow(()
+        final Article article = articleMapper.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("article.notExists", "文章不存在"));
         // 登录情况下不统计点击量
         if(BlogContext.isAuthenticated()) {
@@ -374,7 +374,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteByIds(List<Integer> ids) {
-        List<Article> articles = articleMapper.selectByIds(ids);
+        List<Article> articles = articleMapper.findByIds(ids);
         if(articles.isEmpty()) {
             return;
         }
@@ -459,10 +459,11 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
                 oldTag.setModifyAt(LocalDateTime.now());
                 tagMapper.insert(oldTag);
             }
-//            articleTagMapper.insert(new ArticleTag(article.getId(), oldTag.getId()));
             articleTags.add(new ArticleTag(article.getId(), oldTag.getId()));
         }
-        articleTagMapper.batchInsert(articleTags);
+        if(!articleTags.isEmpty()) {
+            articleTagMapper.batchInsert(articleTags);
+        }
     }
 
     /**
@@ -474,7 +475,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         if(module == null) {
             throw new LogicException("invalid.module", "模块不能为空");
         }
-        final Optional<Article> articleOp = articleMapper.selectById(module.getId());
+        final Optional<Article> articleOp = articleMapper.findById(module.getId());
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notExists", "内容不存在");
         }
@@ -512,7 +513,7 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
             throw new LogicException("illegal.operators", "无效的操作");
         }
 
-        final Optional<Article> articleOp = articleMapper.selectById(module.getId());
+        final Optional<Article> articleOp = articleMapper.findById(module.getId());
         if(!articleOp.isPresent()) {
             throw new ResourceNotFoundException("article.notExists", "内容不存在");
         }

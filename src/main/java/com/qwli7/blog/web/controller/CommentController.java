@@ -65,7 +65,7 @@ public class CommentController {
         if (commentQueryParam.hasNoSize()) {
             commentQueryParam.setSize(blogProperties.getDefaultPageSize());
         }
-        return commentService.selectPage(commentQueryParam);
+        return commentService.findPage(commentQueryParam);
     }
 
     /**

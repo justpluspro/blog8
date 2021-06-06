@@ -26,13 +26,13 @@ public interface CategoryService {
      * @return Category
      * @throws LogicException LogicException
      */
-    Optional<Category> selectById(int id) throws LogicException;
+    Optional<Category> findById(int id) throws LogicException;
 
     /**
      * 获取所有的分类
      * @return list
      */
-    List<Category> getAll();
+    List<Category> findAll();
 
     /**
      * 根据分类查询分类
@@ -40,7 +40,7 @@ public interface CategoryService {
      * @return Category
      * @throws LogicException LogicException
      */
-    Optional<Category> selectByName(String name) throws LogicException;
+    Optional<Category> findByName(String name) throws LogicException;
 
     /**
      * 删除分类

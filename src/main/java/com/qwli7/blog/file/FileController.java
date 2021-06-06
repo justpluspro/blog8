@@ -4,10 +4,7 @@ import com.qwli7.blog.security.Authenticated;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,7 +14,7 @@ import java.util.List;
  * 2021/3/2 8:42
  * 功能：FileController
  **/
-@Authenticated
+//@Authenticated
 @RestController
 @Conditional(FileCondition.class)
 @RequestMapping("api")
@@ -56,6 +53,13 @@ public class FileController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @GetMapping("directories")
+    public ResponseEntity<List<String>> findDirectories(@RequestParam(value = "path", required = false, defaultValue = "/") String path) {
+        List<String> directories = fileService.findDirectories(path);
+        return ResponseEntity.ok(directories);
+    }
+
     /**
      * 上传文件
      * @param queryParam queryParam
@@ -63,7 +67,6 @@ public class FileController {
      */
     @GetMapping(value = "files")
     public FilePageResult queryFiles(FileQueryParam queryParam) {
-
         return fileService.queryFiles(queryParam);
     }
 

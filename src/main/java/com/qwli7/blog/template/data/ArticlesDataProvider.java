@@ -4,7 +4,6 @@ import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.ArticleQueryParam;
 import com.qwli7.blog.service.ArticleService;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -47,6 +46,6 @@ public class ArticlesDataProvider extends AbstractDataProvider<PageDto<Article>>
         queryParam.setSize(size < 10 || size > 20 ? 10: size);
         queryParam.setQuery(query);
 
-        return articleService.selectPage(queryParam);
+        return articleService.findPage(queryParam);
     }
 }

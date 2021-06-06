@@ -13,7 +13,7 @@
     <version>2.0.RELEASE</version>
     <name>blog8</name>
     <packaging>jar</packaging>
-    <description>Blog8 project for Spring Boot</description>
+    <description>Blog project for Spring Boot</description>
     <url>https://github.com/qwli7/blog8</url>
 
     <licenses>
@@ -36,11 +36,17 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <java.version>1.8</java.version>
         <commonmark.version>0.14.0</commonmark.version>
+        <commonmark.tasklist.version>0.15.2</commonmark.tasklist.version>
+        <commonmark.image.version>0.15.2</commonmark.image.version>
         <easy-captcha.version>1.6.2</easy-captcha.version>
         <lucene.version>8.8.1</lucene.version>
+        <lucene.analyzers.version>8.4.0</lucene.analyzers.version>
+        <lucene.queryparser.version>8.4.0</lucene.queryparser.version>
         <mybatis.version>3.5.6</mybatis.version>
         <mybatis-starter.version>2.1.2</mybatis-starter.version>
         <jsoup.version>1.12.1</jsoup.version>
+        <commons.codec.version>1.13</commons.codec.version>
+        <maven.compile.version>3.8.1</maven.compile.version>
     </properties>
 
     <dependencies>
@@ -115,18 +121,18 @@
         <dependency>
             <groupId>com.atlassian.commonmark</groupId>
             <artifactId>commonmark-ext-image-attributes</artifactId>
-            <version>0.15.2</version>
+            <version>${commonmark.image.version}</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.commonmark</groupId>
             <artifactId>commonmark-ext-task-list-items</artifactId>
-            <version>0.15.2</version>
+            <version>${commonmark.tasklist.version}</version>
         </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.13</version>
+            <version>${commons.codec.version}</version>
         </dependency>
 
         <dependency>
@@ -157,13 +163,13 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>8.4.0</version>
+            <version>${lucene.analyzers.version}</version>
         </dependency>
         <!-- 查询解析器 -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>8.4.0</version>
+            <version>${lucene.queryparser.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -192,27 +198,26 @@
     </repositories>
 
     <build>
-        <finalName>${project.artifactId}-${profileActive}</finalName>
-<!--        <finalName>-->
-<!--            ${project.artifactId}-${project.version}-->
-<!--        </finalName>-->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>application.yml</include>
-                    <include>application-${profileActive}.yml</include>
-                    <include>mapper/**/*.xml</include>
-                    <include>static/**</include>
-                    <include>templates/**</include>
-                    <include>*.xml</include>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-        </resources>
+        <finalName>${project.artifactId}</finalName>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/bin</directory>-->
+<!--                <filtering>true</filtering>-->
+<!--                <targetPath>bin</targetPath>-->
+<!--                <includes>-->
+<!--                    <include>*.sh</include>-->
+<!--                    <include>*.bat</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
         <plugins>
+            <!-- SpringBoot 的插件会将三方的 jar 打进项目的 jar 中，这样会导致 FatJar -->
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--            </plugin>-->
 
+            <!-- 编译 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -243,26 +248,21 @@
                         <addMavenDescriptor>false</addMavenDescriptor>
                         <manifest>
                             <!-- 是否要把第三方jar加入到类构建路径 -->
-                            <addClasspath> true </addClasspath>
+                            <addClasspath>true</addClasspath>
                             <!-- 外部依赖 jar 包的最终位置 -->
                             <!-- 因为我们将第三方 jar 和本项目 jar 放在同一个目录下，这里就使用 ./ -->
-                            <classpathPrefix>../boot/</classpathPrefix>
+                            <classpathPrefix>./</classpathPrefix>
                             <!-- 项目启动类 -->
                             <mainClass>com.qwli7.blog.BlogApplication</mainClass>
                         </manifest>
                     </archive>
+                    <!-- jar 包中排除 config 目录 -->
+                    <excludes>
+                        <exclude>config/**</exclude>
+<!--                        <exclude>defaultTemplate/**</exclude>-->
+                    </excludes>
                 </configuration>
-
-
             </plugin>
-            <!-- SpringBoot 的插件会将三方的 jar 打进项目的 jar 中，这样会导致 FatJar -->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <includeSystemScope>true</includeSystemScope>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

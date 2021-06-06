@@ -40,7 +40,7 @@ public interface MomentService {
      * @param id id
      * @return Moment
      */
-    Optional<Moment> getMomentForEdit(int id);
+    Optional<Moment> findMomentForEdit(int id);
 
     /**
      * 更新点击量
@@ -54,27 +54,27 @@ public interface MomentService {
      * @param id id
      * @return Moment
      */
-    Optional<Moment> getMoment(int id);
+    Optional<Moment> findMoment(int id);
 
     /**
      * 分页查询动态
      * @param queryParam queryParam
      * @return PageDto
      */
-    PageDto<Moment> selectPage(MomentQueryParam queryParam);
+    PageDto<Moment> findPage(MomentQueryParam queryParam);
 
     /**
      * 获取归档动态列表
      * @return list
      */
-    PageDto<MomentArchive> selectArchivePage(MomentQueryParam queryParam);
+    PageDto<MomentArchive> findArchivePage(MomentQueryParam queryParam);
 
     /**
      * 获取动态导航
      * @param id id
      * @return MomentNav
      */
-    Optional<MomentNav> selectMomentNav(int id);
+    Optional<MomentNav> findMomentNav(int id);
 
     /**
      * 点击动态
@@ -86,13 +86,6 @@ public interface MomentService {
      * 获取最近的动态
      * @return MomentArchive
      */
-    MomentArchive selectLatestMoments();
-
-    /**
-     * 根据 id 查找动态
-     * @param id id
-     * @return Moment
-     */
-    Moment selectById(int id);
+    MomentArchive findLatestMoments();
 }
 

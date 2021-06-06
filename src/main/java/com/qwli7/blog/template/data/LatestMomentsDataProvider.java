@@ -2,7 +2,7 @@ package com.qwli7.blog.template.data;
 
 import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.service.MomentService;
-import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 /**
@@ -21,6 +21,6 @@ public class LatestMomentsDataProvider extends AbstractDataProvider<MomentArchiv
 
     @Override
     public MomentArchive queryData(Map<String, String> attributeMap) {
-        return momentService.selectLatestMoments();
+        return momentService.findLatestMoments();
     }
 }

@@ -62,7 +62,7 @@ public class BlogEventHandler {
             // 评论状态正常
             final CommentModule module = comment.getModule();
             if (module.getName().equals(Moment.class.getSimpleName().toLowerCase())) {
-                final Optional<Moment> momentOptional = momentMapper.selectById(module.getId());
+                final Optional<Moment> momentOptional = momentMapper.findById(module.getId());
                 if(momentOptional.isPresent()) {
                     final Moment moment = momentOptional.get();
                     momentMapper.addComments(moment.getId(), 1);
@@ -70,7 +70,7 @@ public class BlogEventHandler {
                 return;
             }
             if(module.getName().equals(Article.class.getSimpleName().toLowerCase())) {
-                final Optional<Article> articleOp = articleMapper.selectById(module.getId());
+                final Optional<Article> articleOp = articleMapper.findById(module.getId());
                 if(articleOp.isPresent())  {
                     final Article article = articleOp.get();
                     articleMapper.addComments(article.getId(), 1);

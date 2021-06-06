@@ -35,7 +35,7 @@ public class CategoryController {
      */
     @GetMapping("categories")
     public List<Category> getAllCategories() {
-        return categoryService.getAll();
+        return categoryService.findAll();
     }
 
     /**
@@ -45,7 +45,7 @@ public class CategoryController {
      */
     @GetMapping("category/{id}")
     public ResponseEntity<Category> getCategoryForEdit(@PathVariable("id") int id) {
-        final Category category = categoryService.selectById(id).orElseThrow(() ->
+        final Category category = categoryService.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("category.notExists", "分类不存在"));
         return ResponseEntity.ok(category);
     }

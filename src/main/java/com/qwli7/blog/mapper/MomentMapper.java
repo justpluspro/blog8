@@ -34,7 +34,7 @@ public interface MomentMapper {
      * @param id id
      * @return Moment
      */
-    Optional<Moment> selectById(int id);
+    Optional<Moment> findById(int id);
 
     /**
      * 删除动态
@@ -75,7 +75,7 @@ public interface MomentMapper {
      * @param queryParam queryParam
      * @return List
      */
-    List<Moment> selectPage(MomentQueryParam queryParam);
+    List<Moment> findPage(MomentQueryParam queryParam);
 
     /**
      * 获取动态的数量
@@ -96,26 +96,26 @@ public interface MomentMapper {
      * @param queryParam queryParam
      * @return List
      */
-    List<MomentArchive> selectArchivePage(MomentQueryParam queryParam);
+    List<MomentArchive> findArchivePage(MomentQueryParam queryParam);
 
     /**
      * 获取上一篇动态
      * @param moment moment
      * @return Optional
      */
-    Optional<Moment> selectPreMoment(Moment moment);
+    Optional<Moment> findPreMoment(Moment moment);
 
     /**
      * 获取下一篇动态
      * @param moment moment
      * @return Optional
      */
-    Optional<Moment> selectNextMoment(Moment moment);
+    Optional<Moment> findNextMoment(Moment moment);
 
     /**
      * 获取最近的动态
      * @param queryParam queryParam
      * @return MomentArchive
      */
-    MomentArchive selectLatestMoments(MomentQueryParam queryParam);
+    MomentArchive findLatestMoments(MomentQueryParam queryParam);
 }

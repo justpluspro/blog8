@@ -22,6 +22,6 @@ public class CategoriesDataProvider extends AbstractDataProvider<List<Category>>
 
     @Override
     public List<Category> queryData(Map<String, String> attributeMap) {
-        return categoryService.getAll();
+        return categoryService.findAll();
     }
 }

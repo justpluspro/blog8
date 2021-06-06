@@ -4,7 +4,7 @@ import com.qwli7.blog.entity.MomentArchive;
 import com.qwli7.blog.entity.dto.PageDto;
 import com.qwli7.blog.entity.vo.MomentQueryParam;
 import com.qwli7.blog.service.MomentService;
-import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 /**
@@ -39,6 +39,6 @@ public class MomentsDataProvider extends AbstractDataProvider<PageDto<MomentArch
         }
         queryParam.setSize(size < 10 || size > 20 ? 20 : size);
         queryParam.setQuery(attributeMap.getOrDefault("query", ""));
-        return momentService.selectArchivePage(queryParam);
+        return momentService.findArchivePage(queryParam);
     }
 }

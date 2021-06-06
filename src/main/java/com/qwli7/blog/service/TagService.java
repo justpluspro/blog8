@@ -23,7 +23,7 @@ public interface TagService {
      * @param queryParam queryParam
      * @return PageDto
      */
-    PageDto<Tag> selectPage(CommonQueryParam queryParam);
+    PageDto<Tag> findPage(CommonQueryParam queryParam);
 
     /**
      * 删除标签
@@ -42,5 +42,5 @@ public interface TagService {
      * @param id id
      * @return Tag
      */
-    Optional<Tag> selectById(int id);
+    Optional<Tag> findById(int id);
 }

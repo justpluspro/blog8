@@ -33,7 +33,7 @@ public class MomentDataProvider extends AbstractDataProvider<Moment> {
             throw new ResourceNotFoundException("moment.notFound", "动态未找到");
         }
         final Optional<Moment> momentOp =
-                momentService.getMoment(momentId);
+                momentService.findMoment(momentId);
         return momentOp.get();
     }
 }
