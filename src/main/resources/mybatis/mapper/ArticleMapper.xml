@@ -26,7 +26,7 @@
     </resultMap>
 
     <sql id="articlePageSql">
-        select ba.id as aid,
+        SELECT ba.id AS aid,
                ba.title,
                ba.summary,
                ba.post_at,
@@ -39,119 +39,153 @@
                ba.status,
                ba.feature_image,
                ba.allow_comment,
-               group_concat(batt.tag_id) as tag_ids,
-               bc.id as category_id,
-               bc.name as category_name
-
-        from blog_article ba
-        left join blog_category bc on ba.category_id = bc.id
-        left join (select bt.id as tag_id, bt.name as tag_name, bat.article_id from blog_tag bt left join blog_article_tag bat on bt.id = bat.tag_id)
-            batt on batt.article_id = ba.id
+               GROUP_CONCAT(batt.tag_id) AS tag_ids,
+               bc.id AS category_id,
+               bc.name AS category_name
+        FROM blog_article ba
+        LEFT JOIN blog_category bc ON ba.category_id = bc.id
+        LEFT JOIN (
+                SELECT bt.id AS tag_id, bt.name AS tag_name, bat.article_id
+                FROM blog_tag bt
+                LEFT JOIN blog_article_tag bat on bt.id = bat.tag_id
+                ) batt
+        ON batt.article_id = ba.id
     </sql>
 
     <sql id="articleDetailSql">
-        select ba.id as aid,
-        ba.title, ba.content, ba.summary, ba.create_at, ba.post_at, ba.modify_at,
-            ba.is_private, ba.alias, ba.hits, ba.comments, ba.status, ba.feature_image,
-            ba.allow_comment,
-            group_concat(batt.tag_id) as tag_ids,
-            bc.id as category_id,
-            bc.name as category_name
-            from blog_article ba
-        left join blog_category bc on ba.category_id = bc.id
-        left join (select bt.id as tag_id, bt.name as tag_name, bat.article_id from blog_tag bt left join blog_article_tag bat on bt.id = bat.tag_id)
-            batt on batt.article_id = ba.id
+        SELECT ba.id AS aid,
+                ba.title,
+                ba.content,
+                ba.summary,
+                ba.create_at,
+                ba.post_at,
+                ba.modify_at,
+                ba.is_private,
+                ba.alias,
+                ba.hits,
+                ba.comments,
+                ba.status,
+                ba.feature_image,
+                ba.allow_comment,
+                GROUP_CONCAT(batt.tag_id) AS tag_ids,
+                bc.id AS category_id,
+                bc.name AS category_name
+        FROM blog_article ba
+        LEFT JOIN blog_category bc ON ba.category_id = bc.id
+        LEFT JOIN (SELECT bt.id AS tag_id,
+                          bt.name AS tag_name,
+                          bat.article_id
+                   FROM blog_tag bt
+                   LEFT JOIN blog_article_tag bat ON bt.id = bat.tag_id
+                ) batt
+        ON batt.article_id = ba.id
     </sql>
 
     <insert id="insert" parameterType="Article" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
-        insert into blog_article(title, content, hits, comments, alias, summary, create_at, modify_at,
-                                 post_at, status, feature_image, allow_comment, is_private, category_id)
-        values(#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{hits,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER},
-            #{alias,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR},
-                      #{createAt}, #{modifyAt}, #{postAt}, #{status, javaType=ArticleStatus}, #{featureImage,jdbcType=VARCHAR},
-                      #{allowComment,jdbcType=BOOLEAN}, #{isPrivate,jdbcType=BOOLEAN}, #{category.id,jdbcType=INTEGER})
+        INSERT INTO
+                blog_article(title, content, hits, comments,
+                                 alias, summary, create_at, modify_at,
+                                 post_at, status, feature_image,
+                                 allow_comment, is_private, category_id)
+        VALUES (#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+                #{hits,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER},
+                #{alias,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR},
+                #{createAt}, #{modifyAt}, #{postAt},
+                #{status, javaType=ArticleStatus}, #{featureImage,jdbcType=VARCHAR},
+                #{allowComment,jdbcType=BOOLEAN}, #{isPrivate,jdbcType=BOOLEAN},
+                #{category.id,jdbcType=INTEGER})
     </insert>
 
-    <select id="selectByAlias" parameterType="string" resultMap="BaseResultMap">
+    <select id="findByAlias" parameterType="string" resultMap="BaseResultMap">
         <include refid="articleDetailSql" />
-        where ba.alias = #{alias,jdbcType=VARCHAR} group by ba.id
+        WHERE
+        ba.alias = #{alias,jdbcType=VARCHAR}
+        GROUP BY ba.id
     </select>
 
-    <select id="selectById" parameterType="int" resultMap="BaseResultMap">
+    <select id="findById" parameterType="int" resultMap="BaseResultMap">
         <include refid="articleDetailSql" />
-        where ba.id = #{id} group by ba.id
+        WHERE ba.id = #{id}
+        GROUP BY ba.id
     </select>
 
 
     <select id="count" parameterType="HandledArticleQueryParam" resultType="int">
-        select count(id) from blog_article
+        SELECT COUNT(id) FROM blog_article
         <where>
             <if test="aids != null and !aids.isEmpty() > 0">
-                and id in
+                AND id IN
                 <foreach collection="aids" open="(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="statuses != null and !statuses.isEmpty()">
-                and status in
+                AND STATUS IN
                 <foreach collection="statuses" item="status" separator="," close=")" open="(">
                     #{status, javaType=ArticleStatus}
                 </foreach>
             </if>
             <if test="query != null and query != ''">
-                and content like concat('%', #{query,jdbcType=VARCHAR}, '%')
-                or summary like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                AND content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
+                OR summary LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
     </select>
 
-    <select id="selectPage" parameterType="HandledArticleQueryParam" resultMap="BaseResultMap">
+    <select id="findPage" parameterType="HandledArticleQueryParam" resultMap="BaseResultMap">
         <include refid="articlePageSql" />
 
         <where>
             <if test="aids != null and !aids.isEmpty()">
-                and ba.id in
+                AND ba.id IN
                 <foreach collection="aids" item="id" open="(" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>
             <if test="statuses != null and !statuses.isEmpty()">
-                and ba.status in
+                AND ba.status IN
                 <foreach collection="statuses" item="status" open="(" close=")" separator=",">
                     #{status, javaType=ArticleStatus, typeHandler=EnumOrdinalTypeHandler}
                 </foreach>
             </if>
             <if test="query != null and query != ''">
-                and ba.title like #{query,jdbcType=VARCHAR}
-                or ba.content like #{query,jdbcType=VARCHAR}
-                or ba.summary like #{query,jdbcType=VARCHAR}
+                AND ba.title LIKE #{query,jdbcType=VARCHAR}
+                OR ba.content LIKE #{query,jdbcType=VARCHAR}
+                OR ba.summary LIKE #{query,jdbcType=VARCHAR}
             </if>
         </where>
-
-        group by ba.id
-
-        order by ba.id desc
-        limit #{start}, #{offset}
+        GROUP BY ba.id
+        ORDER BY ba.id DESC
+        LIMIT #{start} OFFSET #{offset}
     </select>
 
     <update id="addHits">
-        UPDATE blog_article SET hits = hits + #{hits} WHERE id = #{id}
+        UPDATE blog_article
+        SET hits = hits + #{hits}
+        WHERE id = #{id}
     </update>
 
     <update id="updateHits">
-        UPDATE blog_article SET hits = #{hits} WHERE id = #{id}
+        UPDATE blog_article
+        SET hits = #{hits}
+        WHERE id = #{id}
     </update>
 
     <update id="addComments">
-        UPDATE blog_article SET comments = comments + #{comments} WHERE id = #{id}
+        UPDATE blog_article
+        SET comments = comments + #{comments}
+        WHERE id = #{id}
     </update>
 
     <update id="updateComments">
-        UPDATE blog_article SET comments = #{comments} WHERE id = #{id}
+        UPDATE blog_article
+        SET comments = #{comments}
+        WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="int">
-        delete from blog_article where id = #{id}
+        DELETE FROM blog_article
+        WHERE id = #{id}
     </delete>
 
     <update id="update">
@@ -192,29 +226,38 @@
         WHERE id = #{id,jdbcType=INTEGER}
     </update>
 
-    <select id="selectByIds" resultType="com.qwli7.blog.entity.Article">
-        select * from blog_article where id in
-        <where>
-            <foreach collection="ids" item="item" separator="," close=")" open="(">
-                #{item}
-            </foreach>
-        </where>
+    <select id="findByIds" resultType="com.qwli7.blog.entity.Article">
+        SELECT * FROM
+        blog_article
+        <if test="ids != null and ids.size() > 0">
+            <where>
+                id IN
+                <foreach collection="ids" item="item" separator="," close=")" open="(">
+                    #{item}
+                </foreach>
+            </where>
+        </if>
     </select>
 
     <select id="countByCategory" resultType="long">
-        select count(id) from blog_article where category_id = #{id,jdbcType=INTEGER}
+        SELECT COUNT(id)
+        FROM blog_article
+        WHERE category_id = #{id,jdbcType=INTEGER}
     </select>
 
-    <select id="selectPreArticle" resultType="com.qwli7.blog.entity.Article">
-        SELECT id, title, alias FROM blog_article
+    <select id="findPrePage" resultType="com.qwli7.blog.entity.Article">
+        SELECT id, title, alias
+        FROM blog_article
         WHERE id <![CDATA[ < ]]> #{id}
-        ORDER BY id DESC LIMIT 1
+        ORDER BY id DESC
+        LIMIT 1
     </select>
 
-    <select id="selectNextArticle" resultType="com.qwli7.blog.entity.Article">
+    <select id="findNextArticle" resultType="com.qwli7.blog.entity.Article">
         SELECT id, title, alias
         FROM blog_article
         WHERE id <![CDATA[ > ]]>  #{id}
-        ORDER BY id ASC LIMIT 1
+        ORDER BY id
+        LIMIT 1
     </select>
 </mapper>

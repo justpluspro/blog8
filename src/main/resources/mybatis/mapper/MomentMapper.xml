@@ -4,13 +4,17 @@
 <mapper namespace="com.qwli7.blog.mapper.MomentMapper">
 
     <insert id="insert" parameterType="moment" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
-        insert into blog_moment(content, is_private, allow_comment, create_at, modify_at, hits, comments)
-            values(#{content,jdbcType=VARCHAR}, #{isPrivate,jdbcType=BOOLEAN}, #{allowComment,jdbcType=BOOLEAN}, #{createAt},
-                   #{modifyAt}, #{hits,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER})
+        INSERT INTO blog_moment (
+                content, is_private, allow_comment, create_at, modify_at, hits, comments
+                )
+            VALUES (#{content,jdbcType=VARCHAR}, #{isPrivate,jdbcType=BOOLEAN},
+                   #{allowComment,jdbcType=BOOLEAN}, #{createAt},
+                   #{modifyAt}, #{hits,jdbcType=INTEGER},
+                   #{comments,jdbcType=INTEGER})
     </insert>
 
-    <update id="update"  parameterType="Moment">
-        update blog_moment
+    <update id="update" parameterType="Moment">
+        UPDATE blog_moment
             <set>
                 <if test="content != null  and content != ''">
                     content = #{content,jdbcType=VARCHAR},
@@ -29,69 +33,82 @@
                 </if>
                 modify_at = now(),
             </set>
-            where id = #{id,jdbcType=INTEGER}
+            WHERE id = #{id,jdbcType=INTEGER}
     </update>
 
-    <select id="selectById" parameterType="integer" resultType="Moment">
-        select id, content, is_private, allow_comment, create_at, modify_at, hits, comments from blog_moment
-        where id = #{id}
+    <select id="findById" parameterType="integer" resultType="Moment">
+        SELECT id, content, is_private, allow_comment, create_at, modify_at, hits, comments
+        FROM blog_moment
+        WHERE id = #{id}
     </select>
 
     <delete id="deleteById" parameterType="int">
-        delete from blog_moment where id = #{id}
+        DELETE FROM
+                blog_moment
+        WHERE id = #{id}
     </delete>
 
     <update id="updateHits">
-        UPDATE blog_moment SET hits = #{hits} WHERE id = #{id}
+        UPDATE blog_moment
+        SET hits = #{hits}
+        WHERE id = #{id}
     </update>
 
     <update id="addHits">
-        UPDATE blog_moment set hits = hits + #{hits} WHERE id = #{id}
+        UPDATE blog_moment
+        SET hits = hits + #{hits}
+        WHERE id = #{id}
     </update>
 
     <update id="addComments">
-        UPDATE blog_moment set comments = #{comments} WHERE id = #{id}
+        UPDATE blog_moment
+        SET comments = #{comments}
+        WHERE id = #{id}
     </update>
 
     <update id="updateComments">
-        UPDATE blog_moment set hits = comments + #{comments} WHERE id = #{id}
+        UPDATE blog_moment
+        SET hits = comments + #{comments}
+        WHERE id = #{id}
     </update>
 
 
     <select id="count" parameterType="MomentQueryParam" resultType="int">
-        select count(id) from blog_moment
+        SELECT count(id) FROM blog_moment
         <where>
             <if test="query != null and query != ''">
-                content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
     </select>
 
-    <select id="selectPage" parameterType="MomentQueryParam" resultType="Moment">
-        select * from blog_moment
+    <select id="findPage" parameterType="MomentQueryParam" resultType="Moment">
+        SELECT id, content, is_private, allow_comment, create_at, modify_at, hits, comments
+        FROM blog_moment
         <where>
             <if test="query != null and query != ''">
-                content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
         <if test="orderDesc != null">
-            order by create_at
+            ORDER BY create_at
             <choose>
                 <when test="orderDesc">
-                    desc
+                    DESC
                 </when>
             </choose>
         </if>
-        limit #{start}, #{offset}
+        LIMIT #{start} OFFSET #{offset}
     </select>
 
     <select id="countArchive" resultType="int" parameterType="MomentQueryParam">
-        SELECT count(1) FROM (
-            SELECT DATE_FORMAT(create_at, '%Y-%m-%d') as date FROM blog_moment bm
+        SELECT COUNT(1) FROM (
+            SELECT DATE_FORMAT(create_at, '%Y-%m-%d') as date
+            FROM blog_moment bm
             <if test="query != null and query != ''">
                 bm.content LIKE concat('%', ${query,jdbcType=VARCHAR}, '%')
             </if>
-            GROUP BY date)
+            GROUP BY bm.date)
         AS bmd
     </select>
 
@@ -109,45 +126,47 @@
             <result property="modifyAt" column="modify_at" />
         </collection>
     </resultMap>
-    <select id="selectArchivePage" parameterType="MomentQueryParam" resultMap="ArchiveMomentResult">
-        select archive.archiveDate, bm.id, bm.content, bm.hits,
+    <select id="findArchivePage" parameterType="MomentQueryParam" resultMap="ArchiveMomentResult">
+        SELECT archive.archiveDate, bm.id, bm.content, bm.hits,
                 bm.comments, bm.allow_comment, bm.create_at,
-                bm.modify_at, bm.is_private from (
-              select date_format(create_at, '%Y-%m-%d') as archiveDate
-              from blog_moment
+                bm.modify_at, bm.is_private
+        FROM (
+              SELECT DATE_FORMAT(create_at, '%Y-%m-%d') AS archiveDate
+              FROM blog_moment
               <where>
                   <if test="query != null and query != ''">
-                      and content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                      AND content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
                   </if>
               </where>
-            group by archiveDate order by archiveDate desc
-                              ) archive
-        left join blog_moment bm on archive.archiveDate = DATE_FORMAT(bm.create_at, '%Y-%m-%d')
+            GROUP BY archiveDate ORDER BY archiveDate DESC
+        ) archive
+        LEFT JOIN blog_moment bm ON archive.archiveDate = DATE_FORMAT(bm.create_at, '%Y-%m-%d')
         <where>
             <if test="query != null and query != ''">
-                bm.content like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                bm.content LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
-        order by bm.create_at desc
-        limit #{start}, #{offset}
+        ORDER BY bm.create_at DESC
+        LIMIT #{start} OFFSET #{offset}
     </select>
 
-    <select id="selectPreMoment" resultType="com.qwli7.blog.entity.Moment">
+    <select id="findPreMoment" resultType="com.qwli7.blog.entity.Moment">
 
     </select>
-    <select id="selectNextMoment" resultType="com.qwli7.blog.entity.Moment">
+    <select id="findNextMoment" resultType="com.qwli7.blog.entity.Moment">
 
     </select>
 
-    <select id="selectLatestMoments" resultMap="ArchiveMomentResult">
-        select archive.archiveDate, bm.id, bm.content, bm.hits,
+    <select id="findLatestMoments" resultMap="ArchiveMomentResult">
+        SELECT archive.archiveDate, bm.id, bm.content, bm.hits,
                bm.comments, bm.allow_comment, bm.create_at,
-               bm.modify_at, bm.is_private from (
-                            select date_format(create_at, '%Y-%m-%d') as archiveDate
-                            from blog_moment
-        group by archiveDate order by archiveDate desc
-                                            ) archive
-                                            left join blog_moment bm on archive.archiveDate = DATE_FORMAT(bm.create_at, '%Y-%m-%d')
-        order by bm.create_at desc limit 1
+               bm.modify_at, bm.is_private
+        FROM (
+                SELECT DATE_FORMAT(create_at, '%Y-%m-%d') AS archiveDate
+                FROM blog_moment
+                GROUP BY archiveDate ORDER BY archiveDate DESC
+            ) archive
+        LEFT JOIN blog_moment bm ON archive.archiveDate = DATE_FORMAT(bm.create_at, '%Y-%m-%d')
+        ORDER BY bm.create_at DESC LIMIT 1
     </select>
 </mapper>

@@ -4,21 +4,25 @@
 <mapper namespace="com.qwli7.blog.mapper.ArticleTagMapper">
 
     <insert id="insert" parameterType="ArticleTag">
-        insert into blog_article_tag(article_id, tag_id)
-            values (#{articleId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER})
+        INSERT INTO blog_article_tag( article_id, tag_id)
+            VALUES (#{articleId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER})
     </insert>
 
     <delete id="deleteByArticle" parameterType="Article">
-        delete from blog_article_tag where article_id = #{id,jdbcType=INTEGER}
+        DELETE FROM
+                blog_article_tag
+        WHERE article_id = #{id,jdbcType=INTEGER}
     </delete>
 
     <delete id="deleteByTag" parameterType="Tag" >
-        delete from blog_article_tag where tag_id = #{id,jdbcType=INTEGER}
+        DELETE FROM
+                blog_article_tag
+        WHERE tag_id = #{id,jdbcType=INTEGER}
     </delete>
 
     <insert id="batchInsert" parameterType="list">
-        insert into blog_article_tag (article_id, tag_id)
-            values
+        INSERT INTO blog_article_tag (article_id, tag_id)
+            VALUES
             <foreach collection="articleTags" separator="," item="item">
                 ( #{item.articleId}, #{item.tagId} )
             </foreach>

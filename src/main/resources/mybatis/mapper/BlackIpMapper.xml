@@ -4,42 +4,42 @@
 <mapper namespace="com.qwli7.blog.mapper.BlackIpMapper">
 
     <insert id="insert" parameterType="BlackIp" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
-        insert into blog_blackip (ip, create_at)
-            values (#{ip,jdbcType=VARCHAR}, now())
+        INSERT INTO blog_blackip (ip, create_at)
+            VALUES (#{ip,jdbcType=VARCHAR}, now())
     </insert>
 
 
-    <select id="selectByIp" resultType="BlackIp" parameterType="string">
-        select id, ip from blog_blackip where ip = #{ip,jdbcType=VARCHAR}
+    <select id="findByIp" resultType="BlackIp" parameterType="string">
+        SELECT id, ip FROM blog_blackip WHERE ip = #{ip,jdbcType=VARCHAR}
     </select>
-    <select id="selectById" resultType="BlackIp">
-        select id, ip from blog_blackip where id = #{id}
+    <select id="findById" parameterType="integer" resultType="BlackIp">
+        SELECT id, ip FROM blog_blackip WHERE id = #{id}
     </select>
 
     <delete id="deleteById" parameterType="int">
-        delete from blog_blackip where id = #{id}
+        DELETE FROM blog_blackip WHERE id = #{id}
     </delete>
 
-    <select id="selectAll" resultType="BlackIp">
-        select id, ip from blog_blackip
+    <select id="findAll" resultType="BlackIp">
+        SELECT id, ip FROM blog_blackip
     </select>
 
     <select id="count" resultType="int" parameterType="CommonQueryParam">
-        select count(1) from blog_blackip
+        SELECT COUNT(1) FROM blog_blackip
         <where>
             <if test="query != null and query != ''">
-                ip like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                ip LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
     </select>
 
-    <select id="selectPage" resultType="BlackIp" parameterType="CommonQueryParam">
-        select id, ip, create_at from blog_blackip
+    <select id="findPage" resultType="BlackIp" parameterType="CommonQueryParam">
+        SELECT id, ip, create_at FROM blog_blackip
         <where>
             <if test="query != null and query != ''">
-                ip like concat('%', #{query,jdbcType=VARCHAR}, '%')
+                ip LIKE concat('%', #{query,jdbcType=VARCHAR}, '%')
             </if>
         </where>
-        order by create_at desc limit #{start}, #{offset}
+        ORDER BY create_at DESC LIMIT #{start} OFFSET #{offset}
     </select>
 </mapper>

@@ -26,18 +26,20 @@
     </resultMap>
 
     <sql id="fullSql">
-        select id, parent_id, path, nickname, email,
+        SELECT id, parent_id, path, nickname, email,
                ip, admin, content, module_id,
                create_at, modify_at, website, avatar,
-               module_name, checking from blog_comment
+               module_name, checking
+        FROM blog_comment
     </sql>
 
     <delete id="deleteByModule" parameterType="CommentModule">
-        delete from blog_comment where module_id = #{id,jdbcType=INTEGER}
-        and module_name = #{name,jdbcType=VARCHAR}
+        DELETE FROM blog_comment
+        WHERE module_id = #{id,jdbcType=INTEGER}
+        AND module_name = #{name,jdbcType=VARCHAR}
     </delete>
 
-    <select id="selectById" parameterType="integer" resultMap="BaseResultMap">
+    <select id="findById" parameterType="integer" resultMap="BaseResultMap">
         <include refid="fullSql" />
         WHERE id = #{id,jdbcType=INTEGER}
     </select>
@@ -48,27 +50,30 @@
                 parent_id,
             </if>
                 path, nickname, email, ip, admin, content, module_id, create_at,
-                                  modify_at, avatar, module_name) VALUES (
+                                  modify_at, avatar, module_name)
+        VALUES (
             <if test="parent != null">
                 #{parent.id,jdbcType=INTEGER},
             </if>
-        #{conversationPath,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
-        #{ip,jdbcType=VARCHAR},
-        #{admin,jdbcType=BOOLEAN}, #{content,jdbcType=VARCHAR}, #{module.id,jdbcType=INTEGER},
-        #{createAt}, #{modifyAt}, #{avatar,jdbcType=VARCHAR}, #{module.name,jdbcType=VARCHAR})
+            #{conversationPath,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+            #{email,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR},
+            #{admin,jdbcType=BOOLEAN}, #{content,jdbcType=VARCHAR},
+            #{module.id,jdbcType=INTEGER}, #{createAt}, #{modifyAt},
+            #{avatar,jdbcType=VARCHAR}, #{module.name,jdbcType=VARCHAR})
     </insert>
 
-    <select id="selectLatestCommentByIp" resultType="com.qwli7.blog.entity.Comment">
+    <select id="findLatestCommentByIp" resultType="com.qwli7.blog.entity.Comment">
         <include refid="fullSql" />
-        where ip = #{ip, jdbcType=VARCHAR} order by id desc limit 1
+        WHERE ip = #{ip, jdbcType=VARCHAR}
+        ORDER BY id DESC LIMIT 1
     </select>
 
-    <delete id="deleteById">
-        delete from blog_comment where id = #{id,jdbcType=INTEGER}
+    <delete id="deleteById" parameterType="integer">
+        DELETE FROM blog_comment WHERE id = #{id,jdbcType=INTEGER}
     </delete>
 
     <update id="update" parameterType="Comment">
-        update blog_comment
+        UPDATE blog_comment
             <set>
                 <if test="content != null and content != ''">
                     content = #{content,jdbcType=VARCHAR},
@@ -81,41 +86,49 @@
                 </if>
                 modify_at = #{modifyAt},
             </set>
-        where id = #{id,jdbcType=INTEGER}
+        WHERE id = #{id,jdbcType=INTEGER}
     </update>
 
     <select id="count" resultType="long" parameterType="CommentQueryParam">
-        select count(id) from blog_comment
+        SELECT COUNT(id) FROM blog_comment
         <where>
             <if test="commentModule != null">
-                and module_id = #{commentModule.id,jdbcType=INTEGER}
-                and module_name = #{commentModule.name,jdbcType=VARCHAR}
+                AND module_id = #{commentModule.id,jdbcType=INTEGER}
+                AND module_name = #{commentModule.name,jdbcType=VARCHAR}
             </if>
         </where>
     </select>
 
-
-    <select id="selectPage" parameterType="CommentQueryParam" resultMap="BaseResultMap">
-        select
-            bc1.id,
+    <select id="findPage" parameterType="CommentQueryParam" resultMap="BaseResultMap">
+        SELECT bc1.id,
             bc1.parent_id,
             bc1.path,
-        bc1.nickname,
-        bc1.email, bc1.ip, bc1.admin,
-        bc1.content, bc1.module_id, bc1.create_at,
-        bc1.modify_at, bc1.website, bc1.avatar, bc1.module_name,
-        bc1.checking, bc2.id as parent_id, bc2.content as parent_conent, bc2.nickname as parent_name
-
-        from blog_comment bc1 left join blog_comment bc2 on bc1.parent_id = bc2.id
+            bc1.nickname,
+            bc1.email,
+            bc1.ip,
+            bc1.admin,
+            bc1.content,
+            bc1.module_id,
+            bc1.create_at,
+            bc1.modify_at,
+            bc1.website,
+            bc1.avatar,
+            bc1.module_name,
+            bc1.checking,
+            bc2.id AS parent_id,
+            bc2.content AS parent_conent,
+            bc2.nickname AS parent_name
+        FROM blog_comment bc1
+        LEFT JOIN blog_comment bc2 ON bc1.parent_id = bc2.id
         <where>
             <if test="commentModule != null">
-                and bc1.module_id = #{commentModule.id,jdbcType=INTEGER}
-                and bc1.module_name = #{commentModule.name,jdbcType=VARCHAR}
+                AND bc1.module_id = #{commentModule.id,jdbcType=INTEGER}
+                AND bc1.module_name = #{commentModule.name,jdbcType=VARCHAR}
             </if>
         </where>
-        order by bc1.create_at desc
+        ORDER BY bc1.create_at DESC
         <if test="!ignorePaging">
-            limit #{start}, #{offset}
+            LIMIT #{start} OFFSET #{offset}
         </if>
     </select>
 </mapper>
