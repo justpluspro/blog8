@@ -199,6 +199,26 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
+             <resources>
+                      <resource>
+                               <directory>src/main/resources</directory>
+                               <filtering>true</filtering>
+                               <includes>
+                                      <include>*.*</include>
+                                      <include>config/**</include>
+                               </includes>
+                      </resource>
+                       <resource>
+                         <directory>src/main/resources</directory>
+                         <filtering>false</filtering>
+                         <includes>
+                             <include>static/**</include>
+                             <include>data/**</include>
+                             <include>templates/**</include>
+                             <include>mybatis/**</include>
+                         </includes>
+            </resource>
+             </resources>
 <!--        <resources>-->
 <!--            <resource>-->
 <!--                <directory>src/bin</directory>-->
@@ -255,11 +275,18 @@
                             <!-- 项目启动类 -->
                             <mainClass>com.qwli7.blog.BlogApplication</mainClass>
                         </manifest>
+                        
+                        <!--保存版本信息到Jar包的MANIFEST.MF文件中-->
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
                     </archive>
-                    <!-- jar 包中排除 config 目录 -->
+                    <!-- 排除不希望打在 jar 包中的目录-->
                     <excludes>
                         <exclude>config/**</exclude>
-<!--                        <exclude>defaultTemplate/**</exclude>-->
+                             <exclude>templates/**</exclude>
+                       <exclude>defaultTemplate/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
