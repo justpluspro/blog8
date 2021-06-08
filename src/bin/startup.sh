@@ -17,6 +17,9 @@
 APPLICATION="${project.artifactId}"
 # jar 名称
 APPLICATION_JAR="${project.build.finalName}.jar"
+
+SERVER_PORT="${server.port}"
+
 # bin目录绝对路径
 BIN_PATH=$(cd `dirname $0`; pwd)
 # 进入bin目录
@@ -33,41 +36,41 @@ BASE_PATH=`pwd`
 CONFIG_DIR=${BASE_PATH}"/config/"
 
 # 进程ID
-PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
+PIDS=`ps -f | grep java | grep "${CONFIG_DIR}" | awk '{ print $2 }'`
 if [ -n "$PIDS" ]; then
-    echo "ERROR: The ${APPLICATION} is running....!"
-    echo "PID: $PID"
+    echo "ERROR: The ${APPLICATION} already started!"
+    echo "PID: $PIDS"
     exit 1
 fi
 
-if [ -n "$SERVER_PORT" ]; then
-    SERVER_PORT_COUNT=`netstat -tln | grep $SERVER_PORT | wc -l`
-    if [ $SERVER_PORT_COUNT -gt 0 ]; then
-        echo "ERROR: The $SERVER_NAME port $SERVER_PORT already used!"
-        exit 1
-    fi
-fi
+#if [ -n "$SERVER_PORT" ]; then
+#    SERVER_PORT_COUNT=`netstat -tln | grep $SERVER_PORT | wc -l`
+#    if [ $SERVER_PORT_COUNT -gt 0 ]; then
+#        echo "ERROR: The $SERVER_NAME port $SERVER_PORT already used!"
+#        exit 1
+#    fi
+#fi
 
 # 项目日志输出绝对路径
 LOG_DIR=${BASE_PATH}"/logs"
 LOG_FILE="${APPLICATION}.log"
 LOG_PATH="${LOG_DIR}/${LOG_FILE}"
 # 日志备份目录
-LOG_BACK_DIR="${LOG_DIR}/back/"
+LOG_BAK_DIR="${LOG_DIR}/bak/"
 
 # 项目启动日志输出绝对路径
-LOG_STARTUP_PATH="${LOG_DIR}/startup.log"
+#LOG_STARTUP_PATH="${LOG_DIR}/startup.log"
 
 # 当前时间
 NOW=`date +'%Y-%m-%m-%H-%M-%S'`
 NOW_PRETTY=`date +'%Y-%m-%m %H:%M:%S'`
 
 # 启动日志
-STARTUP_LOG="================================================ ${NOW_PRETTY} ================================================\n"
+echo -e "================================================ ${NOW_PRETTY} ================================================\n"
 
 # 获取应用端口号
-SERVER_PORT=`sed -nr '/port: [0-9]+/ s/.*port: +([0-9]+).*/\1/p' ${CONFIG_DIR}/application.yml`
-STARTUP_LOG="${STARTUP_LOG}Occupy Port: ${SERVER_PORT}"
+#SERVER_PORT=`sed -nr '/port: [0-9]+/ s/.*port: +([0-9]+).*/\1/p' ${CONFIG_DIR}/application.yml`
+#STARTUP_LOG="${STARTUP_LOG}Occupy Port: ${SERVER_PORT}"
 
 # 如果logs文件夹不存在,则创建文件夹
 if [[ ! -d "${LOG_DIR}" ]]; then
@@ -75,13 +78,13 @@ if [[ ! -d "${LOG_DIR}" ]]; then
 fi
 
 # 如果logs/back文件夹不存在,则创建文件夹
-if [[ ! -d "${LOG_BACK_DIR}" ]]; then
-  mkdir "${LOG_BACK_DIR}"
-fi
+#if [[ ! -d "${LOG_BACK_DIR}" ]]; then
+#  mkdir "${LOG_BACK_DIR}"
+#fi
 
 # 如果项目运行日志存在,则重命名备份
 if [[ -f "${LOG_PATH}" ]]; then
-	mv ${LOG_PATH} "${LOG_BACK_DIR}/${APPLICATION}_back_${NOW}.log"
+	mv ${LOG_PATH} "${LOG_BAK_DIR}/${APPLICATION}_bak_${NOW}.log"
 fi
 
 # 创建新的项目运行日志
@@ -105,13 +108,9 @@ echo "" > ${LOG_PATH}
 JAVA_MEM_OPTS=""
 BITS=`java -version 2>&1 | grep -i 64-bit`
 if [ -n "$BITS" ]; then
-    JAVA_MEM_OPTS="-server -Xms256m -Xmx256m -Xmn512m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m"
-    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:-OmitStackTraceInFastThrow"
-    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR}"
+    JAVA_MEM_OPTS=" -server -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError "
     else
-    JAVA_MEM_OPTS="-server -Xms256m -Xmx256m -Xmn512m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m"
-    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:-OmitStackTraceInFastThrow"
-    JAVA_MEM_OPTS="${JAVA_MEM_OPTS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR}"
+    JAVA_MEM_OPTS="-server -Xms512m -Xmx512m -Xmn128m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError "
 fi
 
 #=======================================================
@@ -119,53 +118,45 @@ fi
 #=======================================================
 
 # 输出项目名称
-STARTUP_LOG="${STARTUP_LOG}application name: ${APPLICATION}\n"
+echo -e "application name: ${APPLICATION}\n"
 # 输出jar包名称
-STARTUP_LOG="${STARTUP_LOG}application jar  name: ${APPLICATION_JAR}\n"
+echo -e "application jar name: ${APPLICATION_JAR}\n"
 # 输出项目根目录
-STARTUP_LOG="${STARTUP_LOG}application root path: ${BASE_PATH}\n"
+echo -e "application root path: ${BASE_PATH}\n"
 # 输出项目bin路径
-STARTUP_LOG="${STARTUP_LOG}application bin  path: ${BIN_PATH}\n"
+echo -e "application bin path: ${BIN_PATH}\n"
 # 输出项目config路径
-STARTUP_LOG="${STARTUP_LOG}application config path: ${CONFIG_DIR}\n"
+echo -e "application config path: ${CONFIG_DIR}\n"
 # 打印日志路径
-STARTUP_LOG="${STARTUP_LOG}application log path: ${LOG_PATH}\n"
+echo -e "application log path: ${LOG_PATH}\n"
 # 打印JVM配置
-STARTUP_LOG="${STARTUP_LOG}application JAVA_MEM_OPTS : ${JAVA_MEM_OPTS}\n"
+echo -e "application JAVA_MEM_OPTS : ${JAVA_MEM_OPTS}\n"
 
 
 # 打印启动命令
-STARTUP_LOG="${STARTUP_LOG}application startup command: nohup java ${JAVA_MEM_OPTS} -jar ${BASE_PATH}/lib/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &\n"
+echo -e "application startup command: nohup java ${JAVA_MEM_OPTS} -Dspring.config.location=${CONFIG_DIR}application.properties -Dlogging.location=${CONFIG_DIR}logback-spring.xml > ${LOG_PATH} 2>&1 &\n"
 
 
 #======================================================================
 # 执行启动命令：后台启动项目,并将日志输出到项目根目录下的logs文件夹下
 #======================================================================
-STARTUP_LOG="${STARTUP_LOG}Starting the $APPLICATION}....\n"
-nohup java ${JAVA_MEM_OPTS} -jar ${BASE_PATH}/lib/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &
+echo -e "Starting the {$APPLICATION}....\n"
+nohup java ${JAVA_MEM_OPTS} -jar ${BASE_PATH}/lib/${APPLICATION_JAR} -Dspring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &
 
-COUNT=0
-while [ $COUNT -lt 1 ]; do
-  echo -e '.\c'
-  sleep 1
-  if [ -n "$SERVER_PORT" ]; then
-      COUNT=`netstat -an | grep $SERVER_PORT | wc -l`
-      else
-      COUNT=`ps -f | grep java | grep $BASE_PATH | awk '${print $2}' | wc -l`
-  fi
-  if [ $COUNT -gt 0 ]; then
-      break
-  fi
-done
+echo -e "OK!\n"
+
 
 # 进程ID
-PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
-STARTUP_LOG="${STARTUP_LOG}application pid: ${PID}\n"
+PIDS=`ps -f | grep java | grep "${CONFIG_DIR}" | awk '{ print $2 }'`
 
+echo -e "PIDS: $PIDS"
+echo -e "Startup log: ${LOG_PATH}"
+
+tail -f ${LOG_PATH}
 # 启动日志追加到启动日志文件中
-echo -e ${STARTUP_LOG} >> ${LOG_STARTUP_PATH}
+#echo -e ${STARTUP_LOG} >> ${LOG_STARTUP_PATH}
 # 打印启动日志
-echo -e ${STARTUP_LOG}
+#echo -e ${STARTUP_LOG}
 
 # 打印项目日志
-tail -f ${LOG_PATH}
+#tail -f ${LOG_PATH}
