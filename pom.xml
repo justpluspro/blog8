@@ -175,12 +175,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.junit.vintage</groupId>-->
-<!--                    <artifactId>junit-vintage-engine</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
         </dependency>
     </dependencies>
 
@@ -200,42 +194,32 @@
     <build>
         <finalName>${project.artifactId}</finalName>
              <resources>
-                      <resource>
-                               <directory>src/main/resources</directory>
-                               <filtering>true</filtering>
-                               <includes>
-                                      <include>*.*</include>
-                                      <include>config/**</include>
-                               </includes>
-                      </resource>
-                       <resource>
-                         <directory>src/main/resources</directory>
-                         <filtering>false</filtering>
-                         <includes>
-                             <include>static/**</include>
-                             <include>data/**</include>
-                             <include>templates/**</include>
-                             <include>mybatis/**</include>
-                         </includes>
-            </resource>
+                 <resource>
+                     <directory>src/main/resources</directory>
+                     <filtering>true</filtering>
+                     <includes>
+                         <include>*.*</include>
+                     </includes>
+                 </resource>
+                 <resource>
+                     <directory>src/main/resources</directory>
+                     <filtering>false</filtering>
+                     <includes>
+                         <include>*.*</include>
+                         <include>static/**</include>
+                         <include>data/**</include>
+                         <include>templates/**</include>
+                         <include>defaultTemplate/**</include>
+                         <include>mybatis/**</include>
+                     </includes>
+                </resource>
              </resources>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/bin</directory>-->
-<!--                <filtering>true</filtering>-->
-<!--                <targetPath>bin</targetPath>-->
-<!--                <includes>-->
-<!--                    <include>*.sh</include>-->
-<!--                    <include>*.bat</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
-<!--        </resources>-->
         <plugins>
             <!-- SpringBoot 的插件会将三方的 jar 打进项目的 jar 中，这样会导致 FatJar -->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
 
             <!-- 编译 -->
             <plugin>
@@ -274,19 +258,14 @@
                             <classpathPrefix>./</classpathPrefix>
                             <!-- 项目启动类 -->
                             <mainClass>com.qwli7.blog.BlogApplication</mainClass>
-                        </manifest>
-                        
-                        <!--保存版本信息到Jar包的MANIFEST.MF文件中-->
-                        <manifest>
+                            <!--保存版本信息到Jar包的MANIFEST.MF文件中-->
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                     <!-- 排除不希望打在 jar 包中的目录-->
                     <excludes>
-                        <exclude>config/**</exclude>
-                             <exclude>templates/**</exclude>
-                       <exclude>defaultTemplate/**</exclude>
+                        <exclude>*.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -330,6 +309,10 @@
             <id>test-mysql环境</id>
             <properties>
                 <profileActive>mysql</profileActive>
+                <server.port>8188</server.port>
+                <datasource.username>root</datasource.username>
+                <datasource.password>student</datasource.password>
+                <datasource.url>jdbc:mysql://localhost:3306/blog8?useUnicode=true&amp;zeroDateTimeBehavior=convertToNull&amp;characterEncoding=UTF-8&amp;useSSL=false</datasource.url>
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -354,5 +337,4 @@
             </activation>
         </profile>
     </profiles>
-
 </project>
