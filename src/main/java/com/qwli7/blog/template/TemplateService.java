@@ -57,4 +57,14 @@ public interface TemplateService {
      * @param id id
      */
     void deleteTemplate(int id);
+
+    Optional<Template> findById(int id);
+
+    /**
+     * 保存模板
+     * @param template template
+     */
+    void save(Template template);
+
+    void update(Template template);
 }

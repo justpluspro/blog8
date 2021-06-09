@@ -13,7 +13,7 @@
 <!--    <id>${project.build.finalName}</id>-->
     <!-- 打包格式，可以手动修改 -->
     <formats>
-<!--        <format>tar.gz</format>-->
+        <format>tar.gz</format>
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
@@ -55,7 +55,7 @@
         <!-- 配置文件打包 -->
         <fileSet>
             <!--目标目录,会处理目录里面的所有文件-->
-            <directory>${project.basedir}/src/main/resources/config</directory>
+            <directory>${project.basedir}/src/main/resources</directory>
             <!--相对于打包后的目录-->
             <outputDirectory>config</outputDirectory>
             <fileMode>0644</fileMode>
@@ -83,28 +83,5 @@
             </includes>
             <fileMode>0644</fileMode>
         </fileSet>
-
-<!--        &lt;!&ndash; resource 打包 &ndash;&gt;-->
-<!--        <fileSet>-->
-<!--            <directory>${project.basedir}/src/main/resources</directory>-->
-<!--            <outputDirectory>logs</outputDirectory>-->
-<!--            <fileMode>0755</fileMode>-->
-<!--            <includes>-->
-<!--                <include>**/*</include>-->
-<!--            </includes>-->
-<!--        </fileSet>-->
-
     </fileSets>
-<!--    <files>-->
-<!--        &lt;!&ndash;包含打包后的jar文件，可以不加入<outputDirectory/>,默认打包的目录&ndash;&gt;-->
-<!--        <file>-->
-<!--            <source>${project.build.directory}/${project.build.finalName}.jar</source>-->
-<!--        </file>-->
-<!--        &lt;!&ndash;这种方式也可以进行文件处理，但是针对单文件&ndash;&gt;-->
-<!--        &lt;!&ndash; <file>-->
-<!--             <source>${project.basedir}/src/main/resources/script/startup.sh</source>-->
-<!--             <fileMode>0755</fileMode>-->
-<!--             <lineEnding>unix</lineEnding>-->
-<!--         </file>&ndash;&gt;-->
-<!--    </files>-->
 </assembly>

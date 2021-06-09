@@ -12,7 +12,12 @@ import org.springframework.core.Ordered;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.*;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
@@ -111,18 +116,9 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
         if(!antPathMatcher.isPattern(pattern)) {
             throw new LogicException("invalid.pattern", "无效的 pattern");
         }
-        Optional<Template> templateOp = templateMapper.findByName(template.getName());
-        if(templateOp.isPresent()) {
-            throw new LogicException("template.exists", "模板已经存在了");
+        if(!urlPatterns.isEmpty()) {
+            urlPatterns.add(pattern);
         }
-        templateOp = templateMapper.findByPattern(pattern);
-        if(templateOp.isPresent()) {
-            throw new LogicException("template.pattern.exists", "模板pattern已经存在了");
-        }
-        template.setCreateAt(LocalDateTime.now());
-        template.setModifyAt(LocalDateTime.now());
-        templateMapper.insert(template);
-        urlPatterns.add(pattern);
     }
 
     @Override
@@ -135,17 +131,72 @@ public class TemplateServiceImpl implements TemplateService, HandlerMapping, Ini
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void deleteTemplate(int id) {
         Template template = templateMapper.findById(id).orElseThrow(()
                 -> new LogicException("template.notExists", "模板不存在"));
-        templateMapper.deleteById(id);
+        final Boolean enable = template.getEnable();
+        if(enable) {
+            throw new LogicException("template.enable", "激活状态下的模板不允许被删除");
+        }
         urlPatterns.remove(template.getPattern());
+        templateMapper.deleteById(id);
     }
 
     @Override
     public Optional<Template> findByName(String templateName) {
         return templateMapper.findByName(templateName);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Template> findById(int id) {
+        return templateMapper.findById(id);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void save(Template template) {
+        final String pattern = template.getPattern();
+        Optional<Template> templateOp = templateMapper.findByPattern(pattern);
+        if(templateOp.isPresent()) {
+            throw new LogicException("pattern.already.used", "模板 pattern 已经使用");
+        }
+        templateOp = templateMapper.findByName(template.getName());
+        if(templateOp.isPresent()) {
+            throw new LogicException("name.already.used", "模板 name 已经使用");
+        }
+        final Boolean enable = template.getEnable();
+        if(enable == null) {
+            template.setEnable(false);
+        }
+        final Boolean allowComment = template.getAllowComment();
+        if(allowComment == null) {
+            template.setAllowComment(false);
+        }
+        template.setCreateAt(LocalDateTime.now());
+        template.setModifyAt(LocalDateTime.now());
+        templateMapper.insert(template);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                if(template.getEnable()) {
+                    registerTemplate(template);
+                }
+            }
+        });
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void update(Template template) {
+        final Optional<Template> templateOp = templateMapper.findById(template.getId());
+        if(!templateOp.isPresent()) {
+            throw new LogicException("template.notFound", "模板未找到");
+        }
+
     }
 
     @Override
