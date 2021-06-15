@@ -79,10 +79,19 @@ public class ArticleIndexer {
 
     private final Path directoryPath = Paths.get(System.getProperty("user.home")).resolve("blog/index");
 
+    /**
+     * 写索引工具
+     */
     private final IndexWriter indexWriter;
 
+    /**
+     * 索引存放目录
+     */
     private final Directory directory;
 
+    /**
+     * 分词器
+     */
     private final Analyzer analyzer;
 
     public ArticleIndexer() throws IOException {
@@ -107,9 +116,16 @@ public class ArticleIndexer {
         final Document document = createDocument(article);
         indexWriter.addDocument(document);
         indexWriter.commit();
+        indexWriter.close();
     }
 
-
+    /**
+     * 根据索引搜索
+     * @param queryParam queryParam
+     * @return List<Integer>
+     * @throws IOException IOException
+     * @throws ParseException ParseException
+     */
     public List<Integer> doSearch(HandledArticleQueryParam queryParam) throws IOException, ParseException {
         final String query = queryParam.getQuery();
         final List<ArticleStatus> statuses = queryParam.getStatuses();

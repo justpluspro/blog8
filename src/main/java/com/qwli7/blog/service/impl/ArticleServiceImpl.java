@@ -75,11 +75,11 @@ public class ArticleServiceImpl implements ArticleService, CommentModuleHandler 
         this.commentMapper = commentMapper;
         this.blogProperties = blogProperties;
         this.scheduledExecutorService = scheduledExecutorService;
-//        try {
-//            this.articleIndexer = new ArticleIndexer();
-//        } catch (IOException ex){
-//            logger.error("创建文章索引类失败:[{}]", ex.getMessage(), ex);
-//        }
+        try {
+            this.articleIndexer = new ArticleIndexer();
+        } catch (IOException ex){
+            logger.error("创建文章索引类失败: [{}]", ex.getMessage(), ex);
+        }
         this.publisher = publisher;
     }
 
