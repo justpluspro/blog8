@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -38,10 +39,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Web 相关配置
@@ -80,20 +78,19 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
 
-//    @Bean
-//    public BlogExceptionResolver exceptionResolver() {
-//        return new BlogExceptionResolver();
-//    }
+    @Bean
+    public BlogExceptionResolver exceptionResolver() {
+        return new BlogExceptionResolver();
+    }
 
-//
-//    @Override
-//    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
-//        logger.info("method<extendHandlerExceptionResolvers> resolvers: [{}]", resolvers.size());
-//        logger.info("method<extendHandlerExceptionResolvers> resolvers: [{}]", resolvers.toArray().toString());
-//        // resolvers 已经有值了
-//        // 将自定义的插在第一个位置上
-//        resolvers.add(0, exceptionResolver());
-//    }
+
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        logger.info("method<extendHandlerExceptionResolvers> resolvers: [{}]", resolvers.size());
+        // resolvers 已经有值了
+        // 将自定义的插在第一个位置上
+        resolvers.add(0, exceptionResolver());
+    }
 //
 //    @Override
 //    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {

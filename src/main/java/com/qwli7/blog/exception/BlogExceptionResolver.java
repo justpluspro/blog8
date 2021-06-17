@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionResolver {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private final String ERROR_ATTRIBUTE = this.getClass().getName() + ".ERROR";
     private final String SERVLET_ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
@@ -29,6 +29,7 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
     private final List<ExceptionReader> exceptionReaders;
 
     public BlogExceptionResolver() {
+        logger.info("class BlogExceptionResolver constructor method initial success!");
         this.exceptionReaders = new ArrayList<>();
         this.exceptionReaders.add(new LogicExceptionReader());
         this.exceptionReaders.add(new AuthenticatedExceptionReader());
@@ -49,7 +50,7 @@ public class BlogExceptionResolver implements ErrorAttributes, HandlerExceptionR
     public ModelAndView resolveException(HttpServletRequest httpServletRequest,
                                          HttpServletResponse httpServletResponse,
                                          Object o, Exception e) {
-//        logger.info("exception occurred! e:[{}]", e.getMessage(), e);
+        logger.info("exception occurred! e:[{}]", e.getMessage(), e);
 
         Optional<ExceptionReader> exceptionReaderOp = filterReader(e);
         if(exceptionReaderOp.isPresent()) {
