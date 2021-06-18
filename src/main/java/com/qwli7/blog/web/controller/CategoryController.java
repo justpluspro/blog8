@@ -34,7 +34,7 @@ public class CategoryController {
      * @return List
      */
     @GetMapping("categories")
-    public List<Category> getAllCategories() {
+    public List<Category> findAll() {
         return categoryService.findAll();
     }
 

@@ -57,9 +57,9 @@ public class CommentController {
      * @return PageDto
      */
     @GetMapping("{module}/{id}/comments")
-    public PageDto<CommentDto> selectPage(CommentQueryParam commentQueryParam,
-                                          @PathVariable("module") String module,
-                                          @PathVariable("id") int id) {
+    public PageDto<CommentDto> findPage(CommentQueryParam commentQueryParam,
+                                        @PathVariable("module") String module,
+                                        @PathVariable("id") int id) {
         final CommentModule commentModule = new CommentModule(id, module);
         commentQueryParam.setCommentModule(commentModule);
         if (commentQueryParam.hasNoSize()) {

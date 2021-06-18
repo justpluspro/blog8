@@ -36,7 +36,7 @@ public class MomentController {
      * @return 动态列表
      */
     @GetMapping("moments")
-    public ResponseEntity<PageDto<Moment>> selectPage(MomentQueryParam queryParam) {
+    public ResponseEntity<PageDto<Moment>> findAll(MomentQueryParam queryParam) {
         Boolean orderDesc = queryParam.getOrderDesc();
         if(orderDesc == null) {
             orderDesc = true;

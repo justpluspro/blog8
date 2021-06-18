@@ -35,7 +35,7 @@ public class BlackIpController {
      * @return PageDto
      */
     @GetMapping("blackips")
-    public PageDto<BlackIp> selectPage(CommonQueryParam queryParam) {
+    public PageDto<BlackIp> findPage(CommonQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }

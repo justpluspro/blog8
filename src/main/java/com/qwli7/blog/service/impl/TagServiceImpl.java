@@ -93,11 +93,11 @@ public class TagServiceImpl implements TagService {
      * 删除标签
      * @param id id
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = LogicException.class)
     @Override
     public void deleteTag(int id) {
         Tag tag = tagMapper.findById(id).orElseThrow(()
-                -> new ResourceNotFoundException("tag.notExists", "标签不存在"));
+                -> new LogicException("tag.notExists", "标签不存在"));
         tagMapper.deleteById(id);
         articleTagMapper.deleteByTag(tag);
         publisher.publishEvent(new TagDeleteEvent(this, tag));
@@ -107,12 +107,12 @@ public class TagServiceImpl implements TagService {
      * 更新标签
      * @param tag tag
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = LogicException.class)
     @Override
     public void updateTag(Tag tag) {
         final Optional<Tag> tagOp = tagMapper.findById(tag.getId());
         if(!tagOp.isPresent()) {
-            throw new ResourceNotFoundException("tag.notExists", "标签不存在");
+            throw new LogicException("tag.notExists", "标签不存在");
         }
         final Tag old = tagOp.get();
         if(old.getName().equals(tag.getName())) {

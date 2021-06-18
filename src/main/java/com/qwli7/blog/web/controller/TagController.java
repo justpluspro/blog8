@@ -37,7 +37,7 @@ public class TagController {
      * @return PageDto
      */
     @GetMapping("tags")
-    public PageDto<Tag> selectPage(CommonQueryParam queryParam) {
+    public PageDto<Tag> findPage(CommonQueryParam queryParam) {
         if(queryParam.hasNoSize()) {
             queryParam.setSize(blogProperties.getDefaultPageSize());
         }
@@ -50,7 +50,7 @@ public class TagController {
      * @return Tag
      */
     @GetMapping("tag/{id}")
-    public Tag selectById(@PathVariable("id") int id) {
+    public Tag findById(@PathVariable("id") int id) {
         return tagService.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("tag.notExists","标签不存在"));
     }

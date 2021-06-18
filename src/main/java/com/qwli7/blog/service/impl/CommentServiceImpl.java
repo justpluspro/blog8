@@ -199,7 +199,7 @@ public class CommentServiceImpl implements CommentService {
      * @param commentQueryParam 评论查询参数
      * @return PageDto
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, rollbackFor = LogicException.class)
     @Override
     public PageDto<CommentDto> findPage(CommentQueryParam commentQueryParam) {
         final CommentModule commentModule = commentQueryParam.getCommentModule();
@@ -263,9 +263,9 @@ public class CommentServiceImpl implements CommentService {
         }
 
         Comment update = new Comment();
-        comment.setId(updateComment.getId());
-        comment.setContent(updateComment.getContent());
-        comment.setModifyAt(LocalDateTime.now());
+        update.setId(updateComment.getId());
+        update.setContent(updateComment.getContent());
+        update.setModifyAt(LocalDateTime.now());
 
         commentMapper.update(update);
 
