@@ -1,13 +1,10 @@
 package com.dumphex.blog.file;
 
 import org.springframework.core.io.Resource;
-import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.Duration;
-import java.util.Collections;
 
 /**
  * @author qwli7 
@@ -16,7 +13,7 @@ import java.util.Collections;
  **/
 class FileResourceHttpRequestHandler extends ResourceHttpRequestHandler {
 
-    public FileResourceHttpRequestHandler(FileResourceResolver fileResourceResolver) {
+    public FileResourceHttpRequestHandler(LocalFileResolver localFileResolver) {
         super();
     }
 

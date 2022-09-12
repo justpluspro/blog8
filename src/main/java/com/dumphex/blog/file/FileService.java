@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -251,27 +251,92 @@ public class FileService implements InitializingBean {
      * @return Resource
      */
     public Optional<Resource> getProcessedFile(String requestPath, boolean supportWebp) {
-        final ResizeResolver rr = new ResizeResolver(requestPath);
-        final String sourcePath = rr.getSourcePath();
-        final Resize resize = rr.getResize();
-        if(!resize.isValid()) {
-            // 无效的缩放属性
-            return Optional.empty();
-        }
-        final Optional<Path> path = searchFile(sourcePath);
-        if(!path.isPresent()) {
-            return Optional.empty();
-        }
-        final Path file = path.get();
-        if(uploadThumbPath == null) {
-            return Optional.of(new ReadablePathResource(file));
+
+
+        Path path = Paths.get("/Users/liqiwen/Desktop/upload", requestPath);
+//        final FileInputStream fileInputStream = null;
+        try {
+            final FileInputStream fileInputStream = new FileInputStream(path.toFile());
+            return Optional.of(new Resource() {
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return fileInputStream;
+                }
+
+                @Override
+                public boolean exists() {
+                    return true;
+                }
+
+                @Override
+                public URL getURL() throws IOException {
+                    return null;
+                }
+
+                @Override
+                public URI getURI() throws IOException {
+                    return null;
+                }
+
+                @Override
+                public File getFile() throws IOException {
+                    return path.toFile();
+                }
+
+                @Override
+                public long contentLength() throws IOException {
+                    return Files.size(path);
+                }
+
+                @Override
+                public long lastModified() throws IOException {
+                    return Files.getLastModifiedTime(path).to(TimeUnit.MILLISECONDS);
+                }
+
+                @Override
+                public Resource createRelative(String relativePath) throws IOException {
+                    return null;
+                }
+
+                @Override
+                public String getFilename() {
+                    return path.getFileName().toString();
+                }
+
+                @Override
+                public String getDescription() {
+                    return null;
+                }
+            });
+
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
-        if(resize.isKeepRate()) {
-            //原样输出
-            return Optional.of(new ReadablePathResource(file));
-        }
-        return getThumbnailFile(file, resize, supportWebp);
+
+
+//        final ResizeResolver rr = new ResizeResolver(requestPath);
+//        final String sourcePath = rr.getSourcePath();
+//        final Resize resize = rr.getResize();
+//        if(!resize.isValid()) {
+//            // 无效的缩放属性
+//            return Optional.empty();
+//        }
+//        final Optional<Path> path = searchFile(sourcePath);
+//        if(!path.isPresent()) {
+//            return Optional.empty();
+//        }
+//        final Path file = path.get();
+//        if(uploadThumbPath == null) {
+//            return Optional.of(new ReadablePathResource(file));
+//        }
+//
+//        if(resize.isKeepRate()) {
+//            //原样输出
+//            return Optional.of(new ReadablePathResource(file));
+//        }
+//        return getThumbnailFile(file, resize, supportWebp);
     }
 
 

@@ -1,6 +1,5 @@
 package com.dumphex.blog.file;
 
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -21,8 +20,8 @@ import java.util.Collections;
  * 功能：FileConfiguration
  **/
 @Configuration
-@Conditional(FileCondition.class)
-public class FileConfiguration implements WebMvcConfigurer {
+//@Conditional(FileCondition.class)
+public class FileConfig implements WebMvcConfigurer {
 
 //    public FileConfiguration(WebMvcProperties mvcProperties) {
 //        String staticPathPattern = mvcProperties.getStaticPathPattern();
@@ -47,9 +46,9 @@ public class FileConfiguration implements WebMvcConfigurer {
                                                      ApplicationContext applicationContext,
                                                      UrlPathHelper urlPathHelper) throws Exception {
         // 创建文件资源解析器
-        FileResourceResolver fileResourceResolver = new FileResourceResolver(fileService);
+        LocalFileResolver localFileResolver = new LocalFileResolver(fileService);
         // 创建文件处理器
-        FileResourceHttpRequestHandler requestHandler = new FileResourceHttpRequestHandler(fileResourceResolver);
+        FileResourceHttpRequestHandler requestHandler = new FileResourceHttpRequestHandler(localFileResolver);
         requestHandler.setApplicationContext(applicationContext);
         if(applicationContext != null) {
             ServletContext servletContext = ((WebApplicationContext) applicationContext).getServletContext();

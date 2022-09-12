@@ -18,13 +18,13 @@ import java.util.List;
  * 2021/3/17 15:32
  * 功能：FileResourceResolver
  **/
-class FileResourceResolver implements ResourceResolver {
+class LocalFileResolver implements ResourceResolver {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private final FileService fileService;
 
-    public FileResourceResolver(FileService fileService) {
+    public LocalFileResolver(FileService fileService) {
         this.fileService = fileService;
     }
 
@@ -33,12 +33,13 @@ class FileResourceResolver implements ResourceResolver {
     public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations,
                                     ResourceResolverChain chain) {
         logger.info("method<resolveResource> static resource requestPath: [{}]", requestPath);
-        if(request == null || StringUtils.isEmpty(requestPath)) {
+        if(request == null || !StringUtils.hasText(requestPath)) {
             return null;
         }
         final String method = request.getMethod().toLowerCase();
 
-        if(!Arrays.asList(HttpMethod.GET.name().toLowerCase(), HttpMethod.OPTIONS.name().toLowerCase()).contains(method)) {
+        if(!Arrays.asList(HttpMethod.GET.name().toLowerCase(),
+                HttpMethod.OPTIONS.name().toLowerCase()).contains(method)) {
             // get static resource if not 'get' or 'options'
             // will return null
             return null;

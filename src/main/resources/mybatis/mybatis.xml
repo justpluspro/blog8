@@ -14,8 +14,6 @@
         <typeAlias
                 type="org.apache.ibatis.type.EnumOrdinalTypeHandler"
                 alias="EnumOrdinalTypeHandler" />
-        <typeAlias type="com.qwli7.blog.mapper.TagsTypeHandler" alias="TagsTypeHandler" />
-        <package name="com.qwli7.blog.entity" />
     </typeAliases>
 
     <mappers>
