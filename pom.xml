@@ -44,7 +44,7 @@
         <lucene.queryparser.version>8.4.0</lucene.queryparser.version>
         <mybatis.version>3.5.6</mybatis.version>
         <mybatis-starter.version>2.1.2</mybatis-starter.version>
-        <jsoup.version>1.12.1</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <commons.codec.version>1.13</commons.codec.version>
         <maven.compile.version>3.8.1</maven.compile.version>
     </properties>
