@@ -16,20 +16,6 @@
     <description>Blog project for Spring Boot</description>
     <url>https://github.com/qwli7/blog8</url>
 
-    <licenses>
-        <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>liqiwen.com</id>
-            <name>qwli7</name>
-            <email>selfassu@gmail.com</email>
-        </developer>
-    </developers>
 
     <properties>
         <timestamp>${maven.build.timestamp}</timestamp>
@@ -44,12 +30,16 @@
         <lucene.queryparser.version>8.4.0</lucene.queryparser.version>
         <mybatis.version>3.5.6</mybatis.version>
         <mybatis-starter.version>2.1.2</mybatis-starter.version>
-        <jsoup.version>1.12.1</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <commons.codec.version>1.13</commons.codec.version>
         <maven.compile.version>3.8.1</maven.compile.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -62,30 +52,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.whvcse</groupId>
-            <artifactId>easy-captcha</artifactId>
-            <version>${easy-captcha.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>${mybatis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>${mybatis-starter.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -93,12 +66,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
-        <!-- 缓存 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
         <dependency>
@@ -158,24 +125,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- lucene 索引 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${lucene.version}</version>
-        </dependency>
-        <!-- 中文分词 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>${lucene.analyzers.version}</version>
-        </dependency>
-        <!-- 查询解析器 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>${lucene.queryparser.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -197,149 +146,12 @@
     </repositories>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
-             <resources>
-                 <resource>
-                     <directory>src/main/resources</directory>
-                     <filtering>true</filtering>
-                     <includes>
-                         <include>*.*</include>
-                     </includes>
-                 </resource>
-                 <resource>
-                     <directory>src/main/resources</directory>
-                     <filtering>false</filtering>
-                     <includes>
-                         <include>*.*</include>
-                         <include>static/**</include>
-                         <include>data/**</include>
-                         <include>templates/**</include>
-                         <include>defaultTemplate/**</include>
-                         <include>mybatis/**</include>
-                     </includes>
-                </resource>
-             </resources>
         <plugins>
             <!-- SpringBoot 的插件会将三方的 jar 打进项目的 jar 中，这样会导致 FatJar -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
-            <!-- 编译 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-
-            <!-- 打包时跳过测试 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <!-- 生成的 jar 中，不要包含 pom.xml 和 pom.properties 这两个文件 -->
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <!-- 是否要把第三方jar加入到类构建路径 -->
-                            <addClasspath>true</addClasspath>
-                            <!-- 外部依赖 jar 包的最终位置 -->
-                            <!-- 因为我们将第三方 jar 和本项目 jar 放在同一个目录下，这里就使用 ./ -->
-                            <classpathPrefix>./</classpathPrefix>
-                            <!-- 项目启动类 -->
-                            <mainClass>com.qwli7.blog.BlogApplication</mainClass>
-                            <!--保存版本信息到Jar包的MANIFEST.MF文件中-->
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                    <!-- 排除不希望打在 jar 包中的目录-->
-                    <excludes>
-                        <exclude>*.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <descriptors>
-                        <!-- 具体的配置文件 -->
-                        <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <!-- 绑定到 maven 的 package 动作上 -->
-                        <phase>package</phase>
-                        <!-- 执行一次 -->
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
-    <!-- 环境配置 -->
-    <profiles>
-        <profile>
-            <id>local-本地环境</id>
-            <properties>
-                <profileActive>local</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>test-mysql环境</id>
-            <properties>
-                <profileActive>mysql</profileActive>
-                <server.port>8188</server.port>
-                <datasource.username>root</datasource.username>
-                <datasource.password>student</datasource.password>
-                <datasource.url>jdbc:mysql://localhost:3306/blog8?useUnicode=true&amp;zeroDateTimeBehavior=convertToNull&amp;characterEncoding=UTF-8&amp;useSSL=false</datasource.url>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>uat-h2环境</id>
-            <properties>
-                <profileActive>uat</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <profileActive>prod</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-    </profiles>
 </project>

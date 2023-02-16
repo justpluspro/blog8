@@ -3,31 +3,27 @@ package com.qwli7.blog.entity;
 import java.io.Serializable;
 
 /**
- * @author qwli7
- * 2021/2/22 13:05
- * 功能：User
+ * @author qwli7 
+ * @date 2023/2/16 14:51
+ * 功能：blog8
  **/
 public class User implements Serializable {
 
-    /**
-     * 用户名称
-     */
     private String username;
 
-    /**
-     * 用户密码
-     */
-    private String password;
-
-    /**
-     * 邮箱
-     */
     private String email;
 
-    /**
-     * 头像
-     */
     private String avatar;
+
+    private String password;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getAvatar() {
         return avatar;
@@ -51,13 +47,5 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return email;
     }
 }

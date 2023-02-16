@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <input type="hidden" id="_csrf" th:value="${_csrf}">
+</head>
+<body>
+<input type="text" id="title"><br/>
+<input type="text" id="alias"><br/>
+<select id="category">
+    <option value="1">1</option>
+    <option value="2">2</option>
+</select><br/>
+
+<textarea id="content" rows="3" cols="10"></textarea>
+<br/>
+
+<button type="button" id="btn-post">发布</button>
+<script src="/static/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        getAllCategories()
+    })
+
+    $('#btn-post').click(function() {
+        let Article = getArticle()
+
+        if (Article.title === null || Article.title.trim().length === 0) {
+            alert('请输入标题')
+            return
+        }
+        if (Article.content === null || Article.content.trim().length === 0) {
+            alert('请输入内容')
+            return
+        }
+        let url = '/api/article'
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            contentType: 'application/json;charset=utf8',
+            data: JSON.stringify(Article),
+            method: 'POST',
+            success: function () {
+                window.location.href = '/console/articles'
+            },
+            error: function (xhrRequest, error, thrown) {
+
+            }
+        })
+    })
+
+
+    function getAllCategories() {
+        let url = '/api/categories'
+        $.ajax({
+            url: url,
+            method: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf8',
+            success: function(data) {
+                let html = ''
+                for(let i = 0; i < data.length; i++) {
+                    let category = data[i]
+                    html += '<option value="'+category.id+'">'+category.categoryName+'</option>'
+                }
+                $('#category').html(html)
+            },
+            error: function(xhrRequest, error, thrown) {
+                alert('获取分类失败')
+            }
+        })
+    }
+
+    function getArticle() {
+        let title = $('#title').val()
+        let content = $('#content').val()
+        let alias = $('#alias').val()
+
+        let categoryId = $('#category').val()
+
+        return {
+            'title': title,
+            'content': content,
+            'alias': alias,
+            'categoryId': categoryId,
+            'articleState': 'POSTED'
+        }
+    }
+
+
+</script>
+</body>
+</html>

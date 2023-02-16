@@ -1,29 +1,21 @@
 package com.qwli7.blog.service;
 
 import com.qwli7.blog.entity.User;
+import com.qwli7.blog.entity.vo.LoginBean;
+import com.qwli7.blog.exception.BizException;
 
 /**
- * @author qwli7
- * 2021/2/22 13:09
- * 功能：UserService
+ * @author qwli7 
+ * @date 2023/2/16 14:51
+ * 功能：blog8
  **/
 public interface UserService {
 
-    /**
-     * 获取用户数据
-     * @return User
-     */
-    User getUser();
+    void getUser();
 
     /**
-     * 更新密码
+     * login
+     * @param loginBean loginBean
      */
-    void updatePassword();
-
-
-    /**
-     * 修改用户数据
-     */
-    void updateUser();
-
+    User login(LoginBean loginBean) throws BizException;
 }

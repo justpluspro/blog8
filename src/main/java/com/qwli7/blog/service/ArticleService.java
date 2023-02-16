@@ -1,77 +1,23 @@
 package com.qwli7.blog.service;
 
-import com.qwli7.blog.entity.Article;
-import com.qwli7.blog.entity.ArticleNav;
-import com.qwli7.blog.entity.ArticleSaved;
-import com.qwli7.blog.entity.dto.PageDto;
-import com.qwli7.blog.entity.vo.ArticleQueryParam;
-
-import java.util.List;
-import java.util.Optional;
+import com.qwli7.blog.entity.dto.ArticleDto;
+import com.qwli7.blog.entity.dto.PageResult;
+import com.qwli7.blog.entity.vo.ArticleBean;
+import com.qwli7.blog.entity.vo.ArticleQueryParams;
 
 /**
- * @author qwli7
- * 2021/2/22 13:09
- * 功能：ArticleService
+ * @author qwli7 
+ * @date 2023/2/16 15:00
+ * 功能：blog8
  **/
 public interface ArticleService {
 
-    /**
-     * 保存文章
-     * @param article article
-     * @return ArticleSaved
-     */
-    ArticleSaved save(Article article);
 
-    /**
-     * 更新文章
-     * @param article article
-     */
-    void update(Article article);
+    void saveArticle(ArticleBean articleBean);
 
-    /**
-     * 查找文章
-     * @param queryParam queryParam
-     * @return PageDto
-     */
-    PageDto<Article> findPage(ArticleQueryParam queryParam);
 
-    /**
-     * 删除文章
-     * @param id id
-     */
-    void deleteById(int id);
+    PageResult<ArticleDto> queryArticle(ArticleQueryParams articleQueryParams);
 
-    /**
-     * 获取文章为编辑
-     * @param id id
-     * @return Article
-     */
-    Optional<Article> findArticleForEdit(int id);
 
-    /**
-     * 获取文章
-     * @param idOrAlias id 或者别名
-     * @return Article
-     */
-    Optional<Article> findArticle(String idOrAlias);
-
-    /**
-     * 获取文章导航
-     * @param id id
-     * @return ArticleNav
-     */
-    Optional<ArticleNav> findArticleNav(int id);
-
-    /**
-     * 更新点击量
-     * @param id id
-     */
-    void hits(int id);
-
-    /**
-     * 批量删除文章
-     * @param ids ids
-     */
-    void deleteByIds(List<Integer> ids);
+    void updateArticle();
 }

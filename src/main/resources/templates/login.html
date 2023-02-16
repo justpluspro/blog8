@@ -1,101 +1,58 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>用户登录</title>
-    <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
-  </head>
-  <body class="antialiased border-top-wide border-primary d-flex flex-column">
-    <div class="flex-fill d-flex flex-column justify-content-center py-4">
-      <div class="container-tight py-6">
-        <form class="card card-md" onsubmit="return false;" method="get" autocomplete="off">
-          <div class="card-body">
-            <h2 class="card-title mb-4">登录</h2>
-            <div class="mb-3">
-              <label for="username" class="form-label">用户名</label>
-              <input id="username" type="text" class="form-control" placeholder="用户名">
-                <div id="usernameErrorTips" class="invalid-feedback" style="display: none;"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <input type="hidden" id="_csrf" th:value="${_csrf}">
+</head>
+<body>
+  <input type="email" id="email"><br/>
+  <input type="password" id="password"><br/>
+  <button id="btn-login" type="button">登录</button>
+  <script src="/static/js/jquery.min.js"></script>
+  <script>
+    $('#btn-login').click(function() {
+      let email = $('#email').val()
+      let password = $('#password').val()
+      if(email === null || email.trim().length === 0) {
+        alert('请输入邮箱')
+        return
+      }
+      if(password === null || password.trim().length === 0) {
+        alert('请输入密码')
+        return
+      }
+      let data = {'email':email, 'password': password}
 
-            </div>
-            <div class="mb-3">
-              <label for="password" class="form-label">
-                密码
-              </label>
-                <input id="password" type="password" class="form-control" placeholder="密码"  autocomplete="off">
-              <div id="passwordErrorTips" class="invalid-feedback" style="display: none;"></div>
-            </div>
-            <div class="mb-3">
-              <label class="form-check">
-                <input type="checkbox" class="form-check-input"/>
-                <span class="form-check-label">记住我</span>
-              </label>
-            </div>
-            <div class="form-footer">
-              <button type="button" id="btnLogin" class="btn btn-primary w-100">登录</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-    <!-- Libs JS -->
-    <!-- Tabler Core -->
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/tabler/js/tabler.min.js"></script>
-    <script>
-        const rootPath = '[[@{/}]]';
-        document.getElementById('btnLogin').addEventListener('click', function() {
+      let loginUrl = '/api/login'
+      $.ajax({
+        url: loginUrl,
+        dataType: 'json',
+        contentType: 'application/json;charset=utf8',
+        headers: {
+          '_csrf-token': $('#_csrf').val()
+        },
+        data: JSON.stringify(data),
+        method: 'POST',
+        success: function() {
+          window.location.href = '/console/articles'
+        },
+        error: function(xhrRequest, error, thrown) {
+          alert('登陆失败' + error)
+        }
+      })
+    })
 
-            let usernameElement = document.getElementById('username');
-            let passwordElement = document.getElementById('password');
-
-            let usernameErrorTips = document.getElementById('usernameErrorTips');
-            let passwordErrorTips = document.getElementById('passwordErrorTips');
-
-            let username = usernameElement.value;
-            let password = passwordElement.value;
-
-            if(username == null || username.length === 0) {
-                usernameErrorTips.style.display = 'display';
-                usernameErrorTips.innerText = '用户不能为空';
-                usernameElement.classList.add('is-invalid');
-                return;
-            }
-            if(password == null || password.length === 0) {
-                passwordErrorTips.style.display = 'display';
-                passwordErrorTips.innerText = '密码不能为空';
-                passwordElement.classList.add('is-invalid');
-                return;
-            }
-
-
-            let authInfo = {
-                name: username,
-                password: password
-            }
-
-            $.ajax({
-                url: rootPath + 'api/token',
-                dataType: 'json',
-                data: authInfo,
-                // contentType: 'application/json;charset=utf8',
-                method: 'POST',
-                success: function(res) {
-
-
-
-
-                },
-                error: function(res) {
-
-                }
-            });
-
-
-
-        })
-
-    </script>
-  </body>
+    function getQueryParam(key) {
+      let queryStr = window.location.search.substring(1)
+      let arrs = queryStr.split('&')
+      for(let i= 0; i < arrs.length; i++) {
+        let pair = arrs[i].split('=')
+        if (pair[0] === key) {
+          return pair[1]
+        }
+      }
+    }
+  </script>
+</body>
 </html>

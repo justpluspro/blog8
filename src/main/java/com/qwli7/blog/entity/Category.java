@@ -1,43 +1,45 @@
 package com.qwli7.blog.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.hibernate.validator.constraints.Length;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * @author qwli7
- * 2021/2/22 13:05
- * 功能：Category
+ * @author qwli7 
+ * @date 2023/2/16 17:29
+ * 功能：blog8
  **/
-public class Category extends BaseEntity implements Serializable {
+@Entity(name = "blog_category")
+@Table
+public class Category implements Serializable {
 
-    @NotBlank(message = "分类名称不能为空")
-    @Length(max = 10, message = "分类名称的长度不能超过 {max}")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    @Column(name = "category_name", nullable = false, length = 32)
     private String name;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
-    private LocalDateTime createAt;
+    @Column(name = "category_alias", nullable = false, length = 32)
+    private String alias;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
-    private LocalDateTime modifyAt;
+    @Column(name = "create_time")
+    @CreationTimestamp
+    private LocalDateTime createTime;
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    @Column(name = "modified_time", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime modifiedTime;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public LocalDateTime getModifyAt() {
-        return modifyAt;
-    }
-
-    public void setModifyAt(LocalDateTime modifyAt) {
-        this.modifyAt = modifyAt;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -46,5 +48,29 @@ public class Category extends BaseEntity implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(LocalDateTime modifiedTime) {
+        this.modifiedTime = modifiedTime;
     }
 }
