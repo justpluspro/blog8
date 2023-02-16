@@ -77,6 +77,8 @@ public class ArticleServiceImpl implements ArticleService {
 
                 Path<Object> state = root.get("state");
 
+                List<Predicate> predicates = new ArrayList<>();
+
                 //左连接 category 表
                 Join<Object, Object> category = root.join("category", JoinType.LEFT);
 
@@ -92,11 +94,15 @@ public class ArticleServiceImpl implements ArticleService {
 
 //                Predicate categoryIdPredicate = criteriaBuilder.equal(categoryId, )
 
-                criteriaBuilder.or(titlePredicate, contentPredicate, aliasPredicate);
-                criteriaBuilder.and(statePredicate);
-                return criteriaBuilder.and(criteriaBuilder.equal(category.get("id").as(Integer.class),
-                        articleQueryParams.getCategoryId()))
-                        .in(statePredicate);
+                Predicate predicate = criteriaBuilder.or(titlePredicate, contentPredicate, aliasPredicate);
+//                Predicate predicate2 = criteriaBuilder.and(statePredicate);
+                Predicate predicate3 = criteriaBuilder.and(criteriaBuilder.equal(category.get("id").as(Integer.class),
+                        articleQueryParams.getCategoryId()));
+                predicates.add(predicate);
+//                predicates.add(predicate2);
+                predicates.add(predicate3);
+
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             }
         };
         Integer page = articleQueryParams.getPage();
