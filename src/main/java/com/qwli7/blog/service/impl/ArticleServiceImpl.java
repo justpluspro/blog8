@@ -64,6 +64,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         Article article = new Article();
+        article.setHits(0);
+        article.setComments(0);
         article.setCategory(categoryOptional.get());
         article.setTitle(articleBean.getTitle());
         article.setContent(articleBean.getContent());
@@ -102,6 +104,7 @@ public class ArticleServiceImpl implements ArticleService {
                 Predicate titlePredicate = criteriaBuilder.like(title.as(String.class), "%s"+articleQueryParams.getQuery()+"%s");
                 Predicate contentPredicate = criteriaBuilder.like(content.as(String.class), "%s"+articleQueryParams.getQuery()+"%s");
                 Predicate aliasPredicate = criteriaBuilder.like(alias.as(String.class), "%s"+articleQueryParams.getQuery()+"%s");
+
 
                 Predicate statePredicate = criteriaBuilder.equal(state, ArticleState.class);
 

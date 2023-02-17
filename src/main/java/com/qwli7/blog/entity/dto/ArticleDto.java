@@ -29,6 +29,10 @@ public class ArticleDto implements Serializable {
 
     private String content;
 
+    private String digest;
+
+    private String featureImage;
+
     private CategoryDto category;
 
     private ArticleState state;
@@ -91,5 +95,21 @@ public class ArticleDto implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public String getFeatureImage() {
+        return featureImage;
+    }
+
+    public void setFeatureImage(String featureImage) {
+        this.featureImage = featureImage;
     }
 }

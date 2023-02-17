@@ -25,6 +25,8 @@ public class PageResult<T> implements Serializable {
     public PageResult(ArticleQueryParams articleQueryParams, long count, List<T> data) {
         this.data = data;
         this.articleQueryParams = articleQueryParams;
+        this.pageSize = articleQueryParams.getSize();
+        this.currentPage = articleQueryParams.getPage();
         this.totalRow = count;
     }
 

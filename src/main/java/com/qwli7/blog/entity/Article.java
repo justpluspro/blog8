@@ -29,11 +29,23 @@ public class Article implements Serializable {
     @Column(name = "content", length = 10240, nullable = false)
     private String content;
 
+    @Column(name = "digest", length = 1024)
+    private String digest;
+
+    @Column(name = "feature_image", length = 128)
+    private String featureImage;
+
     @Column(name = "alias", length = 32)
     private String alias;
 
     @Column(name = "state", nullable = false)
     private ArticleState state;
+
+    @Column(name = "hits", nullable = false)
+    private Integer hits;
+
+    @Column(name = "comments", nullable = false)
+    private Integer comments;
 
     @Column(name = "create_time", nullable = false)
     @CreationTimestamp
@@ -49,6 +61,38 @@ public class Article implements Serializable {
     @OneToOne
     @JoinColumn(name = "fk_category_id", referencedColumnName = "id")
     private Category category;
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public String getFeatureImage() {
+        return featureImage;
+    }
+
+    public void setFeatureImage(String featureImage) {
+        this.featureImage = featureImage;
+    }
+
+    public Integer getHits() {
+        return hits;
+    }
+
+    public void setHits(Integer hits) {
+        this.hits = hits;
+    }
+
+    public Integer getComments() {
+        return comments;
+    }
+
+    public void setComments(Integer comments) {
+        this.comments = comments;
+    }
 
     public Category getCategory() {
         return category;

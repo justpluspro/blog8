@@ -27,7 +27,7 @@ public class LoginApiController {
 
     private final UserService userService;
 
-    private RateLimiter rateLimiter = RateLimiter.create(1);
+    private final RateLimiter rateLimiter = RateLimiter.create(1);
 
     public LoginApiController(UserService userService) {
         this.userService = userService;
@@ -50,7 +50,21 @@ public class LoginApiController {
         session.setAttribute("user", user);
         BlogContext.setAuthorized(true);
         return ResponseEntity.noContent().build();
+    }
 
-
+    /**
+     * 登出接口
+     * @param session session
+     * @return void
+     */
+    @PostMapping("logout")
+    public ResponseEntity<Void> logout(HttpSession session) {
+        if(!BlogContext.isAuthorized()) {
+            throw new BizException(Message.NOT_LOGIN);
+        }
+        session.removeAttribute("user");
+        session.invalidate();
+        BlogContext.removeAll();
+        return ResponseEntity.noContent().build();
     }
 }

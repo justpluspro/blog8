@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author qwli7 (qwli7@iflytek.com)
+ * @author qwli7
  * @date 2023/2/17 9:18
  * 功能：blog8
  **/
@@ -44,5 +44,9 @@ public class BlogContext {
 
     public static GlobalConfig getGlobalConfig() {
         return globalConfigMap.getOrDefault("config", null);
+    }
+
+    public static void removeAll() {
+        loginThreadLocal.remove();
     }
 }

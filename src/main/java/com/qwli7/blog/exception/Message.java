@@ -13,6 +13,8 @@ public enum Message {
     ARTICLE_ALIAS_EXISTS("articleAlias.exists", "文章别名已经存在"),
     OPERATOR_TOO_FREQUENCY("operator.tooFrequency", "操作太频繁"),
 
+    NOT_LOGIN("user.notLogin", "用户未登录"),
+
     ARTICLE_NOT_FOUND("article.notFound", "文章未发现"),
     ;
 

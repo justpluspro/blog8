@@ -63,8 +63,8 @@ public class UserServiceImpl implements UserService {
         try {
             properties.load(Files.newInputStream(configPath.toFile().toPath()));
 
-            String email = properties.getProperty("email");
-            String password = properties.getProperty("password");
+            String email = properties.getProperty("blog.email");
+            String password = properties.getProperty("blog.password");
             User user = new User();
             user.setPassword(password);
             user.setEmail(email);

@@ -7,11 +7,7 @@ import java.io.Serializable;
  * @date 2023/2/16 18:09
  * 功能：blog8
  **/
-public class ArticleQueryParams implements Serializable {
-
-    private Integer page;
-
-    private Integer size;
+public class ArticleQueryParams extends PageQueryParams implements Serializable {
 
     private String query;
 
@@ -23,25 +19,6 @@ public class ArticleQueryParams implements Serializable {
 
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public Integer getPage() {
-        if(page < 0) {
-            return 0;
-        }
-        return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
-    }
-
-    public Integer getSize() {
-        return size;
-    }
-
-    public void setSize(Integer size) {
-        this.size = size;
     }
 
     public String getQuery() {

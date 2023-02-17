@@ -3,26 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
 </head>
 <body>
 
-    <input type="text" id="queryInput"><button type="button" id="query-btn">查询</button><a href="/console/article/create">新增</a>
-    <table>
-        <thead>
-            <tr>
-                <th>标题</th>
-                <th>分类</th>
-                <th>状态</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody id="articlePanel">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4">
+                <ul class="list-unstyled">
+                    <li><a href="/console/articles">文章管理</a> </li>
+                    <li><a href="/console/moments">动态管理</a> </li>
+                    <li><a href="/console/files">文件管理</a> </li>
+                </ul>
 
-        </tbody>
+            </div>
 
-    </table>
+            <div class="col-lg-8 col-md-8">
+                <input type="text" id="queryInput"><button type="button" id="query-btn">查询</button><a href="/console/article/create">新增</a>
+                <table class="table table-responsive">
+                    <thead>
+                        <tr>
+                            <th>标题</th>
+                            <th>分类</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="articlePanel">
 
-<script src="/static/js/jquery.min.js"></script>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
 
 
 
