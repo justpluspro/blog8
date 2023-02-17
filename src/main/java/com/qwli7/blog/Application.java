@@ -2,6 +2,7 @@ package com.qwli7.blog;
 
 import com.qwli7.blog.dao.CategoryDao;
 import com.qwli7.blog.entity.Category;
+import com.qwli7.blog.service.ConfigService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,6 +26,12 @@ public class Application implements CommandLineRunner {
     @Resource
     private CategoryDao categoryDao;
 
+    private final ConfigService configService;
+
+    public Application(ConfigService configService) {
+        this.configService = configService;
+    }
+
 
     @Override
     public void run(String... args) throws Exception {
@@ -37,5 +44,7 @@ public class Application implements CommandLineRunner {
         category.setAlias("web");
         category.setName("web");
         categoryDao.save(category);
+
+        configService.loadConfig();
     }
 }

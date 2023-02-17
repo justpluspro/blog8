@@ -1,22 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <input type="hidden" id="_csrf" th:value="${_csrf}">
 </head>
 <body>
-<input type="text" id="title"><br/>
-<input type="text" id="alias"><br/>
-<select id="category">
+<input type="hidden" id="articleId" th:value="${article != null ? article.id: ''}">
+标题：<input type="text" id="title" th:value="${article != null ? article.title : ''}"><br/>
+别名:<input type="text" id="alias" th:value="${article != null ? article.alias : ''}"><br/>
+分类:<select id="category">
     <option value="1">1</option>
     <option value="2">2</option>
 </select><br/>
-
-<textarea id="content" rows="3" cols="10"></textarea>
+状态：<select id="state">
+        <option value="POSTED" selected>发布</option>
+        <option value="DRAFT">草稿</option>
+    </select><br/>
+正文:<br/>
+<textarea id="content" rows="10" cols="20" th:text="${article != null ? article.content : ''}"></textarea>
 <br/>
 
-<button type="button" id="btn-post">发布</button>
+<button type="button" th:if="${article == null}" id="btn-post">发布</button>
+<button type="button" th:if="${article != null}" id="btn-update">保存修改</button>
 <script src="/static/js/jquery.min.js"></script>
 <script>
     $(document).ready(function(){
@@ -41,6 +47,36 @@
             contentType: 'application/json;charset=utf8',
             data: JSON.stringify(Article),
             method: 'POST',
+            success: function () {
+                window.location.href = '/console/articles'
+            },
+            error: function (xhrRequest, error, thrown) {
+
+            }
+        })
+    })
+
+    $('#btn-update').click(function() {
+
+        let Article = getArticle()
+
+        if (Article.title === null || Article.title.trim().length === 0) {
+            alert('请输入标题')
+            return
+        }
+        if (Article.content === null || Article.content.trim().length === 0) {
+            alert('请输入内容')
+            return
+        }
+        Article.id = $('#articleId').val()
+
+        let url = '/api/article/'
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            contentType: 'application/json;charset=utf8',
+            data: JSON.stringify(Article),
+            method: 'PUT',
             success: function () {
                 window.location.href = '/console/articles'
             },
@@ -84,7 +120,7 @@
             'content': content,
             'alias': alias,
             'categoryId': categoryId,
-            'articleState': 'POSTED'
+            'articleState': $('#state').val()
         }
     }
 

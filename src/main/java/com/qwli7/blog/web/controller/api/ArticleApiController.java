@@ -29,9 +29,22 @@ public class ArticleApiController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @PutMapping("article")
+    public ResponseEntity<Integer> updateArticle(@RequestBody ArticleBean articleBean) {
+        articleService.updateArticle(articleBean);
+        return ResponseEntity.ok(articleBean.getId());
+    }
+
     @GetMapping("articles")
     public ResponseEntity<PageResult<ArticleDto>> queryArticles(ArticleQueryParams articleQueryParams) {
         PageResult<ArticleDto> articleDtoPageResult = articleService.queryArticle(articleQueryParams);
         return ResponseEntity.ok(articleDtoPageResult);
+    }
+
+    @PutMapping("article/{id}/hit")
+    public ResponseEntity<Void> addHits(@PathVariable("id") Integer id) {
+
+        return ResponseEntity.noContent().build();
     }
 }

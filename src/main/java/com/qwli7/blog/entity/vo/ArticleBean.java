@@ -14,6 +14,8 @@ import java.io.Serializable;
  **/
 public class ArticleBean implements Serializable {
 
+    private Integer id;
+
     @NotBlank(message = "标题不能为空")
     @Length(max = 128, min = 1, message = "标题长度{min}到{max}之间")
     private String title;
@@ -32,6 +34,14 @@ public class ArticleBean implements Serializable {
      * 别名
      */
     private String alias;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getAlias() {
         return alias;

@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author qwli7 
  * @date 2023/2/16 15:00
@@ -12,4 +14,6 @@ import org.springframework.stereotype.Repository;
  **/
 @Repository
 public interface ArticleDao extends PagingAndSortingRepository<Article, Integer>, JpaSpecificationExecutor<Article> {
+
+    Optional<Article> findArticleByAlias(String alias);
 }

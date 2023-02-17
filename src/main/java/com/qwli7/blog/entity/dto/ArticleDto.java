@@ -1,8 +1,10 @@
 package com.qwli7.blog.entity.dto;
 
 import com.qwli7.blog.entity.Article;
+import com.qwli7.blog.entity.enums.ArticleState;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author qwli7 
@@ -15,6 +17,9 @@ public class ArticleDto implements Serializable {
         this.id = article.getId();
         this.title = article.getTitle();
         this.content = article.getContent();
+        this.state = article.getState();
+        this.createTime = article.getCreateTime();
+        this.postedTime = article.getPostedTime();
         this.category = new CategoryDto(article.getCategory());
     }
 
@@ -25,6 +30,36 @@ public class ArticleDto implements Serializable {
     private String content;
 
     private CategoryDto category;
+
+    private ArticleState state;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime postedTime;
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getPostedTime() {
+        return postedTime;
+    }
+
+    public void setPostedTime(LocalDateTime postedTime) {
+        this.postedTime = postedTime;
+    }
+
+    public ArticleState getState() {
+        return state;
+    }
+
+    public void setState(ArticleState state) {
+        this.state = state;
+    }
 
     public CategoryDto getCategory() {
         return category;

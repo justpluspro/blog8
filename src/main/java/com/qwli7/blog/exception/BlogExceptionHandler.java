@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,5 +25,12 @@ public class BlogExceptionHandler {
         data.put("code", error.getCode());
         data.put("message", error.getDesc());
         return data;
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public String handleResourceNotFoundException(ResourceNotFoundException notFoundException, HttpServletRequest request) {
+        Message error = notFoundException.getError();
+        request.setAttribute("error",error);
+        return "error";
     }
 }

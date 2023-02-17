@@ -6,5 +6,71 @@
 </head>
 <body>
 
+    <input type="text" id="queryInput"><button type="button" id="query-btn">查询</button><a href="/console/article/create">新增</a>
+    <table>
+        <thead>
+            <tr>
+                <th>标题</th>
+                <th>分类</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="articlePanel">
+
+        </tbody>
+
+    </table>
+
+<script src="/static/js/jquery.min.js"></script>
+
+
+
+<script>
+
+    $(document).ready(function() {
+        let obj = {
+            'page': 1,
+            'size': 10,
+            'query': ''
+        }
+        queryArticle(obj)
+    })
+
+    $('#query-btn').click(function() {
+        let query = $('#queryInput').val()
+        let obj = {
+            'page': 1,
+            'size': 10,
+            'query': query
+        }
+        queryArticle(obj)
+    })
+    function queryArticle(obj) {
+        $.ajax({
+            url: '/api/articles?query=' + obj.query + '&page=' + obj.page + '&size=' + obj.size,
+            method: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf8',
+            success: function(res) {
+                let data = res.data
+                let html = ''
+                for(let i = 0; i < data.length; i++) {
+                    html += '<tr>'
+                    html += '<td><a href="/article/'+data[i].id+'">'+data[i].title+'</a></td>'
+                    html += '<td>'+data[i].category.categoryName+'</td>'
+                    html += '<td>'+data[i].state+'</td>'
+                    html += '<td>'
+                    html += '<a href="/console/article/'+data[i].id+'/edit">编辑</a>'
+                    html += '<a data-delete="'+data[i].id+'" href="javascript:void(0);">删除</a>'
+                    html += '</td>'
+                    html += '</tr>'
+                }
+                $('#articlePanel').html(html)
+            }
+        })
+    }
+
+</script>
 </body>
 </html>

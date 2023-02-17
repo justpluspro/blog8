@@ -3,13 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
   <input type="hidden" id="_csrf" th:value="${_csrf}">
+  <style>
+    .login-form {
+      width: 100%;
+      max-width: 400px;
+      padding: 16px;
+      margin: auto;
+    }
+  </style>
 </head>
-<body>
-  <input type="email" id="email"><br/>
-  <input type="password" id="password"><br/>
-  <button id="btn-login" type="button">登录</button>
-  <script src="/static/js/jquery.min.js"></script>
+<body class="text-center">
+  <div class="login-form">
+    <h3>登录Blog</h3>
+    <input class="form-control mb-3" type="email" placeholder="邮箱" id="email">
+    <input class="form-control mb-3" type="password" placeholder="密码" id="password">
+    <button id="btn-login" class="btn btn-primary btn-block" type="button">登录</button>
+  </div>
+  <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" ></script>
   <script>
     $('#btn-login').click(function() {
       let email = $('#email').val()

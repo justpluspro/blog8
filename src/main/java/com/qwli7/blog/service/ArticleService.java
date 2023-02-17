@@ -1,9 +1,12 @@
 package com.qwli7.blog.service;
 
+import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.dto.ArticleDto;
 import com.qwli7.blog.entity.dto.PageResult;
 import com.qwli7.blog.entity.vo.ArticleBean;
 import com.qwli7.blog.entity.vo.ArticleQueryParams;
+
+import java.util.Optional;
 
 /**
  * @author qwli7 
@@ -19,5 +22,9 @@ public interface ArticleService {
     PageResult<ArticleDto> queryArticle(ArticleQueryParams articleQueryParams);
 
 
-    void updateArticle();
+    void updateArticle(ArticleBean articleBean);
+
+    ArticleDto getArticleForView(String idOrAlias);
+
+    Optional<Article> getArticleForEdit(Integer id);
 }

@@ -1,6 +1,5 @@
 package com.qwli7.blog.service;
 
-import com.qwli7.blog.dao.CategoryDao;
 import com.qwli7.blog.entity.dto.CategoryDto;
 
 import java.util.List;

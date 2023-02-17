@@ -9,6 +9,11 @@ public enum Message {
 
     AUTH_FAILED("auth.failed", "认证失败"),
     CATEGORY_NOT_EXISTS("category.notExists", "分类不存在"),
+    ARTICLE_NOT_EXISTS("article.notExists", "文章不存在"),
+    ARTICLE_ALIAS_EXISTS("articleAlias.exists", "文章别名已经存在"),
+    OPERATOR_TOO_FREQUENCY("operator.tooFrequency", "操作太频繁"),
+
+    ARTICLE_NOT_FOUND("article.notFound", "文章未发现"),
     ;
 
     final String code;

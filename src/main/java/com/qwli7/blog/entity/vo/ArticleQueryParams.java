@@ -26,6 +26,9 @@ public class ArticleQueryParams implements Serializable {
     }
 
     public Integer getPage() {
+        if(page < 0) {
+            return 0;
+        }
         return page;
     }
 

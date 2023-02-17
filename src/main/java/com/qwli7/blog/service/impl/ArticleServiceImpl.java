@@ -1,5 +1,6 @@
 package com.qwli7.blog.service.impl;
 
+import com.qwli7.blog.BlogContext;
 import com.qwli7.blog.dao.ArticleDao;
 import com.qwli7.blog.dao.CategoryDao;
 import com.qwli7.blog.entity.Article;
@@ -11,6 +12,8 @@ import com.qwli7.blog.entity.vo.ArticleBean;
 import com.qwli7.blog.entity.vo.ArticleQueryParams;
 import com.qwli7.blog.exception.BizException;
 import com.qwli7.blog.exception.Message;
+import com.qwli7.blog.exception.ResourceNotFoundException;
+import com.qwli7.blog.plugin.md.MarkdownHandler;
 import com.qwli7.blog.service.ArticleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,9 +41,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final CategoryDao categoryDao;
 
-    public ArticleServiceImpl(ArticleDao articleDao, CategoryDao categoryDao) {
+    private final MarkdownHandler markdownHandler;
+
+    public ArticleServiceImpl(ArticleDao articleDao, CategoryDao categoryDao, MarkdownHandler markdownHandler) {
         this.articleDao = articleDao;
         this.categoryDao = categoryDao;
+        this.markdownHandler = markdownHandler;
     }
 
     @Override
@@ -50,11 +56,18 @@ public class ArticleServiceImpl implements ArticleService {
         if(!categoryOptional.isPresent()) {
             throw new BizException(Message.CATEGORY_NOT_EXISTS);
         }
+
+        String alias = articleBean.getAlias();
+        Optional<Article> articleOp = articleDao.findArticleByAlias(alias);
+        if(articleOp.isPresent()) {
+            throw new BizException(Message.ARTICLE_ALIAS_EXISTS);
+        }
+
         Article article = new Article();
         article.setCategory(categoryOptional.get());
         article.setTitle(articleBean.getTitle());
         article.setContent(articleBean.getContent());
-        article.setAlias(articleBean.getAlias());
+        article.setAlias(alias);
         ArticleState articleState = articleBean.getArticleState();
         article.setState(articleState);
         if(ArticleState.POSTED.equals(articleState)) {
@@ -102,7 +115,7 @@ public class ArticleServiceImpl implements ArticleService {
 //                predicates.add(predicate2);
                 predicates.add(predicate3);
 
-                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+                return criteriaBuilder.and(new ArrayList<>().toArray(new Predicate[0]));
             }
         };
         Integer page = articleQueryParams.getPage();
@@ -110,7 +123,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Sort sort = Sort.by(Sort.Order.desc("postedTime"));
 
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        PageRequest pageRequest = PageRequest.of(page-1, size, sort);
 
         Page<Article> articlePage = articleDao.findAll(specification, pageRequest);
         int totalPages = articlePage.getTotalPages();
@@ -126,7 +139,68 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void updateArticle() {
+    public void updateArticle(ArticleBean articleBean) {
+        Integer id = articleBean.getId();
+        Optional<Article> articleOp = articleDao.findById(id);
+        if(!articleOp.isPresent()) {
+            throw new BizException(Message.ARTICLE_NOT_EXISTS);
+        }
+        Integer categoryId = articleBean.getCategoryId();
+        Optional<Category> categoryOp = categoryDao.findById(categoryId);
+        if(!categoryOp.isPresent()) {
+            throw new BizException(Message.CATEGORY_NOT_EXISTS);
+        }
+        Category category = categoryOp.get();
+        Article article = articleOp.get();
+        article.setTitle(articleBean.getTitle());
+        article.setContent(articleBean.getContent());
+        article.setAlias(articleBean.getAlias());
+        article.setState(articleBean.getArticleState());
+        article.setCategory(category);
 
+        articleDao.save(article);
+
+    }
+
+    @Override
+    public ArticleDto getArticleForView(String idOrAlias) {
+        Integer id = null;
+        try {
+            id = Integer.parseInt(idOrAlias);
+        } catch (NumberFormatException e) {
+            // ignored
+        }
+        Optional<Article> articleOp;
+        if(id == null) {
+            //别名
+            articleOp = articleDao.findArticleByAlias(idOrAlias);
+        } else {
+            if(id <= 0) {
+                throw new ResourceNotFoundException(Message.ARTICLE_NOT_FOUND);
+            } else {
+                articleOp = articleDao.findById(id);
+            }
+        }
+        if(!articleOp.isPresent()) {
+            throw new ResourceNotFoundException(Message.ARTICLE_NOT_FOUND);
+        }
+        Article article = articleOp.get();
+        ArticleState state = article.getState();
+        if(state.equals(ArticleState.DRAFT) && !BlogContext.isAuthorized()) {
+            //状态为草稿并且未登录
+            throw new ResourceNotFoundException(Message.ARTICLE_NOT_FOUND);
+        }
+        ArticleDto articleDto = new ArticleDto(article);
+        String content = articleDto.getContent();
+        content = markdownHandler.toHtml(content);
+        articleDto.setContent(content);
+
+        return articleDto;
+    }
+
+
+    @Override
+    public Optional<Article> getArticleForEdit(Integer id) {
+        return articleDao.findById(id);
     }
 }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传</title>
+</head>
+<body>
+<h2></h2>
+<input type="file" id="file">
+<span id="progress"></span>
+<button type="button" id="file-upload-btn">上传</button>
+<script src="/static/js/jquery.min.js"></script>
+<script>
+    $("#file-upload-btn").click(function() {
+        let formData = new FormData()
+        formData.append("files", document.getElementById('file').files[0])
+
+        $.ajax({
+            url: '/api/file/upload',
+            method: 'POST',
+            cache: false,
+            processData: false,
+            contentType: false,
+            data: formData,
+            xhr:function(){
+                let myXhr = $.ajaxSettings.xhr();
+                if(myXhr.upload){ // check if upload property exists
+                    myXhr.upload.addEventListener('progress',function(e){
+                        var loaded = e.loaded;//已经上传大小情况
+                        var tot = e.total;//附件总大小
+                        var per = Math.floor(100*loaded/tot).toFixed(2);
+                        $("#progress").text( per +"%" );//设置进度显示百分比
+                        // $("#progress").css("width" , per +"%"); //设置完成的进度条宽度
+
+                    }, false); // for handling the progress of the upload
+                }
+                return myXhr;
+            },
+            success:function(data){
+                console.log(data);
+                console.log("上传成功!!!!");
+            },
+            error:function(){
+                console.log("上传失败！");
+            }
+        })
+
+    })
+</script>
+</body>
+</html>
