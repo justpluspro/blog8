@@ -1,6 +1,7 @@
 package com.qwli7.blog.web.controller;
 
 import com.qwli7.blog.entity.dto.ArticleDto;
+import com.qwli7.blog.entity.dto.PageResult;
 import com.qwli7.blog.entity.vo.ArticleQueryParams;
 import com.qwli7.blog.exception.Message;
 import com.qwli7.blog.exception.ResourceNotFoundException;
@@ -29,8 +30,8 @@ public class IndexController {
 
     @GetMapping
     public String index(ArticleQueryParams articleQueryParams, Model model) {
-//        PageResult<ArticleDto> articlePageResult = articleService.queryArticle(articleQueryParams);
-//        model.addAttribute(articlePageResult);
+        PageResult<ArticleDto> articlePageResult = articleService.queryArticle(articleQueryParams);
+        model.addAttribute(articlePageResult);
         return "index";
     }
 
