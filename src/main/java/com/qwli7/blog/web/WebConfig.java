@@ -4,6 +4,7 @@ import com.qwli7.blog.plugin.file.LocalFileResourceResolver;
 import com.qwli7.blog.service.ConfigService;
 import com.qwli7.blog.web.filter.ContextFilter;
 import com.qwli7.blog.web.interceptor.AuthInterceptor;
+import com.qwli7.blog.web.interceptor.CheckCsrfInterceptor;
 import com.qwli7.blog.web.interceptor.CheckInitialInterceptor;
 import com.qwli7.blog.web.interceptor.CsrfInterceptor;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new CheckInitialInterceptor(configService));
         registry.addInterceptor(new CsrfInterceptor());
         registry.addInterceptor(new AuthInterceptor());
+        registry.addInterceptor(new CheckCsrfInterceptor());
     }
 
     @Override

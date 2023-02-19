@@ -3,48 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
     <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/dashbroad.css">
 </head>
 <body>
 
-    <div class="container">
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Company name</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#">登出</a>
+        </li>
+    </ul>
+</nav>
+
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-4 col-md-4">
-                <ul class="list-unstyled">
-                    <li><a href="/console/articles">文章管理</a> </li>
-                    <li><a href="/console/moments">动态管理</a> </li>
-                    <li><a href="/console/files">文件管理</a> </li>
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="/console/articles" class="nav-link active">
+                            <span data-feather="home"></span>
+                            文章管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/console/moments" class="nav-link active">
+                            <span data-feather="user"></span>
+                            动态管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/console/files" class="nav-link active">
+                            <span data-feather="file"></span>
+                            文件管理
+                        </a>
+                    </li>
                 </ul>
+            </nav>
 
-            </div>
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 border-bottom">
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <input type="text" class="form-control" id="queryInput">
+                        <button type="button" id="query-btn" class="btn btn-primary">查询</button>
+                        <a class="btn btn-warning" href="/console/article/create">新增</a>
+                    </div>
+                </div>
 
-            <div class="col-lg-8 col-md-8">
-                <input type="text" id="queryInput"><button type="button" id="query-btn">查询</button><a href="/console/article/create">新增</a>
-                <table class="table table-responsive">
-                    <thead>
-                        <tr>
-                            <th>标题</th>
-                            <th>分类</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="articlePanel">
 
-                    </tbody>
-                </table>
-            </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>分类</th>
+                                <th>状态</th>
+                                <th>点击量</th>
+                                <th>评论量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articlePanel">
+
+                        </tbody>
+                    </table>
+                </div>
+            </main>
         </div>
     </div>
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/feather/feather.min.js"></script>
 
 
 
 <script>
 
     $(document).ready(function() {
+        feather.replace()
         let obj = {
             'page': 1,
             'size': 10,
@@ -74,11 +118,20 @@
                 for(let i = 0; i < data.length; i++) {
                     html += '<tr>'
                     html += '<td><a href="/article/'+data[i].id+'">'+data[i].title+'</a></td>'
-                    html += '<td>'+data[i].category.categoryName+'</td>'
-                    html += '<td>'+data[i].state+'</td>'
+                    html += '<td><span class="badge bg-light">'+data[i].category.categoryName+'</span></td>'
+                    if(data[i].state === 'POSTED') {
+                        html += '<td><span class="badge bg-success">发布</span>'
+                    } else if(data[i].state === 'DRAFT') {
+                        html += '<td><span class="badge bg-warning">草稿</span>'
+                    } else {
+                        html += '<td><span class="badge bg-danger">未知</span>'
+                    }
+                    html += '<td>'+data[i].hits+'</td>'
+                    html += '<td>'+data[i].comments+'</td>'
                     html += '<td>'
-                    html += '<a href="/console/article/'+data[i].id+'/edit">编辑</a>'
-                    html += '<a data-delete="'+data[i].id+'" href="javascript:void(0);">删除</a>'
+                    html += '<a href="/console/article/'+data[i].id+'/edit"><span data-feather="edit"></span></a>'
+                    html += '<a data-delete="'+data[i].id+'" href="javascript:void(0);"><span data-feather="delete"></span></a>'
+                    html += '<a data-setting="'+data[i].id+'" href="javascript:void(0);"><span data-feather="config"></span></a>'
                     html += '</td>'
                     html += '</tr>'
                 }

@@ -18,6 +18,8 @@ public class ArticleDto implements Serializable {
         this.title = article.getTitle();
         this.content = article.getContent();
         this.state = article.getState();
+        this.hits = article.getHits();
+        this.comments = article.getComments();
         this.createTime = article.getCreateTime();
         this.postedTime = article.getPostedTime();
         this.category = new CategoryDto(article.getCategory());
@@ -37,9 +39,29 @@ public class ArticleDto implements Serializable {
 
     private ArticleState state;
 
+    private Integer hits;
+
+    private Integer comments;
+
     private LocalDateTime createTime;
 
     private LocalDateTime postedTime;
+
+    public Integer getHits() {
+        return hits;
+    }
+
+    public void setHits(Integer hits) {
+        this.hits = hits;
+    }
+
+    public Integer getComments() {
+        return comments;
+    }
+
+    public void setComments(Integer comments) {
+        this.comments = comments;
+    }
 
     public LocalDateTime getCreateTime() {
         return createTime;
