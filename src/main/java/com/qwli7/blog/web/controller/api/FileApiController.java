@@ -17,7 +17,7 @@ import java.util.List;
  * 功能：blog8
  **/
 @RestController
-@RequestMapping("api/file")
+@RequestMapping("api")
 public class FileApiController {
 
     private final FileService fileService;
@@ -31,12 +31,18 @@ public class FileApiController {
      * @param fileUpload fileUpload
      * @return file
      */
-    @PostMapping("upload")
+    @PostMapping("file/upload")
     public ResponseEntity<List<FileInfo>> fileUpload(FileUpload fileUpload) {
         List<FileInfo> fileInfoList = fileService.fileUpload(fileUpload);
         return ResponseEntity.ok(fileInfoList);
     }
 
+
+    @GetMapping("files")
+    public ResponseEntity<List<FileInfo>> getFileInfos() {
+        List<FileInfo> fileInfos = fileService.getFileInfos();
+        return ResponseEntity.ok(fileInfos);
+    }
 
     @GetMapping("dirs")
     public ResponseEntity<List<FileInfo>> queryDirs() {

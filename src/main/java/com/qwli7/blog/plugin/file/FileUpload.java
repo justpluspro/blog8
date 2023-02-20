@@ -12,7 +12,17 @@ import java.util.List;
  **/
 public class FileUpload implements Serializable {
 
+    private String path;
+
     private List<MultipartFile> files;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public List<MultipartFile> getFiles() {
         return files;

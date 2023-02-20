@@ -25,4 +25,4 @@ spring:
 
 blog:
   file:
-    path: E:\\upload\\
+    path: /Users/liqiwen/workspace/upload

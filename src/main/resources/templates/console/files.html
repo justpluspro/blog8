@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/fontawesome/all.min.css">
     <link rel="stylesheet" href="/static/css/dashbroad.css">
 </head>
 <body>
@@ -52,7 +53,7 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 border-bottom">
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <input type="text" class="form-control" id="queryInput">
-                        <button type="button" id="query-btn" class="btn btn-primary">查询</button>
+                        <button type="button" id="show-upload-modal-btn" class="btn btn-primary">查询</button>
                         <a class="btn btn-warning" href="/console/article/create">新增</a>
                     </div>
                 </div>
@@ -79,66 +80,96 @@
         </div>
     </div>
 
+    <!-- uploadModel -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">上传文件</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="path" class="col-form-label">Bucket:</label>
+                        <select id="path">
+                            <option id="">请选择 Bucket</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="file" class="col-form-label">File:</label>
+                        <input type="file" multiple name="file" id="file">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="button" id="file-upload-btn" class="btn btn-primary">上传</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/feather/feather.min.js"></script>
+    <script src="/static/fontawesome/all.min.js"></script>
+    <script>
+        $('#show-upload-modal-btn').click(function() {
+            $('#uploadModal').modal('show')
+        })
+        $("#file-upload-btn").click(function() {
+            let formData = new FormData()
+            let path = $('#path').val()
+            if(path === "" || path.length === 0) {
+                alert('请选择存储 Bucket');
+                return;
+            }
+            let file = document.getElementById('file').files[0];
+            if(file === null) {
+                alert('请选择文件')
+                return;
+            }
+            formData.append('path', path)
+            formData.append("files", file)
 
+            $.ajax({
+                url: '/api/file/upload',
+                method: 'POST',
+                cache: false,
+                processData: false,
+                contentType: false,
+                data: formData,
+                xhr:function(){
+                    let myXhr = $.ajaxSettings.xhr();
+                    if(myXhr.upload){ // check if upload property exists
+                        myXhr.upload.addEventListener('progress',function(e){
+                            // var loaded = e.loaded;//已经上传大小情况
+                            // var tot = e.total;//附件总大小
+                            // var per = Math.floor(100*loaded/tot).toFixed(2);
+                            // $("#progress").text( per +"%" );//设置进度显示百分比
+                            // $("#progress").css("width" , per +"%"); //设置完成的进度条宽度
+
+                        }, false); // for handling the progress of the upload
+                    }
+                    return myXhr;
+                },
+                success:function(data){
+                    console.log(data);
+                    // console.log("上传成功!!!!");
+                    $('#uploadModal').modal('hide')
+                },
+                error:function(xhrRequest, error, thrown){
+                    console.log("上传失败！");
+                }
+            })
+
+        })
+    </script>
 
 
 <script>
 
-    $(document).ready(function() {
-        feather.replace()
-        let obj = {
-            'page': 1,
-            'size': 10,
-            'query': ''
-        }
-        queryArticle(obj)
-    })
 
-    $('#query-btn').click(function() {
-        let query = $('#queryInput').val()
-        let obj = {
-            'page': 1,
-            'size': 10,
-            'query': query
-        }
-        queryArticle(obj)
-    })
-    function queryArticle(obj) {
-        $.ajax({
-            url: '/api/articles?query=' + obj.query + '&page=' + obj.page + '&size=' + obj.size,
-            method: 'GET',
-            dataType: 'json',
-            contentType: 'application/json;charset=utf8',
-            success: function(res) {
-                let data = res.data
-                let html = ''
-                for(let i = 0; i < data.length; i++) {
-                    html += '<tr>'
-                    html += '<td><a href="/article/'+data[i].id+'">'+data[i].title+'</a></td>'
-                    html += '<td><span class="badge bg-light">'+data[i].category.categoryName+'</span></td>'
-                    if(data[i].state === 'POSTED') {
-                        html += '<td><span class="badge bg-success">发布</span>'
-                    } else if(data[i].state === 'DRAFT') {
-                        html += '<td><span class="badge bg-warning">草稿</span>'
-                    } else {
-                        html += '<td><span class="badge bg-danger">未知</span>'
-                    }
-                    html += '<td>'+data[i].hits+'</td>'
-                    html += '<td>'+data[i].comments+'</td>'
-                    html += '<td>'
-                    html += '<a href="/console/article/'+data[i].id+'/edit"><span data-feather="edit"></span></a>'
-                    html += '<a data-delete="'+data[i].id+'" href="javascript:void(0);"><span data-feather="delete"></span></a>'
-                    html += '<a data-setting="'+data[i].id+'" href="javascript:void(0);"><span data-feather="config"></span></a>'
-                    html += '</td>'
-                    html += '</tr>'
-                }
-                $('#articlePanel').html(html)
-            }
-        })
-    }
 
 </script>
 </body>

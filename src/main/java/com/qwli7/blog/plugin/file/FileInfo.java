@@ -13,10 +13,20 @@ public class FileInfo implements Serializable {
 
     private String filename;
 
+    private String basename;
+
     private FileExtension fileExtension;
 
     private FileType fileType;
     private long fileSize;
+
+    public String getBasename() {
+        return basename;
+    }
+
+    public void setBasename(String basename) {
+        this.basename = basename;
+    }
 
     public long getFileSize() {
         return fileSize;

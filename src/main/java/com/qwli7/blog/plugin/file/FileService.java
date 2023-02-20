@@ -4,6 +4,7 @@ import com.qwli7.blog.exception.BizException;
 import com.qwli7.blog.exception.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -15,10 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author qwli7
@@ -26,7 +25,7 @@ import java.util.Optional;
  * 功能：blog8
  **/
 @Component
-public class FileService {
+public class FileService implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(FileService.class);
 
@@ -57,7 +56,11 @@ public class FileService {
     private String blogFilePath;
 
 
+    private Path rootPath;
+
     public List<FileInfo> fileUpload(FileUpload fileUpload) {
+
+        Path uploadPath = getUploadPath(fileUpload.getPath());
 
         List<MultipartFile> files = fileUpload.getFiles();
         if(CollectionUtils.isEmpty(files)) {
@@ -69,20 +72,25 @@ public class FileService {
         for(MultipartFile file: files) {
             FileInfo fileInfo = new FileInfo();
             String originalFilename = file.getOriginalFilename();
+            Path uploadFilePath = null;
             try {
-                Files.copy(file.getInputStream(), Paths.get(Paths.get(blogFilePath).toString(), originalFilename));
+                uploadFilePath = Paths.get(uploadPath.toString(), originalFilename);
+                Files.copy(file.getInputStream(), uploadFilePath);
             } catch (IOException e) {
                 logger.error("file upload failed. ", e);
                 continue;
             }
+
             fileInfo.setFilename(originalFilename);
-            fileInfo.setPath(Paths.get(Paths.get(blogFilePath).toString(), originalFilename).toString());
+            fileInfo.setPath(File.pathSeparator + uploadFilePath.subpath(uploadPath.getNameCount(), uploadFilePath.getNameCount()));
 
-            String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String baseName = FileUtils.getBaseName(originalFilename);
+            String fileExtension = FileUtils.getFileExtension(originalFilename);
 
-            Optional<FileExtension> fileTypeOptional = FileExtension.convert(ext);
+            Optional<FileExtension> fileTypeOptional = FileExtension.convert(fileExtension);
             fileTypeOptional.ifPresent(fileInfo::setFileExtension);
 
+            fileInfo.setBasename(baseName);
             fileInfo.setFileSize(file.getSize());
 
             fileInfos.add(fileInfo);
@@ -176,6 +184,18 @@ public class FileService {
     }
 
 
+    private Path getUploadPath(String path) {
+        Path rootPath = Paths.get(blogFilePath);
+        Path uploadPath;
+        if(StringUtils.isEmpty(path)) {
+            uploadPath = rootPath;
+        } else {
+            uploadPath = Paths.get(rootPath.toString(), path);
+        }
+        return uploadPath;
+    }
+
+
     private boolean videoCanEdit(String extension) {
         return VIDEO_FORMAT_HANDLED.contains(extension);
     }
@@ -224,5 +244,52 @@ public class FileService {
         }
 
         return fileInfos;
+    }
+
+    public List<FileInfo> getFileInfos() {
+        Path uploadPath = getUploadPath("");
+
+        List<FileInfo> fileInfos = new ArrayList<>();
+
+        try {
+            fileInfos = Files.walk(uploadPath, FileVisitOption.values()).filter(_e -> {
+                return !Files.isDirectory(_e);
+            }).map(_e -> {
+                return getFileInfo(_e);
+            }).skip(0).limit(10).collect(Collectors.toList());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return fileInfos;
+    }
+
+
+    private FileInfo getFileInfo(Path file) {
+
+        FileInfo fileInfo = new FileInfo();
+        if (Files.isDirectory(file)) {
+            fileInfo.setFileType(FileType.DIR);
+            fileInfo.setFilename(file.getFileName().toString());
+            fileInfo.setFileSize(0);
+        } else {
+            fileInfo.setFileType(FileType.FILE);
+            fileInfo.setBasename(FileUtils.getBaseName(file));
+            String fileExtension = FileUtils.getFileExtension(file);
+            fileInfo.setFilename(file.getFileName().toString());
+            FileExtension.convert(fileExtension).ifPresent(fileInfo::setFileExtension);
+            try {
+                fileInfo.setFileSize(Files.size(file));
+            } catch (IOException e) {
+                fileInfo.setFileSize(-1);
+            }
+        }
+        fileInfo.setPath(File.separator + file.subpath(rootPath.getNameCount(), file.getNameCount()));
+        return fileInfo;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.rootPath = Paths.get(blogFilePath);
     }
 }

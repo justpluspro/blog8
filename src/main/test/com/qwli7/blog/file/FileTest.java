@@ -2,6 +2,7 @@ package com.qwli7.blog.file;
 
 import com.qwli7.blog.plugin.file.FileInfo;
 import com.qwli7.blog.plugin.file.FileType;
+import com.qwli7.blog.plugin.file.FileUtils;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -57,5 +58,26 @@ public class FileTest {
             System.out.println(fileInfo);
 
         }
+    }
+
+    @Test
+    public void test_subpath() {
+        Path root = Paths.get("/Users/liqiwen/workspace/upload");
+        Path end = Paths.get("/Users/liqiwen/workspace/upload/a.png");
+        System.out.println(end.subpath(root.getNameCount(), end.getNameCount()));
+
+    }
+
+    @Test
+    public void test_get_basename() {
+        String filepath = "/Users/liqiwen/workspace/upload/a.png";
+        String baseName = FileUtils.getBaseName(filepath);
+        String baseName1 = FileUtils.getBaseName(Paths.get(filepath));
+        String fileExtension = FileUtils.getFileExtension(filepath);
+        String fileExtension1 = FileUtils.getFileExtension(Paths.get(filepath));
+        System.out.println(baseName1);
+        System.out.println(baseName);
+        System.out.println(fileExtension1);
+        System.out.println(fileExtension);
     }
 }
