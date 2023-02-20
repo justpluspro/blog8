@@ -11,10 +11,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,16 +64,32 @@ public class FileService {
             throw new BizException(Message.AUTH_FAILED);
         }
 
+        List<FileInfo> fileInfos = new ArrayList<>();
+
         for(MultipartFile file: files) {
+            FileInfo fileInfo = new FileInfo();
             String originalFilename = file.getOriginalFilename();
             try {
                 Files.copy(file.getInputStream(), Paths.get(Paths.get(blogFilePath).toString(), originalFilename));
             } catch (IOException e) {
                 logger.error("file upload failed. ", e);
+                continue;
             }
+            fileInfo.setFilename(originalFilename);
+            fileInfo.setPath(Paths.get(Paths.get(blogFilePath).toString(), originalFilename).toString());
+
+            String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+            Optional<FileExtension> fileTypeOptional = FileExtension.convert(ext);
+            fileTypeOptional.ifPresent(fileInfo::setFileExtension);
+
+            fileInfo.setFileSize(file.getSize());
+
+            fileInfos.add(fileInfo);
+
         }
 
-        return new ArrayList<>();
+        return fileInfos;
     }
 
     public Optional<Resource> getFileInfo(String s) {
@@ -127,6 +143,11 @@ public class FileService {
         return Optional.empty();
     }
 
+    /**
+     * 解析图片缩放尺寸
+     * @param s s
+     * @return Resize
+     */
     private Resize resolveResize(String s) {
         String resizeStr = s.substring(s.lastIndexOf("/") + 1);
         if(StringUtils.isEmpty(resizeStr)) {
@@ -145,6 +166,9 @@ public class FileService {
         //200x200! 强制将宽度和高度缩放成 200
         // 200! 宽度强制缩放成 200
         // x200! 高度强制缩放成 200
+        if(resizeStr.startsWith("x")){
+            // x200 || x200!
+        }
 
 
 
@@ -158,5 +182,47 @@ public class FileService {
 
     private boolean imageCanEdit(String extension) {
         return IMAGE_FORMAT_HANDLED.contains(extension);
+    }
+
+    public List<FileInfo> queryDirs() {
+        Path rootPath = Paths.get(blogFilePath);
+        List<FileInfo> fileInfos = new ArrayList<>();
+
+        try {
+            Files.walkFileTree(rootPath, new FileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    FileInfo fileInfo = new FileInfo();
+                    fileInfo.setFileType(FileType.DIR);
+                    if(dir.equals(rootPath)) {
+                        fileInfo.setPath(File.separator);
+                    } else {
+                        fileInfo.setPath(dir.toString().substring(rootPath.toString().length()));
+                    }
+                    fileInfos.add(fileInfo);
+
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return fileInfos;
     }
 }

@@ -13,6 +13,35 @@ public class FileInfo implements Serializable {
 
     private String filename;
 
+    private FileExtension fileExtension;
+
+    private FileType fileType;
+    private long fileSize;
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public FileExtension getFileExtension() {
+        return fileExtension;
+    }
+
+    public void setFileExtension(FileExtension fileExtension) {
+        this.fileExtension = fileExtension;
+    }
+
+    public FileType getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
+    }
+
     public String getPath() {
         return path;
     }
@@ -27,5 +56,16 @@ public class FileInfo implements Serializable {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "path='" + path + '\'' +
+                ", filename='" + filename + '\'' +
+                ", fileExtension=" + fileExtension +
+                ", fileType=" + fileType +
+                ", fileSize=" + fileSize +
+                '}';
     }
 }

@@ -206,4 +206,29 @@ public class ArticleServiceImpl implements ArticleService {
     public Optional<Article> getArticleForEdit(Integer id) {
         return articleDao.findById(id);
     }
+
+    @Override
+    public void deleteArticle(Integer id) {
+        Optional<Article> articleOp = articleDao.findById(id);
+        if(!articleOp.isPresent()) {
+            throw new  BizException(Message.ARTICLE_NOT_EXISTS);
+        }
+        articleDao.deleteById(articleOp.get().getId());
+    }
+
+    @Override
+    public void hitArticle(Integer id) {
+        Optional<Article> articleOp = articleDao.findById(id);
+        if(!articleOp.isPresent()) {
+            throw new BizException(Message.ARTICLE_NOT_EXISTS);
+        }
+        Article article = articleOp.get();
+        if(BlogContext.isAuthorized() || ArticleState.DRAFT.equals(article.getState())) {
+            return;
+        }
+        Integer hits = article.getHits();
+        hits ++;
+        article.setHits(hits);
+        articleDao.save(article);
+    }
 }

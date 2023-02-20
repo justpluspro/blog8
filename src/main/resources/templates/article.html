@@ -3,21 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${articleDto.title}">Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/github-markdown.css">
+    <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/fontawesome/all.min.css">
     <input type="hidden" id="_csrf" th:value="${_csrf}">
 </head>
 <body>
-<h2></h2>
-<div class="h3" th:text="${articleDto.title}"></div>
-<div class="markdown-body" th:utext="${articleDto.content}"></div>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">主页 <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/moments">动态</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/console/articles">控制台</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="container mt-2">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                <div class="h3" th:text="${articleDto.title}"></div>
+                <div class="border-bottom pb-2  text-muted">
+                    <i class="fa fa-calendar-day"></i>
+                    <span th:text="${articleDto.postedTime}"></span>
+                    <i class="fa fa-eye"></i>
+                    <span th:text="${articleDto.hits}"></span>
+                    <i class="fa fa-comment"></i>
+                    <span th:text="${articleDto.comments}"></span>
+                    <i class="fa fa-building"></i>
+                    <span th:text="${articleDto.category.categoryName}"></span>
+
+                    <i class="fa fa-tags"></i>
+                    <span th:if="${!#lists.isEmpty(articleDto.tagDtos)}" th:each="tagDto: ${articleDto.tagDtos}" th:text="${tagDto.tagName}"></span>
+                </div>
+                <div class="markdown-body my-4" th:utext="${articleDto.content}"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+
+</footer>
 
 <script src="/static/js/jquery.min.js"></script>
+<script src="/static/fontawesome/all.min.js"></script>
+<script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let id = '[[@{articleDto.id}]]'
+    let id = '[[${articleDto.id}]]'
     $(document).ready(function(){
 
         $.ajax({
-            url: '/article/' + id + '/hit',
+            url: '/api/article/' + id + '/hit',
+            contentType: 'application/json;charset=utf8',
+            headers: {
+                '_csrf-token': $('#_csrf').val()
+            },
             method: 'PUT',
             data: JSON.stringify({"hit": 1})
         })

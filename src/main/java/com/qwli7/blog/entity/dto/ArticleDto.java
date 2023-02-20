@@ -1,10 +1,16 @@
 package com.qwli7.blog.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.qwli7.blog.entity.Article;
+import com.qwli7.blog.entity.Tag;
 import com.qwli7.blog.entity.enums.ArticleState;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author qwli7 
@@ -16,13 +22,24 @@ public class ArticleDto implements Serializable {
     public ArticleDto(Article article) {
         this.id = article.getId();
         this.title = article.getTitle();
+        this.alias = article.getAlias();
         this.content = article.getContent();
         this.state = article.getState();
         this.hits = article.getHits();
         this.comments = article.getComments();
         this.createTime = article.getCreateTime();
         this.postedTime = article.getPostedTime();
+        this.modifiedTime = article.getModifiedTime();
         this.category = new CategoryDto(article.getCategory());
+
+        Set<Tag> tags = article.getTags();
+        List<TagDto> tagDtos = new ArrayList<>();
+        if(!CollectionUtils.isEmpty(tags)) {
+            for(Tag tag: tags) {
+                tagDtos.add(new TagDto(tag));
+            }
+        }
+        this.setTagDtos(tagDtos);
     }
 
     private Integer id;
@@ -43,9 +60,42 @@ public class ArticleDto implements Serializable {
 
     private Integer comments;
 
+    private String alias;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime postedTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedTime;
+
+    private List<TagDto> tagDtos;
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public List<TagDto> getTagDtos() {
+        return tagDtos;
+    }
+
+    public void setTagDtos(List<TagDto> tagDtos) {
+        this.tagDtos = tagDtos;
+    }
+
+    public LocalDateTime getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(LocalDateTime modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
 
     public Integer getHits() {
         return hits;

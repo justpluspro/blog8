@@ -27,4 +27,8 @@ public interface ArticleService {
     ArticleDto getArticleForView(String idOrAlias);
 
     Optional<Article> getArticleForEdit(Integer id);
+
+    void hitArticle(Integer id);
+
+    void deleteArticle(Integer id);
 }

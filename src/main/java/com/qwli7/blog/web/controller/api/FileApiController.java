@@ -4,6 +4,7 @@ import com.qwli7.blog.plugin.file.FileInfo;
 import com.qwli7.blog.plugin.file.FileService;
 import com.qwli7.blog.plugin.file.FileUpload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,4 +36,12 @@ public class FileApiController {
         List<FileInfo> fileInfoList = fileService.fileUpload(fileUpload);
         return ResponseEntity.ok(fileInfoList);
     }
+
+
+    @GetMapping("dirs")
+    public ResponseEntity<List<FileInfo>> queryDirs() {
+        List<FileInfo> fileInfos = fileService.queryDirs();
+        return ResponseEntity.ok(fileInfos);
+    }
+
 }

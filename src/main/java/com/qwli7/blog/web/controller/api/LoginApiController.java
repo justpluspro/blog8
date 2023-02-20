@@ -2,6 +2,7 @@ package com.qwli7.blog.web.controller.api;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.qwli7.blog.BlogContext;
+import com.qwli7.blog.consts.Consts;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.entity.vo.LoginBean;
 import com.qwli7.blog.exception.BizException;
@@ -47,7 +48,7 @@ public class LoginApiController {
             throw new BizException(Message.OPERATOR_TOO_FREQUENCY);
         }
         User user = userService.login(loginBean);
-        session.setAttribute("user", user);
+        session.setAttribute(Consts.USER, user);
         BlogContext.setAuthorized(true);
         return ResponseEntity.noContent().build();
     }
@@ -62,7 +63,7 @@ public class LoginApiController {
         if(!BlogContext.isAuthorized()) {
             throw new BizException(Message.NOT_LOGIN);
         }
-        session.removeAttribute("user");
+        session.removeAttribute(Consts.USER);
         session.invalidate();
         BlogContext.removeAll();
         return ResponseEntity.noContent().build();

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/dashbroad.css">
+    <link rel="stylesheet" href="/static/fontawesome/all.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Home</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#">登出</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="/console/articles" class="nav-link active">
+                        <span data-feather="home"></span>
+                        主页
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/console/articles" class="nav-link active">
+                        <span data-feather="home"></span>
+                        文章管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/console/moments" class="nav-link active">
+                        <span data-feather="user"></span>
+                        动态管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/console/files" class="nav-link active">
+                        <span data-feather="file"></span>
+                        文件管理
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+            <div class="row">
+                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            快捷方式
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="d-flex flex-column align-items-center bg-light rounded px-2 py-3">
+                                        <div class="fa fa-newspaper fa-2x"></div>
+                                        <div>新建文章</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-flex flex-column align-items-center bg-light rounded px-2 py-3">
+                                        <div class="fa fa-paint-brush fa-2x"></div>
+                                        <div>更换外观</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-flex flex-column align-items-center bg-light rounded px-2 py-3">
+                                        <div class="fa fa-star fa-2x"></div>
+                                        <div>插件管理</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    创建页面
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-flex flex-column align-items-center bg-light rounded px-2 py-3">
+                                        <div class="fa fa-file-archive fa-2x"></div>
+                                        <div>文件管理</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-flex flex-column align-items-center bg-light rounded px-2 py-3">
+                                        <div class="fa fa-server fa-2x"></div>
+                                        <div>系统设置</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            网站统计
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    文章数量
+                                </div>
+                                <div class="col-6">
+                                    动态数量
+                                </div>
+                                <div class="col-6">
+                                    分类数量
+                                </div>
+                                <div class="col-6">
+                                    评论数量
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                    <h4>最新文章</h4>
+                    <ul>
+                        <li><a href="">测试1</a> </li>
+                        <li><a href="">测试2</a> </li>
+                        <li><a href="">测试3</a> </li>
+                        <li><a href="">测试4</a> </li>
+                        <li><a href="">测试5</a> </li>
+                        <li><a href="">测试6</a> </li>
+                        <li><a href="">测试7</a> </li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xl-6">
+                    <h4>最新评论</h4>
+                    <ul>
+                        <li><span>11:47</span>|<a href="">测试1</a><span>kk</span> </li>
+                        <li><span>11:47</span>|<a href="">测试1</a><span>kk</span> </li>
+                        <li><span>11:47</span>|<a href="">测试1</a><span>kk</span> </li>
+                        <li><span>11:47</span>|<a href="">测试1</a><span>kk</span> </li>
+                        <li><span>11:47</span>|<a href="">测试1</a><span>kk</span> </li>
+                        <li><span>11:47</span>|<a href="">测试1</a><span>kk</span> </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/fontawesome/all.min.js"></script>
+<script src="/static/js/sweetalert2.min.js"></script>
+
+
+</body>
+</html>

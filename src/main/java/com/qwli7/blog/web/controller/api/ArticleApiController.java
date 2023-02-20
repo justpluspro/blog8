@@ -36,6 +36,13 @@ public class ArticleApiController {
         return ResponseEntity.ok(articleBean.getId());
     }
 
+
+    @DeleteMapping("article/{id}/delete")
+    public ResponseEntity<Void> deleteArticle(@PathVariable("id") Integer id) {
+        articleService.deleteArticle(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("articles")
     public ResponseEntity<PageResult<ArticleDto>> queryArticles(ArticleQueryParams articleQueryParams) {
         PageResult<ArticleDto> articleDtoPageResult = articleService.queryArticle(articleQueryParams);
@@ -44,7 +51,7 @@ public class ArticleApiController {
 
     @PutMapping("article/{id}/hit")
     public ResponseEntity<Void> addHits(@PathVariable("id") Integer id) {
-
+        articleService.hitArticle(id);
         return ResponseEntity.noContent().build();
     }
 }

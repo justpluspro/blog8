@@ -6,7 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/editor/codemirror/lib/codemirror.css">
     <input type="hidden" id="_csrf" th:value="${_csrf}">
+    <style>
+        .CodeMirror {
+            width: 50%;
+            height: 480px;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        .preview_panel {
+            width: 50%;
+            background-color: #EEEEEE;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <input type="hidden" id="articleId" th:value="${article != null ? article.id: ''}">
@@ -24,27 +39,41 @@
                 <option value="2">2</option>
             </select>
         </div>
+
+        <label for="alias">别名</label>
+        <input type="text" id="alias" class="form-control" th:value="${article != null ? article.alias : ''}">
+
+        <div class="form-inline">
+            <label for="state" class="mr-2 my-1 font-weight-bold">状态：</label>
+            <select id="state" class="custom-select custom-select-sm my-1 mr-sm-2" style="min-width: 280px !important;">
+                <option value="POSTED" selected>发布</option>
+                <option value="DRAFT">草稿</option>
+            </select>
+        </div>
+
+        <label for="content">正文:</label>
+        <div class="d-flex">
+
+            <textarea id="content" class="form-control" th:text="${article != null ? article.content: ''}"></textarea>
+            <div class="preview_panel mr-auto"></div>
+        </div>
+
+        <button type="button" class="btn btn-success" th:if="${article == null}" id="btn-post">发布</button>
+        <button type="button" class="btn btn-success" th:if="${article != null}" id="btn-update">保存修改</button>
+        <button type="button" onclick="previewView()">预览显示</button>
+        <button type="button" onclick="fullscreenDisplay()">全屏显示</button>
     </div>
-别名:<input type="text" id="alias" th:value="${article != null ? article.alias : ''}"><br/>
 
-状态：<select id="state">
-        <option value="POSTED" selected>发布</option>
-        <option value="DRAFT">草稿</option>
-    </select><br/>
-正文:<br/>
-<textarea id="content" th:text="${article != null ? article.content : ''}"></textarea>
-
-<button type="button" class="btn btn-success" th:if="${article == null}" id="btn-post">发布</button>
-<button type="button" class="btn btn-success" th:if="${article != null}" id="btn-update">保存修改</button>
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/editor/codemirror/lib/codemirror.js"></script>
     <script src="/static/editor/codemirror/mode/markdown/markdown.js"></script>
     <script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/sweetalert2.min.js"></script>
 
 <script>
 
     let editor = null;
-    $(document).ready(function(){
+    $(document).ready(function()  {
         getAllCategories()
         editor = CodeMirror.fromTextArea(document.getElementById('content'), {
             mode: 'markdown',
@@ -55,7 +84,6 @@
             lineWrapping: true,
         })
         editor.on('change', editorOnHandler)
-
     })
     function editorOnHandler(cm, co) {
         console.log(cm.getValue())
@@ -142,7 +170,7 @@
 
     function getArticle() {
         let title = $('#title').val()
-        let content = $('#content').val()
+        let content = editor.getValue()
         let alias = $('#alias').val()
 
         let categoryId = $('#category').val()
@@ -156,6 +184,17 @@
         }
     }
 
+
+    function previewView() {
+        console.log('update')
+        $('.CodeMirror').css('width','100%')
+        $('.preview_panel').css('width', '0%')
+    }
+
+    function fullscreenDisplay() {
+        $('.CodeMirror').css('height', '100%')
+        $('.CodeMirror').css('width', '100%')
+    }
 
 </script>
 </body>
