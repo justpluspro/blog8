@@ -65,6 +65,10 @@ public class FileTest {
         Path root = Paths.get("/Users/liqiwen/workspace/upload");
         Path end = Paths.get("/Users/liqiwen/workspace/upload/a.png");
         System.out.println(end.subpath(root.getNameCount(), end.getNameCount()));
+        Path end2 = Paths.get("/Users/liqiwen/workspace/upload");
+        System.out.println(end.subpath(root.getNameCount(), end2.getNameCount()));
+
+
 
     }
 

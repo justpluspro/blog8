@@ -48,4 +48,8 @@ public class FileUtils {
         }
         return filename.substring(filename.lastIndexOf(".")+1);
     }
+
+    public static String getFullname(Path filePath) {
+        return filePath.getFileName().toString();
+    }
 }

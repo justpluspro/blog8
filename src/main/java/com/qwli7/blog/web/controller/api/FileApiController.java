@@ -1,6 +1,7 @@
 package com.qwli7.blog.web.controller.api;
 
 import com.qwli7.blog.plugin.file.FileInfo;
+import com.qwli7.blog.plugin.file.FileQueryParams;
 import com.qwli7.blog.plugin.file.FileService;
 import com.qwli7.blog.plugin.file.FileUpload;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,8 @@ public class FileApiController {
 
 
     @GetMapping("files")
-    public ResponseEntity<List<FileInfo>> getFileInfos() {
-        List<FileInfo> fileInfos = fileService.getFileInfos();
+    public ResponseEntity<List<FileInfo>> getFileInfos(FileQueryParams fileQueryParams) {
+        List<FileInfo> fileInfos = fileService.getFileInfos(fileQueryParams);
         return ResponseEntity.ok(fileInfos);
     }
 

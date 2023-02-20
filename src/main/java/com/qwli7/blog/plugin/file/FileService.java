@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -246,18 +247,32 @@ public class FileService implements InitializingBean {
         return fileInfos;
     }
 
-    public List<FileInfo> getFileInfos() {
-        Path uploadPath = getUploadPath("");
+    public List<FileInfo> getFileInfos(FileQueryParams fileQueryParams) {
+        Path queryPath = getUploadPath(fileQueryParams.getQueryPath());
+        int skip = (fileQueryParams.getPage()-1)*fileQueryParams.getSize();
+        int limit = fileQueryParams.getSize();
+
+        String query = fileQueryParams.getQuery();
 
         List<FileInfo> fileInfos = new ArrayList<>();
 
+        Predicate<Path> predicate = new Predicate<Path>() {
+            @Override
+            public boolean test(Path path) {
+                if(StringUtils.isEmpty(query)) {
+                    return true;
+                }
+                if(FileUtils.getFullname(path).contains(query)) {
+                    return true;
+                }
+
+                return false;
+            }
+        };
+
         try {
-            fileInfos = Files.walk(uploadPath, FileVisitOption.values()).filter(_e -> {
-                return !Files.isDirectory(_e);
-            }).map(_e -> {
-                return getFileInfo(_e);
-            }).skip(0).limit(10).collect(Collectors.toList());
-        }catch (Exception e) {
+            fileInfos = Files.walk(queryPath, FileVisitOption.values()).filter(predicate).map(this::getFileInfo).skip(skip).limit(limit).collect(Collectors.toList());
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -284,7 +299,14 @@ public class FileService implements InitializingBean {
                 fileInfo.setFileSize(-1);
             }
         }
-        fileInfo.setPath(File.separator + file.subpath(rootPath.getNameCount(), file.getNameCount()));
+        if(file.equals(rootPath) && file.getNameCount() <= rootPath.getNameCount()) {
+            //root dir
+            fileInfo.setPath(File.separator);
+            fileInfo.setBasename("");
+            fileInfo.setFilename("");
+        } else {
+            fileInfo.setPath(File.separator + file.subpath(rootPath.getNameCount(), file.getNameCount()));
+        }
         return fileInfo;
     }
 
