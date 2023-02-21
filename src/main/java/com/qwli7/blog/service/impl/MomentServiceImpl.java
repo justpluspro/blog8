@@ -8,7 +8,17 @@ import com.qwli7.blog.entity.enums.MomentState;
 import com.qwli7.blog.entity.vo.MomentBean;
 import com.qwli7.blog.entity.vo.MomentQueryParams;
 import com.qwli7.blog.service.MomentService;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author qwli7
@@ -36,6 +46,22 @@ public class MomentServiceImpl implements MomentService {
         momentDao.save(moment);
 
         return new SavedMoment(moment);
+    }
+
+    @Override
+    public Optional<Moment> getLatestMoment() {
+        Moment moment = new Moment();
+        moment.setState(MomentState.POSTED);
+        Example<Moment> example = Example.of(moment);
+
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("postedTime")));
+
+        Page<Moment> momentPage = momentDao.findAll(example, pageRequest);
+        List<Moment> content = momentPage.getContent();
+        if(CollectionUtils.isEmpty(content)){
+            return Optional.empty();
+        }
+        return Optional.of(content.get(0));
     }
 
     @Override

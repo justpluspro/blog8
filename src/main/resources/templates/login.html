@@ -40,6 +40,7 @@
   <div class="login-form card">
     <div class="card-body">
       <h3>登录Blog</h3>
+      <div class="alert alert-danger" id="login-tips" style="display: none;" role="alert"></div>
       <input class="form-control mb-3" type="email" placeholder="邮箱" id="email">
       <input class="form-control mb-3" type="password" placeholder="密码" id="password">
       <button id="btn-login" class="btn btn-primary btn-block" type="button">登录</button>
@@ -49,22 +50,24 @@
   <script type="text/javascript" src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" ></script>
   <script src="/static/js/sweetalert2.min.js"></script>
   <script>
+    loginTips = $('#login-tips')
     $('#btn-login').click(function() {
       let email = $('#email').val()
       let password = $('#password').val()
       if(email === null || email.trim().length === 0) {
-        alert('请输入邮箱')
+        loginTips.text('请输入邮箱')
+        loginTips.css('display', 'block')
         return
       }
       if(password === null || password.trim().length === 0) {
-        alert('请输入密码')
+        loginTips.text('请输入密码')
+        loginTips.css('display', 'block')
         return
       }
       let data = {'email':email, 'password': password}
 
-      let loginUrl = '/api/login'
       $.ajax({
-        url: loginUrl,
+        url: '/api/login',
         dataType: 'json',
         contentType: 'application/json;charset=utf8',
         headers: {
@@ -72,11 +75,12 @@
         },
         data: JSON.stringify(data),
         method: 'POST',
-        success: function() {
-          window.location.href = '/console/articles'
+        success: function(res) {
+            window.location.href = '/console/articles'
         },
-        error: function(xhrRequest, error, thrown) {
-          alert('登陆失败' + error)
+        error: function(error) {
+          loginTips.text(error.responseJSON.message)
+          loginTips.css('display', 'block')
         }
       })
     })

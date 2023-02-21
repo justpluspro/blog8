@@ -1,16 +1,20 @@
 package com.qwli7.blog.web.controller;
 
+import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.dto.ArticleDto;
 import com.qwli7.blog.entity.dto.PageResult;
 import com.qwli7.blog.entity.vo.ArticleQueryParams;
 import com.qwli7.blog.exception.Message;
 import com.qwli7.blog.exception.ResourceNotFoundException;
 import com.qwli7.blog.service.ArticleService;
+import com.qwli7.blog.service.MomentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.Optional;
 
 /**
  * @author qwli7 
@@ -23,15 +27,23 @@ public class IndexController {
 
     private final ArticleService articleService;
 
-    public IndexController(ArticleService articleService) {
+    private final MomentService momentService;
+
+    public IndexController(ArticleService articleService, MomentService momentService) {
         this.articleService = articleService;
+        this.momentService = momentService;
     }
 
 
     @GetMapping
     public String index(ArticleQueryParams articleQueryParams, Model model) {
         PageResult<ArticleDto> articlePageResult = articleService.queryArticle(articleQueryParams);
-        model.addAttribute(articlePageResult);
+        model.addAttribute("articlePageResult", articlePageResult);
+
+
+        Optional<Moment> latestMomentOp = momentService.getLatestMoment();
+        latestMomentOp.ifPresent(moment -> model.addAttribute("latestMoment", moment));
+
         return "index";
     }
 

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
@@ -137,6 +138,20 @@ public class ArticleServiceImpl implements ArticleService {
             return new PageResult<>(articleQueryParams, 0, new ArrayList<>());
         }
         List<ArticleDto> articleDtos = articles.stream().map(ArticleDto::new).collect(Collectors.toList());
+        for(ArticleDto articleDto: articleDtos) {
+            String digest = articleDto.getDigest();
+            if(StringUtils.isEmpty(digest)) {
+                //从正文中截取 150 字符生成摘要
+                String content = articleDto.getContent();
+                if(content.length() < 150) {
+                    articleDto.setDigest(content);
+                } else {
+                    articleDto.setDigest(content.substring(0, 150));
+                }
+            }
+
+
+        }
 
         return new PageResult<>(articleQueryParams, totalElements, articleDtos);
     }

@@ -3,6 +3,7 @@ package com.qwli7.blog.service.impl;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.entity.vo.LoginBean;
 import com.qwli7.blog.exception.BizException;
+import com.qwli7.blog.exception.LoginFailedException;
 import com.qwli7.blog.exception.Message;
 import com.qwli7.blog.service.UserService;
 import org.springframework.stereotype.Service;
@@ -37,18 +38,18 @@ public class UserServiceImpl implements UserService {
     public User login(LoginBean loginBean) {
         Optional<User> userOptional = readUser();
         if(!userOptional.isPresent()) {
-            throw new BizException(Message.AUTH_FAILED);
+            throw new LoginFailedException(Message.AUTH_FAILED);
         }
 
         User user = userOptional.get();
         String email = user.getEmail();
         if(!loginBean.getEmail().equals(email)) {
-            throw new BizException(Message.AUTH_FAILED);
+            throw new LoginFailedException(Message.AUTH_FAILED);
         }
         String password = loginBean.getPassword();
         String md5Password = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
         if(!user.getPassword().equals(md5Password)) {
-            throw new BizException(Message.AUTH_FAILED);
+            throw new LoginFailedException(Message.AUTH_FAILED);
         }
         return user;
     }

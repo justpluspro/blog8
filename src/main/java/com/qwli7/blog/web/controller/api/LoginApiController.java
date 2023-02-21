@@ -6,6 +6,7 @@ import com.qwli7.blog.consts.Consts;
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.entity.vo.LoginBean;
 import com.qwli7.blog.exception.BizException;
+import com.qwli7.blog.exception.LoginFailedException;
 import com.qwli7.blog.exception.Message;
 import com.qwli7.blog.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class LoginApiController {
                                       HttpSession session) {
         boolean tryAcquire = rateLimiter.tryAcquire();
         if (!tryAcquire) {
-            throw new BizException(Message.OPERATOR_TOO_FREQUENCY);
+            throw new LoginFailedException(Message.OPERATOR_TOO_FREQUENCY);
         }
         User user = userService.login(loginBean);
         session.setAttribute(Consts.USER, user);

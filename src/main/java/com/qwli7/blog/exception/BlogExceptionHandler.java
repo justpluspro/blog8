@@ -24,7 +24,20 @@ public class BlogExceptionHandler {
     private static final String VALIDATE_MESSAGE_TEMPLATE = "%s.validateFailed";
 
 
+    @ExceptionHandler(LoginFailedException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, Object> handleLoginFailedException(LoginFailedException loginFailedException) {
+        Message error = loginFailedException.getError();
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", error.getCode());
+        data.put("message", error.getDesc());
+        return data;
+    }
+
+
     @ExceptionHandler(BizException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Map<String, Object> handleBizException(BizException bizException) {
         Message error = bizException.getError();
@@ -55,6 +68,7 @@ public class BlogExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleResourceNotFoundException(ResourceNotFoundException notFoundException, HttpServletRequest request) {
         Message error = notFoundException.getError();
         request.setAttribute("error",error);

@@ -8,19 +8,49 @@
 </head>
 <body>
 
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
 
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-12 col-xl-8">
-            <div class="card">
-                <div class="card-body">
-                    <div class="h5"><a href="">【和ChatGPT对话】帮助新手批量提取图片文字信息到文件</a></div>
-                    <div class="text-truncate">今天的另外一个案例是模拟有一定编程基础（新新手）的电脑工作者，让 ChatGPT 处理一些图片数据，具体任务是帮助识别学生缴...</div>
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">主页 <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/moments">动态</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/console/articles">控制台</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="mt-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xl-8">
+                <div class="mb-4" th:each="article : ${articlePageResult.data}">
+                    <div class="h5">
+                        <a th:href="${#strings.isEmpty(article.alias) ? '/article/'+article.id : '/article/'+article.alias}" th:text="${article.title}">【和ChatGPT对话】帮助新手批量提取图片文字信息到文件</a>
+                    </div>
+                    <div class="text-truncate" th:text="${article.digest}">今天的另外一个案例是模拟有一定编程基础（新新手）的电脑工作者，让 ChatGPT 处理一些图片数据，具体任务是帮助识别学生缴...</div>
                     <div class="d-flex">
                         <div class="d-flex">
                             <div class="align-items-start">
-                                <span class="badge bg-light">ChatGPT</span>
-                                <span class="badge bg-light">OCR</span>
+                                <span class="badge bg-light" th:text="${article.category.categoryName}">ChatGPT</span>
                                 <span class="badge bg-light">Python</span>
                             </div>
                             <div class="align-items-end">
@@ -30,18 +60,19 @@
                             </div>
                         </div>
                         <div class="mr-auto">
-                            <img class="img-fluid" style="height: 70px !important; width: 116px; !important;" src="/Snipaste_2022-10-30_20-55-34.png">
+                            <img class="img-fluid" style="height: 70px !important; width: 116px; !important;"
+                                 src="/Snipaste_2022-10-30_20-55-34.png">
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-4 col-md-4 col-xl-4">
+            <div class="col-lg-4 col-md-4 col-xl-4">
 
+            </div>
         </div>
     </div>
-</div>
+</main>
 
 
 <script type="text/javascript" src="/static/js/jquery.min.js"></script>
