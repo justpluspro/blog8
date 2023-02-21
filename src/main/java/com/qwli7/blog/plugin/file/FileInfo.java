@@ -11,6 +11,8 @@ public class FileInfo implements Serializable {
 
     private String path;
 
+    private Boolean editable;
+
     private String filename;
 
     private String basename;
@@ -19,6 +21,14 @@ public class FileInfo implements Serializable {
 
     private FileType fileType;
     private long fileSize;
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
 
     public String getBasename() {
         return basename;

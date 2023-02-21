@@ -2,6 +2,8 @@ package com.qwli7.blog.plugin.file;
 
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -48,6 +50,18 @@ public enum FileExtension {
         }
         return Arrays.stream(FileExtension.values()).filter(_e -> _e.getExt().equals(ext.toLowerCase())).findFirst();
     }
+
+
+    public static boolean canEdit(String ext) {
+        Optional<FileExtension> fileExtensionOp = convert(ext);
+        if(fileExtensionOp.isPresent()) {
+            if (Arrays.asList(FileExtension.HTM, FileExtension.HTML, FileExtension.CSS,
+                    FileExtension.MARKDOWN, FileExtension.JSON,
+                    FileExtension.JAVASCRIPT, FileExtension.XML).contains(fileExtensionOp.get()));
+        }
+        return false;
+    }
+
 
     public String getExt() {
         return ext;

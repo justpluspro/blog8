@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/editor/codemirror/lib/codemirror.css">
+    <input type="hidden" id="_csrf" th:value="${_csrf}">
+    <style>
+        .CodeMirror {
+            width: 100%;
+            height: 480px;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="d-flex">
+            <textarea id="content" class="form-control"></textarea>
+        </div>
+        <button type="button" class="btn btn-success">保存</button>
+    </div>
+
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/editor/codemirror/lib/codemirror.js"></script>
+    <script src="/static/editor/codemirror/mode/markdown/markdown.js"></script>
+    <script src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/sweetalert2.min.js"></script>
+
+<script>
+
+    let editor = null;
+    $(document).ready(function()  {
+        editor = CodeMirror.fromTextArea(document.getElementById('content'), {
+            mode: 'markdown',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            showCursorWhenSelecting: true,
+            lineWrapping: true,
+        })
+        editor.on('change', editorOnHandler)
+    })
+    function editorOnHandler(cm, co) {
+        console.log(cm.getValue())
+    }
+
+    $('#btn-post').click(function() {
+
+    })
+
+
+
+
+
+</script>
+</body>
+</html>

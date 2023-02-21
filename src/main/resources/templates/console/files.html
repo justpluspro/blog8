@@ -30,19 +30,19 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a href="/console/articles" class="nav-link">
-                            <span data-feather="home"></span>
+                            <i class="fas fa-home"></i>
                             文章管理
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="/console/moments" class="nav-link">
-                            <span data-feather="user"></span>
+                            <i class="fas fa-magic"></i>
                             动态管理
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="/console/files" class="nav-link active">
-                            <span data-feather="file"></span>
+                            <i class="fas fa-file-archive"></i>
                             文件管理
                         </a>
                     </li>
@@ -63,15 +63,15 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>标题</th>
-                                <th>分类</th>
-                                <th>状态</th>
-                                <th>点击量</th>
-                                <th>评论量</th>
+                                <th>文件名称</th>
+                                <th>文件类型</th>
+                                <th>扩展名</th>
+                                <th>大小</th>
+                                <th>创建时间</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody id="articlePanel">
+                        <tbody id="filePanel">
 
                         </tbody>
                     </table>
@@ -93,13 +93,13 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="path" class="col-form-label">Bucket:</label>
-                        <select id="path">
+                        <select id="path" class="custom-select">
                             <option id="">请选择 Bucket</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="file" class="col-form-label">File:</label>
-                        <input type="file" multiple name="file" id="file">
+                        <input type="file" class="form-control-file" multiple name="file" id="file">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -120,16 +120,16 @@
         $("#file-upload-btn").click(function() {
             let formData = new FormData()
             let path = $('#path').val()
-            if(path === "" || path.length === 0) {
-                alert('请选择存储 Bucket');
-                return;
-            }
+            // if(path === "" || path.length === 0) {
+            //     alert('请选择存储 Bucket');
+            //     return;
+            // }
             let file = document.getElementById('file').files[0];
             if(file === null) {
                 alert('请选择文件')
                 return;
             }
-            formData.append('path', path)
+            // formData.append('path', path)
             formData.append("files", file)
 
             $.ajax({
@@ -164,6 +164,60 @@
             })
 
         })
+
+
+        $(document).ready(function() {
+            getFileInfos()
+        })
+
+
+        function getFileInfos() {
+            $.ajax({
+                url: '/api/files?page=1&size=10',
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json;charset=utf8',
+                success: function(res) {
+                    let html = "";
+                    for(let i = 0; i < res.length; i++) {
+                        html += '<tr>'
+                        if(res[i].fileType === 'DIR') {
+                            html += '<td><img src="/static/icon/folder.png" style="width: 32px !important;" /> <a href="javascript:void(0);">'+res[i].filename+'</a></td>'
+                        } else {
+                            html += '<td><img src="/static/icon/file.png" style="width: 32px !important;" /><a href="javascript:void(0);">'+res[i].filename+'</a></td>'
+                        }
+                        if(res[i].fileType === 'DIR') {
+                            html += '<td>文件夹</td>'
+                        } else {
+                            html += '<td>文件</td>'
+                        }
+                        if(res[i].fileType === 'DIR') {
+                            html += '<td></td>'
+                        } else {
+                            html += '<td>'+res[i].fileExtension+'</td>'
+                        }
+                        if(res[i].fileType === 'DIR') {
+                            html += '<td>-</td>'
+                        } else {
+                            html += '<td>'+res[i].fileSize+'</td>'
+                        }
+                        html += '<td>2023-2-21 11:08:06</td>'
+                        html += '<td>'
+                        if(res[i].editable === true){
+                            html += '<a href="/console/file/edit?path='+res[i].path+'">编辑</a>'
+                        }
+                        html += '</td>'
+                        html += '</tr>'
+                    }
+                    $('#filePanel').html(html)
+
+                },
+                error: function(xhrRequest, error, thrown) {
+
+                }
+            })
+        }
+
     </script>
 
 

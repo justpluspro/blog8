@@ -139,7 +139,7 @@ public class ProcessUtils {
             logger.info("execute cmd {}", StringUtils.arrayToDelimitedString(cmd.toArray(), " "));
             String[] processCmd = cmd.toArray(new String[cmd.size()]);
             ProcessBuilder processBuilder = new ProcessBuilder(processCmd).redirectErrorStream(true);
-            if (StringUtils.isEmpty(workDirectory)) {
+            if (!StringUtils.isEmpty(workDirectory)) {
                 logger.info("work directory: " + workDirectory);
                 processBuilder.directory(new File(workDirectory));
             }

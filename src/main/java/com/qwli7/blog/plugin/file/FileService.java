@@ -91,8 +91,16 @@ public class FileService implements InitializingBean {
             Optional<FileExtension> fileTypeOptional = FileExtension.convert(fileExtension);
             fileTypeOptional.ifPresent(fileInfo::setFileExtension);
 
+
             fileInfo.setBasename(baseName);
             fileInfo.setFileSize(file.getSize());
+
+            if(videoCanEdit(fileExtension)) {
+                //视频压缩
+                Path outputPath = VideoHelper.convertAndCompress(uploadFilePath);
+
+
+            }
 
             fileInfos.add(fileInfo);
 
@@ -271,8 +279,12 @@ public class FileService implements InitializingBean {
         };
 
         try {
-            fileInfos = Files.walk(queryPath, FileVisitOption.values()).filter(predicate).map(this::getFileInfo).skip(skip).limit(limit).collect(Collectors.toList());
-        } catch (Exception e) {
+            fileInfos = Files.walk(queryPath, FileVisitOption.values())
+                    .filter(predicate)
+                    .map(this::getFileInfo)
+                    .skip(skip).limit(limit)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -287,11 +299,13 @@ public class FileService implements InitializingBean {
             fileInfo.setFileType(FileType.DIR);
             fileInfo.setFilename(file.getFileName().toString());
             fileInfo.setFileSize(0);
+            fileInfo.setEditable(false);
         } else {
             fileInfo.setFileType(FileType.FILE);
             fileInfo.setBasename(FileUtils.getBaseName(file));
             String fileExtension = FileUtils.getFileExtension(file);
             fileInfo.setFilename(file.getFileName().toString());
+            fileInfo.setEditable(FileExtension.canEdit(fileExtension));
             FileExtension.convert(fileExtension).ifPresent(fileInfo::setFileExtension);
             try {
                 fileInfo.setFileSize(Files.size(file));
