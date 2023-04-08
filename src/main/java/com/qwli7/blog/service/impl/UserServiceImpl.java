@@ -2,7 +2,6 @@ package com.qwli7.blog.service.impl;
 
 import com.qwli7.blog.entity.User;
 import com.qwli7.blog.entity.vo.LoginBean;
-import com.qwli7.blog.exception.BizException;
 import com.qwli7.blog.exception.LoginFailedException;
 import com.qwli7.blog.exception.Message;
 import com.qwli7.blog.service.UserService;
@@ -18,7 +17,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * @author qwli7 
+ * @author qwli7
  * @date 2023/2/16 14:52
  * 功能：blog8
  **/
@@ -37,18 +36,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(LoginBean loginBean) {
         Optional<User> userOptional = readUser();
-        if(!userOptional.isPresent()) {
+        if (!userOptional.isPresent()) {
             throw new LoginFailedException(Message.AUTH_FAILED);
         }
 
         User user = userOptional.get();
         String email = user.getEmail();
-        if(!loginBean.getEmail().equals(email)) {
+        if (!loginBean.getEmail().equals(email)) {
             throw new LoginFailedException(Message.AUTH_FAILED);
         }
         String password = loginBean.getPassword();
         String md5Password = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
-        if(!user.getPassword().equals(md5Password)) {
+        if (!user.getPassword().equals(md5Password)) {
             throw new LoginFailedException(Message.AUTH_FAILED);
         }
         return user;
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     private synchronized Optional<User> readUser() {
         Path configPath = Paths.get(homePath.toString(), ".blog_config");
-        if(!configPath.toFile().exists()) {
+        if (!configPath.toFile().exists()) {
             return Optional.empty();
         }
         Properties properties = new Properties();

@@ -43,6 +43,7 @@
       <div class="alert alert-danger" id="login-tips" style="display: none;" role="alert"></div>
       <input class="form-control mb-3" type="email" placeholder="邮箱" id="email">
       <input class="form-control mb-3" type="password" placeholder="密码" id="password">
+      <input class="form-control mb-3" type="text" placeholder="验证码" id="captchaCode">
       <button id="btn-login" class="btn btn-primary btn-block" type="button">登录</button>
     </div>
   </div>
@@ -54,6 +55,7 @@
     $('#btn-login').click(function() {
       let email = $('#email').val()
       let password = $('#password').val()
+      let captcha = $('#captchaCode').val()
       if(email === null || email.trim().length === 0) {
         loginTips.text('请输入邮箱')
         loginTips.css('display', 'block')
@@ -81,6 +83,7 @@
         error: function(error) {
           loginTips.text(error.responseJSON.message)
           loginTips.css('display', 'block')
+          checkCaptcha()
         }
       })
     })
@@ -95,6 +98,29 @@
         }
       }
     }
+
+
+    function checkCaptcha() {
+      $.ajax({
+        url: '/api/login/needCaptcha',
+        dataType: 'json',
+        contentType: 'application/json;charset=utf8',
+        method: 'GET',
+        success: function(res) {
+          if(res.data) {
+            $('#captcha_panel').css('display', 'block')
+          } else {
+            $('#captcha_panel').css('display', 'none')
+          }
+        },
+        error: function(error) {
+        }
+      })
+    }
+
+    $(document).ready(function() {
+        checkCaptcha()
+    })
   </script>
 </body>
 </html>

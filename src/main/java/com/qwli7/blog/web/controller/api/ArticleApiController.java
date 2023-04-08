@@ -1,15 +1,16 @@
 package com.qwli7.blog.web.controller.api;
 
-import com.qwli7.blog.entity.dto.ArticleDto;
+import com.qwli7.blog.entity.Article;
 import com.qwli7.blog.entity.dto.PageResult;
-import com.qwli7.blog.entity.vo.ArticleBean;
+import com.qwli7.blog.entity.enums.ArticleStatus;
 import com.qwli7.blog.entity.vo.ArticleQueryParams;
 import com.qwli7.blog.service.ArticleService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author qwli7 
+ * @author qwli7
  * @date 2023/2/16 16:56
  * 功能：blog8
  **/
@@ -24,16 +25,23 @@ public class ArticleApiController {
     }
 
     @PostMapping("article")
-    public ResponseEntity<Void> createArticle(@RequestBody ArticleBean articleBean) {
-        articleService.saveArticle(articleBean);
+    public ResponseEntity<Void> addArticle(@RequestBody @Validated Article article) {
+        articleService.addArticle(article);
         return ResponseEntity.noContent().build();
     }
 
 
     @PutMapping("article")
-    public ResponseEntity<Integer> updateArticle(@RequestBody ArticleBean articleBean) {
-        articleService.updateArticle(articleBean);
-        return ResponseEntity.ok(articleBean.getId());
+    public ResponseEntity<Void> updateArticle(@RequestBody Article article) {
+        articleService.updateArticle(article);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("article/{idOrAlias}")
+    public ResponseEntity<Article> getArticle(@PathVariable("idOrAlias") String idOrAlias) {
+        Article articleForView = articleService.getArticleForView(idOrAlias);
+        return ResponseEntity.ok(articleForView);
     }
 
 
@@ -43,10 +51,18 @@ public class ArticleApiController {
         return ResponseEntity.noContent().build();
     }
 
+//    @GetMapping("articles")
+//    public ResponseEntity<PageResult<ArticleDto>> queryArticles(ArticleQueryParams articleQueryParams) {
+//        PageResult<ArticleDto> articleDtoPageResult = articleService.queryArticle(articleQueryParams);
+//        return ResponseEntity.ok(articleDtoPageResult);
+//    }
+
     @GetMapping("articles")
-    public ResponseEntity<PageResult<ArticleDto>> queryArticles(ArticleQueryParams articleQueryParams) {
-        PageResult<ArticleDto> articleDtoPageResult = articleService.queryArticle(articleQueryParams);
-        return ResponseEntity.ok(articleDtoPageResult);
+    public PageResult<Article> findArticles(@Validated ArticleQueryParams articleQueryParams) {
+        if (articleQueryParams.getStatus() == null) {
+            articleQueryParams.setStatus(ArticleStatus.POSTED);
+        }
+        return articleService.findArticle(articleQueryParams);
     }
 
     @PutMapping("article/{id}/hit")

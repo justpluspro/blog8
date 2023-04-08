@@ -2,29 +2,24 @@ package com.qwli7.blog.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.qwli7.blog.entity.Article;
-import com.qwli7.blog.entity.Tag;
-import com.qwli7.blog.entity.enums.ArticleState;
-import org.springframework.util.CollectionUtils;
+import com.qwli7.blog.entity.enums.ArticleStatus;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author qwli7 
  * @date 2023/2/16 18:09
  * 功能：blog8
  **/
-public class ArticleDto implements Serializable {
+public class ArticleDetail implements Serializable {
 
-    public ArticleDto(Article article) {
+    public ArticleDetail(Article article) {
         this.id = article.getId();
         this.title = article.getTitle();
         this.alias = article.getAlias();
         this.content = article.getContent();
-        this.state = article.getState();
+        this.status = article.getStatus();
         this.hits = article.getHits();
         this.comments = article.getComments();
         this.createTime = article.getCreateTime();
@@ -32,14 +27,6 @@ public class ArticleDto implements Serializable {
         this.modifiedTime = article.getModifiedTime();
         this.category = new CategoryDto(article.getCategory());
 
-        Set<Tag> tags = article.getTags();
-        List<TagDto> tagDtos = new ArrayList<>();
-        if(!CollectionUtils.isEmpty(tags)) {
-            for(Tag tag: tags) {
-                tagDtos.add(new TagDto(tag));
-            }
-        }
-        this.setTagDtos(tagDtos);
     }
 
     private Integer id;
@@ -54,7 +41,7 @@ public class ArticleDto implements Serializable {
 
     private CategoryDto category;
 
-    private ArticleState state;
+    private ArticleStatus status;
 
     private Integer hits;
 
@@ -71,7 +58,6 @@ public class ArticleDto implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifiedTime;
 
-    private List<TagDto> tagDtos;
 
     public String getAlias() {
         return alias;
@@ -80,15 +66,6 @@ public class ArticleDto implements Serializable {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-
-    public List<TagDto> getTagDtos() {
-        return tagDtos;
-    }
-
-    public void setTagDtos(List<TagDto> tagDtos) {
-        this.tagDtos = tagDtos;
-    }
-
     public LocalDateTime getModifiedTime() {
         return modifiedTime;
     }
@@ -129,12 +106,12 @@ public class ArticleDto implements Serializable {
         this.postedTime = postedTime;
     }
 
-    public ArticleState getState() {
-        return state;
+    public ArticleStatus getStatus() {
+        return status;
     }
 
-    public void setState(ArticleState state) {
-        this.state = state;
+    public void setStatus(ArticleStatus status) {
+        this.status = status;
     }
 
     public CategoryDto getCategory() {

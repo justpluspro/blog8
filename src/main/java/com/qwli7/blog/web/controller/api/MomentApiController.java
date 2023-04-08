@@ -2,11 +2,11 @@ package com.qwli7.blog.web.controller.api;
 
 import com.qwli7.blog.entity.Moment;
 import com.qwli7.blog.entity.dto.PageResult;
-import com.qwli7.blog.entity.dto.SavedMoment;
-import com.qwli7.blog.entity.vo.MomentBean;
 import com.qwli7.blog.entity.vo.MomentQueryParams;
 import com.qwli7.blog.service.MomentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,15 +27,27 @@ public class MomentApiController {
 
 
     @PostMapping("moment")
-    public ResponseEntity<SavedMoment> createMoment(@RequestBody MomentBean momentBean) {
-       SavedMoment savedMoment = momentService.saveMoment(momentBean);
-       return ResponseEntity.ok(savedMoment);
+    public ResponseEntity<Void> addMoment(@RequestBody @Validated Moment moment) {
+        momentService.addMoment(moment);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("moment/{id}")
+    public ResponseEntity<Void> updateMoment(@PathVariable("id") Integer id, @RequestBody Moment moment) {
+        moment.setId(id);
+        momentService.updateMoment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("moment/{id}")
+    public ResponseEntity<Void> deleteMoment(@PathVariable("id") Integer id) {
+        momentService.deleteMoment(id);
+        return ResponseEntity.noContent().build();
     }
 
 
     @GetMapping("moments")
-    public ResponseEntity<PageResult<Moment>> queryMoments(MomentQueryParams momentQueryParams) {
-        PageResult<Moment> momentPageResult = momentService.queryMoments(momentQueryParams);
-        return ResponseEntity.ok(momentPageResult);
+    public PageResult<Moment> findMoments(MomentQueryParams momentQueryParams) {
+        return momentService.findMoments(momentQueryParams);
     }
 }

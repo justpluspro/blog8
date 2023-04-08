@@ -1,38 +1,44 @@
 package com.qwli7.blog.entity;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * @author qwli7 
+ * @author qwli7
  * @date 2023/2/16 17:29
  * 功能：blog8
  **/
-@Entity(name = "blog_category")
-@Table
 public class Category implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "category_name", nullable = false, length = 32)
-    private String name;
+    private String categoryName;
 
-    @Column(name = "category_alias", nullable = false, length = 32)
-    private String alias;
+    private String categoryAlias;
 
-    @Column(name = "create_time")
-    @CreationTimestamp
+    //私人空间
+    private Boolean privateSpace;
+
+    //默认空间
+    private Boolean defaultSpace;
     private LocalDateTime createTime;
-
-    @Column(name = "modified_time", nullable = false)
-    @UpdateTimestamp
     private LocalDateTime modifiedTime;
+
+    public Boolean getDefaultSpace() {
+        return defaultSpace;
+    }
+
+    public void setDefaultSpace(Boolean defaultSpace) {
+        this.defaultSpace = defaultSpace;
+    }
+
+    public Boolean getPrivateSpace() {
+        return privateSpace;
+    }
+
+    public void setPrivateSpace(Boolean privateSpace) {
+        this.privateSpace = privateSpace;
+    }
 
     public Integer getId() {
         return id;
@@ -42,20 +48,20 @@ public class Category implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
-    public String getAlias() {
-        return alias;
+    public String getCategoryAlias() {
+        return categoryAlias;
     }
 
-    public void setAlias(String alias) {
-        this.alias = alias;
+    public void setCategoryAlias(String categoryAlias) {
+        this.categoryAlias = categoryAlias;
     }
 
     public LocalDateTime getCreateTime() {

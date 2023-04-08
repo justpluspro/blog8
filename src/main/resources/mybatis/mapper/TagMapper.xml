@@ -1,0 +1,43 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qwli7.blog.mapper.TagMapper">
+
+    <sql id="tagDetailSql">
+        SELECT id,
+               tag_name,
+               create_time
+        FROM blog_tag
+    </sql>
+
+    <resultMap id="tagDetail" type="tag">
+        <id property="id" column="id"/>
+        <result property="tagName" column="name"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="Tag">
+        INSERT INTO blog_tag(tag_name, create_time)
+        VALUES (#{tagName}, now())
+    </insert>
+
+
+    <select id="findByName" resultMap="tagDetail">
+        <include refid="tagDetailSql"/>
+        WHERE
+        tag_name = #{tagName}
+    </select>
+
+    <select id="findById" resultMap="tagDetail">
+        <include refid="tagDetailSql"/>
+        WHERE
+        id = #{id}
+    </select>
+
+    <delete id="delete" parameterType="integer">
+        DELETE
+        FROM blog_tag
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

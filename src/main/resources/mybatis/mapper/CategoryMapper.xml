@@ -1,0 +1,53 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qwli7.blog.mapper.CategoryMapper">
+
+    <resultMap id="CategoryDetail" type="category">
+        <id column="category_id" property="id"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="category_alias" property="categoryAlias"/>
+        <result column="default_space" property="defaultSpace" />
+        <result column="private_space" property="privateSpace" />
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="categorySql">
+        SELECT bc.id as category_id,
+               category_name,
+               category_alias,
+               default_space,
+               private_space,
+               create_time,
+               modified_time
+        FROM blog_category bc
+    </sql>
+    <insert id="insert" parameterType="category">
+        INSERT INTO blog_category(category_name, category_alias, default_space, private_space, create_time, update_time)
+        VALUES (#{categoryAlias}, #{categoryAlias}, #{defaultSpace}, #{privateSpace}, now(), now())
+    </insert>
+
+
+    <select id="findByAlias" parameterType="string" resultMap="CategoryDetail">
+        <include refid="categorySql"/>
+        WHERE
+        bc.category_alias = #{alias}
+    </select>
+    <select id="findById" parameterType="integer" resultMap="CategoryDetail">
+        <include refid="categorySql"/>
+        WHERE
+        bc.id = #{categoryId}
+    </select>
+
+    <select id="findByParams" parameterType="categoryQueryParams" resultMap="CategoryDetail">
+        <include refid="categorySql"/>
+
+        <where>
+            <if test="queryPrivate != null">
+                AND private_space = #{queryPrivate}
+            </if>
+        </where>
+
+        ORDER BY bc.create_time DESC, bc.id DESC
+    </select>
+</mapper>

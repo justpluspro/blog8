@@ -1,0 +1,178 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qwli7.blog.mapper.MomentMapper">
+
+    <sql id="momentDetailSql">
+        SELECT
+            id,
+            content,
+            status,
+            hits,
+            comments,
+            create_time,
+            modified_time,
+            posted_time,
+            allow_comment,
+            private_moment
+        FROM
+            blog_moment
+    </sql>
+
+    <sql id="momentArchiveDetailSql">
+        SELECT bm2.archive_date,
+               bm.id,
+               bm.content,
+               bm.status,
+               bm.hits,
+               bm.comments,
+               bm.create_time,
+               bm.modified_time,
+               bm.posted_time,
+               bm.allow_comment,
+               bm.private_moment
+        FROM (SELECT DISTINCT FORMATDATETIME(posted_time, 'yyyy-MM') AS archive_date FROM blog_moment) bm2
+                 LEFT JOIN blog_moment bm ON bm2.archive_date = FORMATDATETIME(bm.posted_time, 'yyyy-MM')
+
+    </sql>
+
+    <resultMap id="momentDetail" type="moment">
+        <id property="id" column="id" />
+        <result property="content" column="content" />
+        <result property="status" column="status" javaType="com.qwli7.blog.entity.enums.MomentStatus" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result property="hits" column="hits" />
+        <result property="comments" column="comments" />
+        <result property="createTime" column="create_time" />
+        <result property="modifiedTime" column="modified_time" />
+        <result property="postedTime" column="posted_time" />
+        <result property="allowComment" column="allow_comment" />
+        <result property="privateMoment" column="private_moment" />
+    </resultMap>
+
+    <resultMap id="momentArchiveDetail" type="momentArchiveDetail">
+        <result column="archive_date" property="archiveDate" />
+        <collection property="moments" ofType="moment">
+            <id property="id" column="id" />
+            <result property="content" column="content" />
+            <result property="status" column="status" javaType="com.qwli7.blog.entity.enums.MomentStatus" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+            <result property="hits" column="hits" />
+            <result property="comments" column="comments" />
+            <result property="createTime" column="create_time" />
+            <result property="modifiedTime" column="modified_time" />
+            <result property="postedTime" column="posted_time" />
+            <result property="allowComment" column="allow_comment" />
+            <result property="privateMoment" column="private_moment" />
+        </collection>
+    </resultMap>
+
+    <insert id="insert" parameterType="moment" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO blog_moment (content, status, hits, comments, create_time, modified_time, posted_time, allow_comment, private_moment)
+        VALUES ( #{content}, #{status,javaType=com.qwli7.blog.entity.enums.MomentStatus, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{hits}, #{comments}, now(), now(), #{postedTime}, #{allowComment}, #{privateMoment})
+    </insert>
+
+    <select id="findById" parameterType="integer" resultMap="momentDetail">
+        <include refid="momentDetailSql" />
+        WHERE id = #{id}
+    </select>
+
+    <select id="findLatestMoment" parameterType="momentQueryParams" resultMap="momentDetail">
+        <include refid="momentDetailSql"/>
+        <where>
+            <if test="status != null">
+                AND status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="queryPrivate != null">
+                AND private_moment = #{queryPrivate}
+            </if>
+        </where>
+        ORDER BY id DESC, posted_time DESC LIMIT 1
+    </select>
+
+    <select id="count" resultType="integer" parameterType="momentQueryParams">
+        SELECT COUNT(1) FROM blog_moment
+    </select>
+    <select id="countByDate" parameterType="momentQueryParams" resultType="java.lang.Integer">
+        SELECT COUNT(1) AS archive_date FROM (SELECT DISTINCT FORMATDATETIME(posted_time, 'yyyy-MM') FROM blog_moment
+        <where>
+            <if test="status != null">
+                AND status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="queryPrivate != null">
+                AND private_moment = #{queryPrivate}
+            </if>
+        </where>
+        ) tmp
+
+    </select>
+
+    <select id="findArchiveMoments" parameterType="momentQueryParams" resultMap="momentArchiveDetail">
+        SELECT bm2.archive_date,
+        bm.id,
+        bm.content,
+        bm.hits,
+        bm.comments,
+        bm.create_time,
+        bm.modified_time,
+        bm.posted_time,
+        bm.allow_comment,
+        bm.private_moment
+        FROM (SELECT DISTINCT FORMATDATETIME(posted_time, 'yyyy年MM月') AS archive_date FROM blog_moment
+        <where>
+            <if test="status != null">
+                AND status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="queryPrivate != null">
+                AND private_moment = #{queryPrivate}
+            </if>
+        </where>
+
+        ) bm2
+        LEFT JOIN blog_moment bm ON bm2.archive_date = FORMATDATETIME(bm.posted_time, 'yyyy年MM月')
+        <where>
+            <if test="status != null">
+                AND bm.status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="queryPrivate != null">
+                AND bm.private_moment = #{queryPrivate}
+            </if>
+        </where>
+
+        ORDER BY bm2.archive_date DESC, bm.posted_time DESC
+    </select>
+    <select id="findPreMoment" parameterType="momentNavQueryParam" resultMap="momentDetail">
+        <include refid="momentDetailSql" />
+        <where>
+            <if test="queryPrivate != null">
+                AND private_moment = #{queryPrivate}
+            </if>
+            <if test="status != null">
+                AND status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="currentMoment != null">
+                AND id  <![CDATA[<]]> #{currentMoment.id}
+            </if>
+        </where>
+        ORDER BY posted_time DESC LIMIT 1
+    </select>
+    <select id="findNextMoment" parameterType="momentNavQueryParam" resultMap="momentDetail">
+        <include refid="momentDetailSql" />
+        <where>
+            <if test="queryPrivate != null">
+                AND private_moment = #{queryPrivate}
+            </if>
+            <if test="status != null">
+                AND status = #{status, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="currentMoment != null">
+                AND id  <![CDATA[>]]> #{currentMoment.id}
+            </if>
+        </where>
+        ORDER BY posted_time ASC LIMIT 1
+    </select>
+
+
+    <delete id="deleteById" parameterType="integer">
+        DELETE FROM blog_moment
+        WHERE id = #{id}
+    </delete>
+</mapper>

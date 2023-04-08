@@ -1,0 +1,28 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qwli7.blog.mapper.ArticleTagMapper">
+
+
+    <insert id="insert" parameterType="articleTag" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO blog_article_tag(tag_id, article_id)
+        VALUES (#{tag.id}, #{article.id})
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO blog_article_tag(tag_id, article_id)
+        VALUES
+            <foreach collection="articleTagList" item="item" separator=",">
+               ( #{item.tag.id}, #{item.article.id} )
+            </foreach>
+    </insert>
+
+    <delete id="deleteByArticle" parameterType="article">
+        delete from blog_article_tag where article_id = #{article.id}
+    </delete>
+
+    <delete id="deleteByTag" parameterType="tag">
+        delete from blog_article_tag where tag_id = #{tag.id}
+    </delete>
+
+</mapper>

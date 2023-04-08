@@ -1,5 +1,7 @@
 package com.qwli7.blog.entity.vo;
 
+import com.qwli7.blog.entity.enums.ArticleStatus;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,26 @@ public class ArticleQueryParams extends PageQueryParams implements Serializable 
     private String query;
 
     private Integer categoryId;
+
+    private ArticleStatus status;
+
+    private Boolean queryPrivate;
+
+    public Boolean getQueryPrivate() {
+        return queryPrivate;
+    }
+
+    public void setQueryPrivate(Boolean queryPrivate) {
+        this.queryPrivate = queryPrivate;
+    }
+
+    public ArticleStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ArticleStatus status) {
+        this.status = status;
+    }
 
     public Integer getCategoryId() {
         return categoryId;

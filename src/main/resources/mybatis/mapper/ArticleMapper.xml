@@ -1,0 +1,132 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qwli7.blog.mapper.ArticleMapper">
+
+    <sql id="articleDetailSql">
+        SELECT ba.id             AS article_id,
+               ba.title,
+               ba.content,
+               ba.digest,
+               ba.feature_image,
+               ba.alias,
+               ba.status,
+               ba.hits,
+               ba.comments,
+               ba.create_time,
+               ba.posted_time,
+               ba.modified_time,
+               bc.id             AS category_id,
+               bc.category_name  AS category_name,
+               bc.category_alias AS category_alias
+        FROM blog_article ba
+                 LEFT OUTER JOIN blog_category bc ON ba.category_id = bc.id
+    </sql>
+
+    <sql id="articlePageSql">
+        SELECT ba.id    AS article_id,
+               ba.title,
+               ba.content,
+               ba.digest,
+               ba.feature_image,
+               ba.alias,
+               ba.status,
+               ba.hits,
+               ba.comments,
+               ba.create_time,
+               ba.posted_time,
+               ba.modified_time,
+               ba.private_article,
+               ba.allow_comment,
+               bc.id    AS category_id,
+               bc.category_name  AS category_name,
+               bc.category_alias AS category_alias
+        FROM blog_article ba
+                 LEFT OUTER JOIN blog_category bc ON ba.category_id = bc.id
+    </sql>
+
+    <resultMap id="articleDetail" type="article">
+        <id property="id" column="article_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="digest" column="digest"/>
+        <result property="featureImage" column="feature_image"/>
+        <result property="alias" column="alias"/>
+        <result property="status" column="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+        <result property="hits" column="hits"/>
+        <result property="comments" column="comments"/>
+        <result property="createTime" column="create_time"/>
+        <result property="postedTime" column="posted_time"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="privateArticle" column="private_article"/>
+        <result property="allowComment" column="allow_comment"/>
+        <!--        <result property="tags" typeHandler="com.qwli7.blog.plugin.mybatis.TagsTypeHandler" />-->
+        <association property="category" javaType="category">
+            <result property="id" column="category_id"/>
+            <result property="categoryAlias" column="category_alias"/>
+            <result property="categoryName" column="category_name"/>
+        </association>
+    </resultMap>
+
+
+    <insert id="insert" parameterType="article" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+        INSERT INTO blog_article(title, content, digest, feature_image, alias, status, hits, comments, create_time,
+                                 posted_time, modified_time, category_id, private_article, allow_comment)
+        VALUES (#{title}, #{content}, #{digest}, #{featureImage}, #{alias}, #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{hits}, #{comments}, now(),
+                #{postedTime}, now(), #{category.id}, #{privateArticle}, #{allowComment})
+    </insert>
+
+
+    <select id="findByAlias" parameterType="string" resultMap="articleDetail">
+        <include refid="articleDetailSql"/>
+        WHERE
+        ba.alias = #{alias}
+    </select>
+    <select id="findById" parameterType="integer" resultMap="articleDetail">
+        <include refid="articleDetailSql"/>
+        WHERE
+        ba.id = #{id}
+    </select>
+    <select id="count" parameterType="handledArticleQueryParams" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM blog_article
+        <where>
+            <if test="status != null">
+                AND status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="queryPrivate != null">
+                AND private_article = #{queryPrivate}
+            </if>
+            <if test="category != null">
+                AND category_id = #{category.id}
+            </if>
+        </where>
+    </select>
+    <select id="findArticle" parameterType="handledArticleQueryParams" resultMap="articleDetail">
+        <include refid="articlePageSql"/>
+        <where>
+            <if test="status != null">
+                AND status = #{status,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+            </if>
+            <if test="queryPrivate != null">
+                AND private_article = #{queryPrivate}
+            </if>
+            <if test="category != null">
+                AND category_id = #{category.id}
+            </if>
+        </where>
+        ORDER BY ba.posted_time DESC, ba.id DESC LIMIT #{offsetStart}, #{size}
+    </select>
+
+
+    <update id="updateHits" parameterType="article">
+        UPDATE blog_article
+        SET hits = #{hits}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="integer">
+        DELETE
+        FROM blog_article
+        WHERE id = #{id}
+    </delete>
+</mapper>

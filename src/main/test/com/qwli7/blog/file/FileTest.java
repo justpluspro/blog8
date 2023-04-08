@@ -22,7 +22,7 @@ public class FileTest {
 
     @Test
     public void test_file_walk() throws IOException {
-        Path path = Paths.get("E:\\upload\\");
+        Path path = Paths.get("E:\\qingli12\\arr");
         List<FileInfo> fileInfos = new ArrayList<>();
         Files.walkFileTree(path, new FileVisitor<Path>() {
             @Override

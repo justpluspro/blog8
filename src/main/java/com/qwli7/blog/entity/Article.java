@@ -1,77 +1,66 @@
 package com.qwli7.blog.entity;
 
-import com.qwli7.blog.entity.enums.ArticleState;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.qwli7.blog.entity.enums.ArticleStatus;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * @author qwli7 
+ * @author qwli7
  * @date 2023/2/16 14:58
  * 功能：blog8
  **/
-@Entity(name = "blog_article")
-@Table
 public class Article implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-
-    @Column(name = "title", length = 128, nullable = false)
     private String title;
 
-    @Lob
-    @Column(name = "content", length = 10240, nullable = false)
     private String content;
 
-    @Column(name = "digest", length = 1024)
     private String digest;
 
-    @Column(name = "feature_image", length = 128)
     private String featureImage;
 
-    @Column(name = "alias", length = 32)
     private String alias;
 
-    @Column(name = "state", nullable = false)
-    private ArticleState state;
+    private ArticleStatus status;
 
-    @Column(name = "hits", nullable = false)
     private Integer hits;
 
-    @Column(name = "comments", nullable = false)
     private Integer comments;
 
-    @Column(name = "create_time", nullable = false)
-    @CreationTimestamp
     private LocalDateTime createTime;
 
-    @Column(name = "posted_time")
     private LocalDateTime postedTime;
 
-    @Column(name = "modified_time", nullable = false)
-    @UpdateTimestamp
     private LocalDateTime modifiedTime;
 
-    @OneToOne
-    @JoinColumn(name = "fk_category_id", referencedColumnName = "id")
+    private Boolean privateArticle;
+
+    private Boolean allowComment;
+
     private Category category;
 
+    private Set<Tag> tags = new LinkedHashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "articles_tags",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags;
+    public Boolean getPrivateArticle() {
+        return privateArticle;
+    }
+
+    public void setPrivateArticle(Boolean privateArticle) {
+        this.privateArticle = privateArticle;
+    }
+
+    public Boolean getAllowComment() {
+        return allowComment;
+    }
+
+    public void setAllowComment(Boolean allowComment) {
+        this.allowComment = allowComment;
+    }
 
     public Set<Tag> getTags() {
         return tags;
@@ -129,12 +118,12 @@ public class Article implements Serializable {
         this.alias = alias;
     }
 
-    public ArticleState getState() {
-        return state;
+    public ArticleStatus getStatus() {
+        return status;
     }
 
-    public void setState(ArticleState state) {
-        this.state = state;
+    public void setStatus(ArticleStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getPostedTime() {

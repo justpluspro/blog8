@@ -18,6 +18,19 @@ public class LoginBean implements Serializable {
     @NotBlank(message = "密码不能为空")
     private String password;
 
+    /**
+     * 验证码
+     */
+    private String captchaCode;
+
+    public String getCaptchaCode() {
+        return captchaCode;
+    }
+
+    public void setCaptchaCode(String captchaCode) {
+        this.captchaCode = captchaCode;
+    }
+
     public String getEmail() {
         return email;
     }

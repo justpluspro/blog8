@@ -1,18 +1,18 @@
 package com.qwli7.blog.entity.dto;
 
-import com.qwli7.blog.entity.vo.ArticleQueryParams;
+import com.qwli7.blog.entity.vo.PageQueryParams;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author qwli7 
+ * @author qwli7
  * @date 2023/2/16 18:07
  * 功能：blog8
  **/
 public class PageResult<T> implements Serializable {
 
-    private ArticleQueryParams articleQueryParams;
+    private PageQueryParams pageQueryParams;
 
     private Integer currentPage;
 
@@ -22,20 +22,20 @@ public class PageResult<T> implements Serializable {
 
     private List<T> data;
 
-    public PageResult(ArticleQueryParams articleQueryParams, long count, List<T> data) {
+    public PageResult(PageQueryParams pageQueryParams, long count, List<T> data) {
         this.data = data;
-        this.articleQueryParams = articleQueryParams;
-        this.pageSize = articleQueryParams.getSize();
-        this.currentPage = articleQueryParams.getPage();
+        this.pageQueryParams = pageQueryParams;
+        this.pageSize = pageQueryParams.getSize();
+        this.currentPage = pageQueryParams.getPage();
         this.totalRow = count;
     }
 
-    public ArticleQueryParams getArticleQueryParams() {
-        return articleQueryParams;
+    public PageQueryParams getPageQueryParams() {
+        return pageQueryParams;
     }
 
-    public void setArticleQueryParams(ArticleQueryParams articleQueryParams) {
-        this.articleQueryParams = articleQueryParams;
+    public void setPageQueryParams(PageQueryParams pageQueryParams) {
+        this.pageQueryParams = pageQueryParams;
     }
 
     public Long getTotalRow() {

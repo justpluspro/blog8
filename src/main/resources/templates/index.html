@@ -4,79 +4,166 @@
     <meta charset="UTF-8">
     <title>首页</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="/static/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link href="/static/tabler/css/tabler.min.css" rel="stylesheet"/>
 </head>
-<body>
-
-<header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<body class="antialiased">
+<div class="page">
+    <header class="navbar navbar-expand-md navbar-light d-print-none">
+        <div class="container-xl">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">主页 <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/moments">动态</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/console/articles">控制台</a>
-                    </li>
-                </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+            <div class="collapse navbar-collapse" id="navbar-menu">
+                <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" th:href="@{/}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                         stroke-linecap="round" stroke-linejoin="round"><path stroke="none"
+                                                                                              d="M0 0h24v24H0z"
+                                                                                              fill="none"/><polyline
+                                            points="5 12 3 12 12 3 21 12 19 12"/><path
+                                            d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path
+                                            d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></svg>
+                                </span>
+                                <span class="nav-link-title">主页</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/moments}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                         stroke-linecap="round" stroke-linejoin="round"><path stroke="none"
+                                                                                              d="M0 0h24v24H0z"
+                                                                                              fill="none"/><circle
+                                            cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><line x1="15" y1="15"
+                                                                                                        x2="18.35"
+                                                                                                        y2="18.35"/><line
+                                            x1="9" y1="15" x2="5.65" y2="18.35"/><line x1="5.65" y1="5.65" x2="9"
+                                                                                       y2="9"/><line x1="18.35"
+                                                                                                     y1="5.65" x2="15"
+                                                                                                     y2="9"/></svg>
+                                </span>
+                                <span class="nav-link-title">动态</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/login}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                     stroke-linecap="round" stroke-linejoin="round"><path stroke="none"
+                                                                                          d="M0 0h24v24H0z"
+                                                                                          fill="none"/><path
+                                        d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><path
+                                        d="M20 12h-13l3 -3m0 6l-3 -3"/></svg>
+                            </span>
+                                <span class="nav-link-title">
+                              控制台
+                            </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="ms-md-auto ps-md-4 py-2 py-md-0 me-md-4 order-first order-md-last flex-grow-1 flex-md-grow-0">
+                        <form action="." method="get">
+                            <div class="input-icon">
+                            <span class="input-icon-addon">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                   viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                   stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"
+                                                                                        fill="none"/><circle cx="10"
+                                                                                                             cy="10"
+                                                                                                             r="7"/><line
+                                      x1="21" y1="21" x2="15" y2="15"/></svg>
+                            </span>
+                                <input type="text" class="form-control" placeholder="Search…"
+                                       aria-label="Search in website">
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
-</header>
+    </header>
 
-<main class="mt-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-12 col-xl-8">
-                <div class="mb-4" th:each="article : ${articlePageResult.data}">
-                    <div class="h5">
-                        <a th:href="${#strings.isEmpty(article.alias) ? '/article/'+article.id : '/article/'+article.alias}" th:text="${article.title}">【和ChatGPT对话】帮助新手批量提取图片文字信息到文件</a>
-                    </div>
-                    <div class="text-truncate" th:text="${article.digest}">今天的另外一个案例是模拟有一定编程基础（新新手）的电脑工作者，让 ChatGPT 处理一些图片数据，具体任务是帮助识别学生缴...</div>
-                    <div class="d-flex">
-                        <div class="d-flex">
-                            <div class="align-items-start">
-                                <span class="badge bg-light" th:text="${article.category.categoryName}">ChatGPT</span>
-                                <span class="badge bg-light">Python</span>
-                            </div>
-                            <div class="align-items-end">
-                                <span class="badge bg-info">置顶</span>
-                                <span class="badge bg-warning">推荐</span>
-                                <span class="badge bg-success">原创</span>
+    <div class="page-wrapper">
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card mb-3" th:if="${!#lists.isEmpty(articles.getData())}" th:each="article: ${articles.data}">
+                            <div class="row row-0">
+                                <div class="col-3" th:if="${!#strings.isEmpty(article.featureImage)}">
+                                    <!-- Photo -->
+                                    <img th:src="${article.featureImage}" class="w-100 h-100 object-cover card-img-start" alt="feature image"/>
+                                </div>
+                                <div class="col">
+                                    <div class="card-body">
+                                        <a class="text-decoration-none text-dark card-title h3 fw-bold" th:text="${article.title}" th:href="@{/article/}"></a>
+                                        <div th:utext="${article.digest}"></div>
+                                        <div>
+                                            <span class="badge bg-light"></span>
+                                        </div>
+                                        <p class="text-muted">
+                                            <span th:text="${article.hits}"></span>
+                                            <span th:text="${article.comments}"></span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="mr-auto">
-                            <img class="img-fluid" style="height: 70px !important; width: 116px; !important;"
-                                 src="/Snipaste_2022-10-30_20-55-34.png">
+                        <ul class="pagination justify-content-center mt-2">
+                            <li class="page-item">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4" th:if="${moment != null}">
+                        <div class="cursor-auto" th:data-momentid="${moment.id}">
+                            <div class="h1" th:text="${#temporals.format(moment.postedTime, 'HH:mm')}"></div>
+                            <div th:utext="${moment.content}"></div>
+                            <div class="img-responsive" th:if="${!#strings.isEmpty(moment.featureImage)}">
+                                <img th:src="${moment.featureImage}">
+                            </div>
+                            <div>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="icon icon-tabler icon-tabler-flame" width="24" height="24"
+                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                       <path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"></path>
+                                    </svg>
+                                    <span th:text="${moment.hits}"></span>
+                                </span>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="icon icon-tabler icon-tabler-message-dots" width="24" height="24"
+                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                       <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4"></path>
+                                       <path d="M12 11l0 .01"></path>
+                                       <path d="M8 11l0 .01"></path>
+                                       <path d="M16 11l0 .01"></path>
+                                    </svg>
+                                    <span th:text="${moment.comments}"></span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-4 col-md-4 col-xl-4">
-
-            </div>
         </div>
     </div>
-</main>
 
+</div>
 
 <script type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script type="text/javascript" src="/static/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" ></script>
+<script type="text/javascript" src="/static/tabler/js/tabler.min.js"></script>
 <script>
     let rootPath = '[[@{/}]]';
 
@@ -85,9 +172,9 @@
         document.getElementById('queryForm').submit();
     }
 
-    for(elem of document.querySelectorAll('[data-momentid]')) {
-        elem.addEventListener('click', function() {
-            window.location.href = rootPath + 'moment/'+this.dataset.momentid;
+    for (elem of document.querySelectorAll('[data-momentid]')) {
+        elem.addEventListener('click', function () {
+            window.location.href = rootPath + 'moment/' + this.dataset.momentid;
         });
     }
 </script>

@@ -1,11 +1,7 @@
 package com.qwli7.blog.entity;
 
-import com.qwli7.blog.entity.enums.ArticleState;
-import com.qwli7.blog.entity.enums.MomentState;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.qwli7.blog.entity.enums.MomentStatus;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -14,43 +10,47 @@ import java.time.LocalDateTime;
  * @date 2023/2/17 16:40
  * 功能：blog8
  **/
-@Entity(name = "blog_moment")
-@Table
 public class Moment implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Lob
-    @Column(name = "content", length = 2048, nullable = false)
     private String content;
 
-    @Column(name = "state", nullable = false)
-    private MomentState state;
+    private MomentStatus status;
 
-
-    @Column(name = "create_time", nullable = false)
-    @CreationTimestamp
     private LocalDateTime createTime;
 
-    @Column(name = "posted_time")
     private LocalDateTime postedTime;
 
-    @Column(name = "modified_time", nullable = false)
-    @UpdateTimestamp
     private LocalDateTime modifiedTime;
 
-
-    @Column(name = "hits", nullable = false)
     private Integer hits;
 
-    @Column(name = "comments", nullable = false)
     private Integer comments;
 
-
-    @Column(name = "allow_comment", nullable = false)
     private Boolean allowComment;
+
+    //私人动态
+    private Boolean privateMoment;
+
+    //特征图像，使用内容中的第一张图片作为特征图像
+    private String featureImage;
+
+    public String getFeatureImage() {
+        return featureImage;
+    }
+
+    public void setFeatureImage(String featureImage) {
+        this.featureImage = featureImage;
+    }
+
+    public Boolean getPrivateMoment() {
+        return privateMoment;
+    }
+
+    public void setPrivateMoment(Boolean privateMoment) {
+        this.privateMoment = privateMoment;
+    }
 
     public Integer getId() {
         return id;
@@ -68,12 +68,12 @@ public class Moment implements Serializable {
         this.content = content;
     }
 
-    public MomentState getState() {
-        return state;
+    public MomentStatus getStatus() {
+        return status;
     }
 
-    public void setState(MomentState state) {
-        this.state = state;
+    public void setStatus(MomentStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreateTime() {

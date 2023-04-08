@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Optional;
 
 /**
- * @author qwli7 
+ * @author qwli7
  * @date 2023/2/16 15:01
  * 功能：blog8
  **/
@@ -38,21 +38,13 @@ public class ArticleController {
     }
 
     @GetMapping("article/{id}/edit")
-    public String editArticle(@PathVariable("id") String idStr, Model model) {
-        Integer id = null;
-        try {
-            id = Integer.parseInt(idStr);
-        } catch (NumberFormatException e) {
-            throw new ResourceNotFoundException(Message.ARTICLE_NOT_FOUND);
+    public String editArticle(@PathVariable("id") Integer id, Model model) {
+        Optional<Article> articleEditOp = articleService.getArticleForEdit(id);
+        if (!articleEditOp.isPresent()) {
+            throw new ResourceNotFoundException(Message.ARTICLE_NOT_EXISTS);
         }
-        if(id <= 0) {
-            throw new ResourceNotFoundException(Message.ARTICLE_NOT_FOUND);
-        }
-        Optional<Article> articleOptional = articleService.getArticleForEdit(id);
-        if(!articleOptional.isPresent()) {
-            throw new ResourceNotFoundException(Message.ARTICLE_NOT_FOUND);
-        }
-        model.addAttribute(articleOptional.get());
+        Article article = articleEditOp.get();
+        model.addAttribute("article", article);
         return "console/article_edit";
     }
 }

@@ -63,7 +63,7 @@
         <div class="container-xl">
             <div class="row justify-content-center">
                 <div class="col-12 mb-5">
-                   <div class="markdown-body" th:utext="${moment.content}"></div>
+                   <div class="markdown-body" th:utext="${momentNav.currentMoment.content}"></div>
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -140,7 +140,7 @@
 <!-- Tabler Core -->
 <script type="text/javascript" src="/static/tabler/js/tabler.min.js"></script>
 <script type="text/javascript" src="/static/js/sweetalert2.min.js"></script>
-<script type="text/javascript" src="/static/js/comment.js"></script>
+<!--<script type="text/javascript" src="/static/js/comment.js"></script>-->
 <script>
     let rootPath = '[[@{/}]]';
     let momentId = '[[${moment.id}]]';

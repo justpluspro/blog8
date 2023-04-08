@@ -1,6 +1,6 @@
 package com.qwli7.blog.entity.vo;
 
-import com.qwli7.blog.entity.enums.ArticleState;
+import com.qwli7.blog.entity.enums.ArticleStatus;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
@@ -28,7 +28,7 @@ public class ArticleBean implements Serializable {
     private Integer categoryId;
 
     @NotNull(message = "状态不能为空")
-    private ArticleState articleState;
+    private ArticleStatus articleState;
 
     /**
      * 别名
@@ -59,11 +59,11 @@ public class ArticleBean implements Serializable {
         this.categoryId = categoryId;
     }
 
-    public ArticleState getArticleState() {
+    public ArticleStatus getArticleState() {
         return articleState;
     }
 
-    public void setArticleState(ArticleState articleState) {
+    public void setArticleState(ArticleStatus articleState) {
         this.articleState = articleState;
     }
 

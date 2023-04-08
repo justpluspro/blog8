@@ -8,6 +8,8 @@ public class PageQueryParams implements Serializable {
 
     protected Integer size;
 
+    private Integer offsetStart;
+
     public Integer getPage() {
         if(page == null || page <= 0) {
             this.page = 1;
@@ -24,6 +26,14 @@ public class PageQueryParams implements Serializable {
             this.size = 10;
         }
         return size;
+    }
+
+    public Integer getOffsetStart() {
+        return (getPage()-1) * getSize();
+    }
+
+    public void setOffsetStart(Integer offsetStart) {
+        this.offsetStart = offsetStart;
     }
 
     public void setSize(Integer size) {

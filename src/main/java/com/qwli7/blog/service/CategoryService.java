@@ -1,6 +1,8 @@
 package com.qwli7.blog.service;
 
+import com.qwli7.blog.entity.Category;
 import com.qwli7.blog.entity.dto.CategoryDto;
+import com.qwli7.blog.entity.vo.CategoryQueryParams;
 
 import java.util.List;
 
@@ -11,6 +13,14 @@ import java.util.List;
  **/
 public interface CategoryService {
 
+    List<Category> queryCategory(CategoryQueryParams categoryQueryParams);
 
-    List<CategoryDto> getAll();
+    void addCategory(Category category);
+
+    void updateCategory(Category category);
+
+    void deleteCategory(Integer id);
+
+    Category getCategory(Integer id);
+
 }
